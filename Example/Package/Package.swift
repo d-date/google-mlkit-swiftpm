@@ -17,8 +17,8 @@ let package = Package(
     .target(
       name: "Camera",
       dependencies: [
-        .product(name: "MLKitBarcodeScanning", package: "GoogleMLKitSwiftPM"),
-        .product(name: "MLKitFaceDetection", package: "GoogleMLKitSwiftPM"),
+        .product(name: "MLKitBarcodeScanning", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitFaceDetection", package: "google-mlkit-swiftpm"),
       ]),
     .testTarget(
       name: "CameraTests",
