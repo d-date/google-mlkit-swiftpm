@@ -14,3 +14,4 @@ vendor/
 /build
 /Package.resolved
 !/GoogleMLKit
+/Example/Package/Package.resolved
