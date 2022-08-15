@@ -15,7 +15,6 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/google/promises.git", from: "2.1.0"),
-    .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.19.0"),
     .package(url: "https://github.com/google/GoogleDataTransport.git", from: "9.1.4"),
     .package(url: "https://github.com/google/GoogleUtilities.git", from: "7.7.1"),
     .package(url: "https://github.com/google/gtm-session-fetcher.git", from: "1.7.2"),
