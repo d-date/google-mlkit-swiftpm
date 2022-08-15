@@ -64,5 +64,26 @@ create-xcframework: bootstrap-builder build-cocoapods
 	-ios ./Pods/MLKitVision/Frameworks/MLKitVision.framework \
 	-output GoogleMLKit
 
+archive: create-xcframework
+	@cd ./GoogleMLKit/MLKitBarcodeScanning.xcframework/ios-arm64/MLKitBarcodeScanning.framework \
+	 && mv MLKitBarcodeScanning MLKitBarcodeScanning.o \
+	 && ar r MLKitBarcodeScanning MLKitBarcodeScanning.o \
+	 && ranlib MLKitBarcodeScanning \
+	 && rm MLKitBarcodeScanning.o
+	@cd ./GoogleMLKit/MLKitBarcodeScanning.xcframework/ios-x86_64-simulator/MLKitBarcodeScanning.framework \
+	 && mv MLKitBarcodeScanning MLKitBarcodeScanning.o \
+	 && ar r MLKitBarcodeScanning MLKitBarcodeScanning.o \
+	 && ranlib MLKitBarcodeScanning \
+	 && rm MLKitBarcodeScanning.o
+	@cd ./GoogleMLKit/MLKitFaceDetection.xcframework/ios-arm64/MLKitFaceDetection.framework \
+	 && mv MLKitFaceDetection MLKitFaceDetection.o \
+	 && ar r MLKitFaceDetection MLKitFaceDetection.o \
+	 && ranlib MLKitFaceDetection \
+	 && rm MLKitFaceDetection.o
+	@cd ./GoogleMLKit/MLKitFaceDetection.xcframework/ios-x86_64-simulator/MLKitFaceDetection.framework \
+	 && mv MLKitFaceDetection MLKitFaceDetection.o \
+	 && ar r MLKitFaceDetection MLKitFaceDetection.o \
+	 && ranlib MLKitFaceDetection \
+	 && rm MLKitFaceDetection.o
 .PHONY:
-run: create-xcframework
+run: archive
