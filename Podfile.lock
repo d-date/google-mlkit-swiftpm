@@ -3,14 +3,14 @@ PODS:
     - GoogleUtilities/Environment (~> 7.7)
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
-  - GoogleMLKit/BarcodeScanning (3.1.0):
+  - GoogleMLKit/BarcodeScanning (3.2.0):
     - GoogleMLKit/MLKitCore
-    - MLKitBarcodeScanning (~> 2.1.0)
-  - GoogleMLKit/FaceDetection (3.1.0):
+    - MLKitBarcodeScanning (~> 2.2.0)
+  - GoogleMLKit/FaceDetection (3.2.0):
     - GoogleMLKit/MLKitCore
-    - MLKitFaceDetection (~> 2.1.0)
-  - GoogleMLKit/MLKitCore (3.1.0):
-    - MLKitCommon (~> 7.0.0)
+    - MLKitFaceDetection (~> 2.2.0)
+  - GoogleMLKit/MLKitCore (3.2.0):
+    - MLKitCommon (~> 8.0.0)
   - GoogleToolboxForMac/DebugUtils (2.3.2):
     - GoogleToolboxForMac/Defines (= 2.3.2)
   - GoogleToolboxForMac/Defines (2.3.2)
@@ -33,10 +33,10 @@ PODS:
     - GoogleUtilities/Logger
   - GTMSessionFetcher/Core (1.7.2)
   - MLImage (1.0.0-beta3)
-  - MLKitBarcodeScanning (2.1.0):
-    - MLKitCommon (~> 7.0)
-    - MLKitVision (~> 4.1)
-  - MLKitCommon (7.0.0):
+  - MLKitBarcodeScanning (2.2.0):
+    - MLKitCommon (~> 8.0)
+    - MLKitVision (~> 4.2)
+  - MLKitCommon (8.0.0):
     - GoogleDataTransport (~> 9.0)
     - GoogleToolboxForMac/Logger (~> 2.1)
     - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
@@ -45,15 +45,15 @@ PODS:
     - GoogleUtilitiesComponents (~> 1.0)
     - GTMSessionFetcher/Core (~> 1.1)
     - Protobuf (~> 3.12)
-  - MLKitFaceDetection (2.1.0):
-    - MLKitCommon (~> 7.0)
-    - MLKitVision (~> 4.1)
-  - MLKitVision (4.1.0):
+  - MLKitFaceDetection (2.2.0):
+    - MLKitCommon (~> 8.0)
+    - MLKitVision (~> 4.2)
+  - MLKitVision (4.2.0):
     - GoogleToolboxForMac/Logger (~> 2.1)
     - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
     - GTMSessionFetcher/Core (~> 1.1)
     - MLImage (= 1.0.0-beta3)
-    - MLKitCommon (~> 7.0)
+    - MLKitCommon (~> 8.0)
     - Protobuf (~> 3.12)
   - nanopb (2.30909.0):
     - nanopb/decode (= 2.30909.0)
@@ -64,8 +64,8 @@ PODS:
   - Protobuf (3.21.5)
 
 DEPENDENCIES:
-  - GoogleMLKit/BarcodeScanning
-  - GoogleMLKit/FaceDetection
+  - GoogleMLKit/BarcodeScanning (~> 3.2.0)
+  - GoogleMLKit/FaceDetection (~> 3.2.0)
 
 SPEC REPOS:
   trunk:
@@ -86,20 +86,20 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   GoogleDataTransport: 1c8145da7117bd68bbbed00cf304edb6a24de00f
-  GoogleMLKit: 9d072522949ff0ef4dae5359feaf3db2ef2fa658
+  GoogleMLKit: 0017a6a8372e1a182139b9def4d89be5d87ca5a7
   GoogleToolboxForMac: 8bef7c7c5cf7291c687cf5354f39f9db6399ad34
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
   GoogleUtilitiesComponents: 679b2c881db3b615a2777504623df6122dd20afe
   GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
   MLImage: 489dfec109f21da8621b28d476401aaf7a0d4ff4
-  MLKitBarcodeScanning: 74f43c38f3f85b3f3f332006b20a1a22f404256c
-  MLKitCommon: 20f4aca0ec2bb37cef2b9c211b50586817bac5d3
-  MLKitFaceDetection: 2698721de95805902cac5e018a01fe95dc76d615
-  MLKitVision: 639a171d937241f3fcf92bc1b3ef8f179f49916c
+  MLKitBarcodeScanning: d92fe1911001ec36870162c5a0eb206f612b7169
+  MLKitCommon: f6da6c5659618c070b50a80db01248ebe2964175
+  MLKitFaceDetection: 9f29d8d0bb38911281407e24e74d2e5da812ba8d
+  MLKitVision: 96c96571190b7f63eddf4a12068ce8a8689e0d2c
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
   Protobuf: 7504b04fffcf6662ad629694db8231f5e744327f
 
-PODFILE CHECKSUM: c8faed8033feb768a8152ec7304911ed1444d168
+PODFILE CHECKSUM: c89bcdb03de81a4ec2ef42aa6c4fbd883932bdce
 
 COCOAPODS: 1.11.3
