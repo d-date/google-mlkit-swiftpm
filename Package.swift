@@ -38,7 +38,6 @@ let package = Package(
         "MLKitCommon",
         "GoogleToolboxForMac",
         "GoogleUtilitiesComponents",
-        "PromisesObjC",
         "Protobuf",
         .product(name: "GULAppDelegateSwizzler", package: "GoogleUtilities"),
         .product(name: "GULEnvironment", package: "GoogleUtilities"),
@@ -52,6 +51,7 @@ let package = Package(
         .product(name: "GTMSessionFetcher", package: "gtm-session-fetcher"),
         .product(name: "GoogleDataTransport", package: "GoogleDataTransport"),
         .product(name: "nanopb", package: "nanopb"),
+        .product(name: "FBLPromises", package: "promises"),
       ]),
   ]
 )
