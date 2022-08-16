@@ -13,5 +13,5 @@ vendor/
 .vscode/
 /build
 /Package.resolved
-!/GoogleMLKit
+/GoogleMLKit
 /Example/Package/Package.resolved
