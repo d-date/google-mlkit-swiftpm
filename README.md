@@ -1,4 +1,4 @@
-Google MLKit SwiftPM Wrapper
+# Google MLKit SwiftPM Wrapper
 
 This is experimental project for building MLKit in Swift Package Manager.
 
