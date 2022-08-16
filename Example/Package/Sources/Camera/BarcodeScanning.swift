@@ -1,12 +1,15 @@
 import AVFoundation
-import MLKitBarcodeScanning
+@_exported import MLKitBarcodeScanning
 import MLKitVision
 import UIKit
 
-public struct BarcodeScanningExample {
-  public init() {}
+public struct BarcodeScanClient {
+  public var barcodeScanFromImage: (UIImage, BarcodeFormat) async throws -> [Barcode]
+  public var barcodeScanFromBuffer: (CMSampleBuffer, AVCaptureDevice.Position, BarcodeFormat) async throws -> [Barcode]
+}
 
-  public func barcodeScan(image: UIImage, formats: BarcodeFormat) async throws -> [Barcode] {
+public extension BarcodeScanClient {
+  static var live = Self(barcodeScanFromImage: { image, formats in
     let barcodeOptions = BarcodeScannerOptions(formats: formats)
     let visionImage = VisionImage(image: image)
     visionImage.orientation = image.imageOrientation
@@ -14,12 +17,7 @@ public struct BarcodeScanningExample {
     let barcodeScanner = BarcodeScanner.barcodeScanner(options: barcodeOptions)
     let features = try await barcodeScanner.process(visionImage)
     return features
-  }
-
-  public func barcodeScan(
-    buffer sampleBuffer: CMSampleBuffer, cameraPosition: AVCaptureDevice.Position,
-    formats: BarcodeFormat = .all
-  ) async throws -> [Barcode] {
+  }, barcodeScanFromBuffer: { sampleBuffer, cameraPosition, formats in
     let barcodeOptions = BarcodeScannerOptions(formats: formats)
     let visionImage = VisionImage(buffer: sampleBuffer)
     visionImage.orientation = await imageOrientation(
@@ -29,24 +27,5 @@ public struct BarcodeScanningExample {
     let barcodeScanner = BarcodeScanner.barcodeScanner(options: barcodeOptions)
     let features = try await barcodeScanner.process(visionImage)
     return features
-  }
-
-  func imageOrientation(
-    deviceOrientation: UIDeviceOrientation, cameraPosition: AVCaptureDevice.Position
-  ) -> UIImage.Orientation {
-    switch deviceOrientation {
-    case .portrait:
-      return cameraPosition == .front ? .leftMirrored : .right
-    case .landscapeLeft:
-      return cameraPosition == .front ? .downMirrored : .up
-    case .portraitUpsideDown:
-      return cameraPosition == .front ? .rightMirrored : .left
-    case .landscapeRight:
-      return cameraPosition == .front ? .upMirrored : .down
-    case .faceDown, .faceUp, .unknown:
-      return .up
-    @unknown default:
-      fatalError()
-    }
-  }
+  })
 }
