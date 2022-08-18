@@ -11,7 +11,8 @@ let package = Package(
       targets: ["Camera"])
   ],
   dependencies: [
-    .package(path: "../../")
+    .package(path: "../../"),
+    .package(url: "https://github.com/firebase/firebase-ios-sdk", from: "9.2.0"),
   ],
   targets: [
     .target(
@@ -19,6 +20,7 @@ let package = Package(
       dependencies: [
         .product(name: "MLKitBarcodeScanning", package: "google-mlkit-swiftpm"),
         .product(name: "MLKitFaceDetection", package: "google-mlkit-swiftpm"),
+        .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
       ]),
     .testTarget(
       name: "CameraTests",
