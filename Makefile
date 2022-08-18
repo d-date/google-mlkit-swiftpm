@@ -41,10 +41,6 @@ create-xcframework: bootstrap-builder build-cocoapods
 		-framework Pods/Pods/Build/Release-iphoneos/GoogleUtilitiesComponents/GoogleUtilitiesComponents.framework \
 		-output GoogleMLKit/GoogleUtilitiesComponents.xcframework
 	@xcodebuild -create-xcframework \
-		-framework Pods/Pods/Build/Release-iphonesimulator/PromisesObjC/FBLPromises.framework \
-		-framework Pods/Pods/Build/Release-iphoneos/PromisesObjC/FBLPromises.framework \
-		-output GoogleMLKit/PromisesObjC.xcframework
-	@xcodebuild -create-xcframework \
 		-framework Pods/Pods/Build/Release-iphonesimulator/Protobuf/Protobuf.framework \
 		-framework Pods/Pods/Build/Release-iphoneos/Protobuf/Protobuf.framework \
 		-output GoogleMLKit/Protobuf.xcframework

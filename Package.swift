@@ -30,7 +30,6 @@ let package = Package(
     .binaryTarget(name: "GoogleToolboxForMac", path: "GoogleMLKit/GoogleToolboxForMac.xcframework"),
     .binaryTarget(
       name: "GoogleUtilitiesComponents", path: "GoogleMLKit/GoogleUtilitiesComponents.xcframework"),
-    .binaryTarget(name: "PromisesObjC", path: "GoogleMLKit/PromisesObjC.xcframework"),
     .binaryTarget(name: "Protobuf", path: "GoogleMLKit/Protobuf.xcframework"),
     .target(
       name: "Common",
