@@ -9,12 +9,21 @@ This is experimental project for building MLKit in Swift Package Manager.
 - Ruby
 - bundler
 - CocoaPods (install via bundler)
+- Git-lfs
 
 ## Getting Started
 
 ```sh
 git submodule update --remote
 make run
+```
+
+## Note: How to install to your project
+Since built binaries are very large for GitHub repo and not available in Swift PM directly, please clone this repo as submodule as your project.
+
+```
+git submodule add https://github.com/d-date/google-mlkit-swiftpm
+cd google-mlkit-swiftpm && make run
 ```
 
 ## Limitation
