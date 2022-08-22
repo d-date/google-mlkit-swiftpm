@@ -2,6 +2,13 @@
 
 This is experimental project for building MLKit in Swift Package Manager.
 
+## IMPORTANT about Donation
+
+I need GitHub sponsor to maintain this repo due to be used git lfs with paid plan.
+When I reach to the maximum quota, I'll remove artifacts from this repo.
+
+https://github.com/d-date
+
 ## Requirements
 
 - iOS 14 and later
@@ -34,3 +41,4 @@ cd google-mlkit-swiftpm && make run
 ## Example
 
 Open `Example/Example.xcworkspace` and fixing code signing to yours.
+
