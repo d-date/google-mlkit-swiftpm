@@ -1,6 +1,0 @@
-framework module GoogleUtilitiesComponents {
-  umbrella header "GoogleUtilitiesComponents-umbrella.h"
-
-  export *
-  module * { export * }
-}
