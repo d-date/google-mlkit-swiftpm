@@ -9,9 +9,17 @@ This is experimental project for building MLKit in Swift Package Manager.
 
 ## Installation
 
+### Use Swift Package Manager to install
+
 ```swift
     .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "3.2.1")
 ```
+
+### Link `.bundle` to your project
+
+The `MLKitFaceDetection` contains `GoogleMVFaceDetectorResources.bundle`. Since the bundle can't be introduced via Swift PM, you need to link to your project by yourself.
+
+Download `GoogleMVFaceDetectorResources.bundle` from [Release][https://github.com/d-date/google-mlkit-swiftpm/releases/download/3.2.0/GoogleMVFaceDetectorResources.bundle.zip] and add to your Xcode project and make it available in your build target.
 
 ## Limitation
 
