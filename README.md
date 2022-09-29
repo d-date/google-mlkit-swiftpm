@@ -6,15 +6,11 @@ This is experimental project for building MLKit in Swift Package Manager.
 
 - iOS 14 and later
 - Xcode 13.2.1 and later
-- Ruby
-- bundler
-- CocoaPods (install via bundler)
 
-## Getting Started
+## Installation
 
-```sh
-git submodule update --remote
-make run
+```swift
+    .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "3.2.1")
 ```
 
 ## Limitation
