@@ -13,6 +13,26 @@
 		D55A934C2899396300177BD8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D55A934B2899396300177BD8 /* Preview Assets.xcassets */; };
 		D57545FD2BC508DD00CBFC5A /* GoogleMVFaceDetectorResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D57545FC2BC508DD00CBFC5A /* GoogleMVFaceDetectorResources.bundle */; };
 		D5A77F2D28AA8F22007019A8 /* Camera in Frameworks */ = {isa = PBXBuildFile; productRef = D5A77F2C28AA8F22007019A8 /* Camera */; };
+		D5FA2A9328F1C71E00BEFB62 /* MLKitExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5FA2A9228F1C71E00BEFB62 /* MLKitExtensions.swift */; };
+		D5FA2A9528F1C72F00BEFB62 /* UIUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5FA2A9428F1C72F00BEFB62 /* UIUtilities.swift */; };
+		D5FA2A9728F1C75400BEFB62 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5FA2A9628F1C75400BEFB62 /* ViewController.swift */; };
+		D5FA2A9928F1C77000BEFB62 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5FA2A9828F1C77000BEFB62 /* CameraViewController.swift */; };
+		D5FA2AAB28F280FF00BEFB62 /* bird.tflite in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2A9B28F280F900BEFB62 /* bird.tflite */; };
+		D5FA2AAC28F280FF00BEFB62 /* liberty.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2A9C28F280FA00BEFB62 /* liberty.jpg */; };
+		D5FA2AAD28F280FF00BEFB62 /* japanese_sparse.png in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2A9D28F280FA00BEFB62 /* japanese_sparse.png */; };
+		D5FA2AAE28F280FF00BEFB62 /* japanese.png in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2A9E28F280FA00BEFB62 /* japanese.png */; };
+		D5FA2AAF28F280FF00BEFB62 /* grace_hopper.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2A9F28F280FB00BEFB62 /* grace_hopper.jpg */; };
+		D5FA2AB028F280FF00BEFB62 /* devanagari_sparse.png in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA028F280FB00BEFB62 /* devanagari_sparse.png */; };
+		D5FA2AB128F280FF00BEFB62 /* beach.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA128F280FC00BEFB62 /* beach.jpg */; };
+		D5FA2AB228F280FF00BEFB62 /* devanagari.png in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA228F280FC00BEFB62 /* devanagari.png */; };
+		D5FA2AB328F280FF00BEFB62 /* chinese_sparse.png in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA328F280FC00BEFB62 /* chinese_sparse.png */; };
+		D5FA2AB428F280FF00BEFB62 /* korean_sparse.png in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA428F280FD00BEFB62 /* korean_sparse.png */; };
+		D5FA2AB528F280FF00BEFB62 /* bird.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA528F280FD00BEFB62 /* bird.jpg */; };
+		D5FA2AB628F280FF00BEFB62 /* korean.png in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA628F280FE00BEFB62 /* korean.png */; };
+		D5FA2AB728F280FF00BEFB62 /* image_has_text.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA728F280FE00BEFB62 /* image_has_text.jpg */; };
+		D5FA2AB828F280FF00BEFB62 /* chinese.png in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA828F280FE00BEFB62 /* chinese.png */; };
+		D5FA2AB928F280FF00BEFB62 /* qr_code.jpg in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AA928F280FF00BEFB62 /* qr_code.jpg */; };
+		D5FA2ABA28F280FF00BEFB62 /* barcode_128.png in Resources */ = {isa = PBXBuildFile; fileRef = D5FA2AAA28F280FF00BEFB62 /* barcode_128.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,6 +56,26 @@
 		D55A93492899396300177BD8 /* Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Example.entitlements; sourceTree = "<group>"; };
 		D55A934B2899396300177BD8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D57545FC2BC508DD00CBFC5A /* GoogleMVFaceDetectorResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = GoogleMVFaceDetectorResources.bundle; path = "../Pods/Pods/Build/Release-iphoneos/MLKitFaceDetection/GoogleMVFaceDetectorResources.bundle"; sourceTree = "<group>"; };
+		D5FA2A9228F1C71E00BEFB62 /* MLKitExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLKitExtensions.swift; sourceTree = "<group>"; };
+		D5FA2A9428F1C72F00BEFB62 /* UIUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtilities.swift; sourceTree = "<group>"; };
+		D5FA2A9628F1C75400BEFB62 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D5FA2A9828F1C77000BEFB62 /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
+		D5FA2A9B28F280F900BEFB62 /* bird.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = bird.tflite; sourceTree = "<group>"; };
+		D5FA2A9C28F280FA00BEFB62 /* liberty.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = liberty.jpg; sourceTree = "<group>"; };
+		D5FA2A9D28F280FA00BEFB62 /* japanese_sparse.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = japanese_sparse.png; sourceTree = "<group>"; };
+		D5FA2A9E28F280FA00BEFB62 /* japanese.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = japanese.png; sourceTree = "<group>"; };
+		D5FA2A9F28F280FB00BEFB62 /* grace_hopper.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = grace_hopper.jpg; sourceTree = "<group>"; };
+		D5FA2AA028F280FB00BEFB62 /* devanagari_sparse.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = devanagari_sparse.png; sourceTree = "<group>"; };
+		D5FA2AA128F280FC00BEFB62 /* beach.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = beach.jpg; sourceTree = "<group>"; };
+		D5FA2AA228F280FC00BEFB62 /* devanagari.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = devanagari.png; sourceTree = "<group>"; };
+		D5FA2AA328F280FC00BEFB62 /* chinese_sparse.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chinese_sparse.png; sourceTree = "<group>"; };
+		D5FA2AA428F280FD00BEFB62 /* korean_sparse.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = korean_sparse.png; sourceTree = "<group>"; };
+		D5FA2AA528F280FD00BEFB62 /* bird.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = bird.jpg; sourceTree = "<group>"; };
+		D5FA2AA628F280FE00BEFB62 /* korean.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = korean.png; sourceTree = "<group>"; };
+		D5FA2AA728F280FE00BEFB62 /* image_has_text.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = image_has_text.jpg; sourceTree = "<group>"; };
+		D5FA2AA828F280FE00BEFB62 /* chinese.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = chinese.png; sourceTree = "<group>"; };
+		D5FA2AA928F280FF00BEFB62 /* qr_code.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = qr_code.jpg; sourceTree = "<group>"; };
+		D5FA2AAA28F280FF00BEFB62 /* barcode_128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = barcode_128.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +111,7 @@
 		D55A93422899396100177BD8 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				D5FA2A9128F1C71000BEFB62 /* VisionExample */,
 				D55A93432899396100177BD8 /* ExampleApp.swift */,
 				D55A93452899396100177BD8 /* ContentView.swift */,
 				D55A93472899396300177BD8 /* Assets.xcassets */,
@@ -93,6 +134,41 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D5FA2A9128F1C71000BEFB62 /* VisionExample */ = {
+			isa = PBXGroup;
+			children = (
+				D5FA2A9A28F280E700BEFB62 /* Resources */,
+				D5FA2A9228F1C71E00BEFB62 /* MLKitExtensions.swift */,
+				D5FA2A9428F1C72F00BEFB62 /* UIUtilities.swift */,
+				D5FA2A9628F1C75400BEFB62 /* ViewController.swift */,
+				D5FA2A9828F1C77000BEFB62 /* CameraViewController.swift */,
+			);
+			path = VisionExample;
+			sourceTree = "<group>";
+		};
+		D5FA2A9A28F280E700BEFB62 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D5FA2AAA28F280FF00BEFB62 /* barcode_128.png */,
+				D5FA2AA128F280FC00BEFB62 /* beach.jpg */,
+				D5FA2AA528F280FD00BEFB62 /* bird.jpg */,
+				D5FA2A9B28F280F900BEFB62 /* bird.tflite */,
+				D5FA2AA328F280FC00BEFB62 /* chinese_sparse.png */,
+				D5FA2AA828F280FE00BEFB62 /* chinese.png */,
+				D5FA2AA028F280FB00BEFB62 /* devanagari_sparse.png */,
+				D5FA2AA228F280FC00BEFB62 /* devanagari.png */,
+				D5FA2A9F28F280FB00BEFB62 /* grace_hopper.jpg */,
+				D5FA2AA728F280FE00BEFB62 /* image_has_text.jpg */,
+				D5FA2A9D28F280FA00BEFB62 /* japanese_sparse.png */,
+				D5FA2A9E28F280FA00BEFB62 /* japanese.png */,
+				D5FA2AA428F280FD00BEFB62 /* korean_sparse.png */,
+				D5FA2AA628F280FE00BEFB62 /* korean.png */,
+				D5FA2A9C28F280FA00BEFB62 /* liberty.jpg */,
+				D5FA2AA928F280FF00BEFB62 /* qr_code.jpg */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -158,8 +234,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				D55A934C2899396300177BD8 /* Preview Assets.xcassets in Resources */,
+				D5FA2ABA28F280FF00BEFB62 /* barcode_128.png in Resources */,
+				D5FA2AB128F280FF00BEFB62 /* beach.jpg in Resources */,
+				D5FA2AB628F280FF00BEFB62 /* korean.png in Resources */,
+				D5FA2AB728F280FF00BEFB62 /* image_has_text.jpg in Resources */,
+				D5FA2AAE28F280FF00BEFB62 /* japanese.png in Resources */,
 				D55A93482899396300177BD8 /* Assets.xcassets in Resources */,
 				D57545FD2BC508DD00CBFC5A /* GoogleMVFaceDetectorResources.bundle in Resources */,
+				D5FA2AB228F280FF00BEFB62 /* devanagari.png in Resources */,
+				D5FA2AAD28F280FF00BEFB62 /* japanese_sparse.png in Resources */,
+				D5FA2AB428F280FF00BEFB62 /* korean_sparse.png in Resources */,
+				D5FA2AB828F280FF00BEFB62 /* chinese.png in Resources */,
+				D5FA2AAB28F280FF00BEFB62 /* bird.tflite in Resources */,
+				D5FA2AB028F280FF00BEFB62 /* devanagari_sparse.png in Resources */,
+				D5FA2AB328F280FF00BEFB62 /* chinese_sparse.png in Resources */,
+				D5FA2AAF28F280FF00BEFB62 /* grace_hopper.jpg in Resources */,
+				D5FA2AB928F280FF00BEFB62 /* qr_code.jpg in Resources */,
+				D5FA2AB528F280FF00BEFB62 /* bird.jpg in Resources */,
+				D5FA2AAC28F280FF00BEFB62 /* liberty.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -170,8 +262,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D5FA2A9728F1C75400BEFB62 /* ViewController.swift in Sources */,
 				D55A93462899396100177BD8 /* ContentView.swift in Sources */,
 				D55A93442899396100177BD8 /* ExampleApp.swift in Sources */,
+				D5FA2A9528F1C72F00BEFB62 /* UIUtilities.swift in Sources */,
+				D5FA2A9328F1C71E00BEFB62 /* MLKitExtensions.swift in Sources */,
+				D5FA2A9928F1C77000BEFB62 /* CameraViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,6 +396,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera are used to get your image for anlayze with Vision API";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Photo Library are used to get your image for anlayze with Vision API";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -310,11 +408,15 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-all_load",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.d-date.mlkit-swiftpm-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -340,6 +442,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera are used to get your image for anlayze with Vision API";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Photo Library are used to get your image for anlayze with Vision API";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -350,11 +454,15 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-all_load",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.d-date.mlkit-swiftpm-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
