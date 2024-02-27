@@ -18,7 +18,7 @@ let package = Package(
     .package(url: "https://github.com/google/GoogleDataTransport.git", from: "9.2.0"),
     .package(url: "https://github.com/google/GoogleUtilities.git", from: "7.7.1"),
     .package(url: "https://github.com/google/gtm-session-fetcher.git", from: "1.7.2"),
-    .package(url: "https://github.com/firebase/nanopb.git", .upToNextMinor(from: "2.30909.0")),
+    .package(url: "https://github.com/firebase/nanopb.git", .upToNextMinor(from: "2.30910.0")),
   ],
   targets: [
     .binaryTarget(name: "MLImage", url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/3.2.0/MLImage.xcframework.zip", checksum: "d360820204628a8d6d9a915d0bd9ed78aec6ed0eeed7c84c1e78bd85909bbe37"),
