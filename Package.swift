@@ -14,11 +14,11 @@ let package = Package(
       targets: ["MLKitFaceDetection", "MLImage", "MLKitVision", "Common"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/google/promises.git", from: "2.1.1"),
-    .package(url: "https://github.com/google/GoogleDataTransport.git", from: "9.2.0"),
-    .package(url: "https://github.com/google/GoogleUtilities.git", from: "7.7.1"),
-    .package(url: "https://github.com/google/gtm-session-fetcher.git", from: "1.7.2"),
-    .package(url: "https://github.com/firebase/nanopb.git", .upToNextMinor(from: "2.30909.0")),
+    .package(url: "https://github.com/google/promises.git", exact: "2.4.0"),
+    .package(url: "https://github.com/google/GoogleDataTransport.git", exact: "9.4.0"),
+    .package(url: "https://github.com/google/GoogleUtilities.git", exact: "7.13.0"),
+    .package(url: "https://github.com/google/gtm-session-fetcher.git", from: "2.3.0"),
+    .package(url: "https://github.com/firebase/nanopb.git", .upToNextMinor(from: "2.30910.0")),
   ],
   targets: [
     .binaryTarget(name: "MLImage", path: "GoogleMLKit/MLImage.xcframework"),
@@ -30,14 +30,12 @@ let package = Package(
     .binaryTarget(name: "GoogleToolboxForMac", path: "GoogleMLKit/GoogleToolboxForMac.xcframework"),
     .binaryTarget(
       name: "GoogleUtilitiesComponents", path: "GoogleMLKit/GoogleUtilitiesComponents.xcframework"),
-    .binaryTarget(name: "Protobuf", path: "GoogleMLKit/Protobuf.xcframework"),
     .target(
       name: "Common",
       dependencies: [
         "MLKitCommon",
         "GoogleToolboxForMac",
         "GoogleUtilitiesComponents",
-        "Protobuf",
         .product(name: "GULAppDelegateSwizzler", package: "GoogleUtilities"),
         .product(name: "GULEnvironment", package: "GoogleUtilities"),
         .product(name: "GULISASwizzler", package: "GoogleUtilities"),
