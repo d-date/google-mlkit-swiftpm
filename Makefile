@@ -75,5 +75,13 @@ archive: create-xcframework
 	 && ar r MLKitFaceDetection MLKitFaceDetection.o \
 	 && ranlib MLKitFaceDetection \
 	 && rm MLKitFaceDetection.o
+	@cd ./GoogleMLKit \
+	 && zip -r MLKitBarcodeScanning.xcframework.zip MLKitBarcodeScanning.xcframework \
+	 && zip -r MLKitFaceDetection.xcframework.zip MLKitFaceDetection.xcframework \
+	 && zip -r GoogleToolboxForMac.xcframework.zip GoogleToolboxForMac.xcframework \
+	 && zip -r GoogleUtilitiesComponents.xcframework.zip GoogleUtilitiesComponents.xcframework \
+	 && zip -r MLImage.xcframework.zip MLImage.xcframework \
+	 && zip -r MLKitCommon.xcframework.zip MLKitCommon.xcframework \
+	 && zip -r MLKitVision.xcframework.zip MLKitVision.xcframework
 .PHONY:
 run: archive
