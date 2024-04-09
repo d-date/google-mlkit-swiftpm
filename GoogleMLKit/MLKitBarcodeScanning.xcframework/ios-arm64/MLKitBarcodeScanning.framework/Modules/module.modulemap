@@ -5,6 +5,7 @@ framework module MLKitBarcodeScanning {
   link "c++"
   link "dl"
   link "m"
+  link "pthread"
   link "z"
   link framework "AVFoundation"
   link framework "Accelerate"

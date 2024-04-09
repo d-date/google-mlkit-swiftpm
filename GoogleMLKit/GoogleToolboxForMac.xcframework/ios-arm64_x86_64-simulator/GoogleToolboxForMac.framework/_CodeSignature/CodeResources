@@ -36,13 +36,17 @@
 		<data>
 		ips8wXBEK8crK2K0oS0JPgd8L9o=
 		</data>
+		<key>Headers/GTMStringEncoding.h</key>
+		<data>
+		Ybo+2cQFEDsVVsx/lJEkEanERtc=
+		</data>
 		<key>Headers/GoogleToolboxForMac-umbrella.h</key>
 		<data>
 		QBKh/w7BGyfIXjdy9CILJn4LV+I=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		FCigDn9Jpx31Yta3wvyzNSPlyCg=
+		/9QH29qwRuJlq5y7fjraIlCenRo=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -105,6 +109,13 @@
 			<key>hash2</key>
 			<data>
 			UutpyHfK9Mdw/DONimY7sMbOh5k3QMLCdhY4WsHT8qE=
+			</data>
+		</dict>
+		<key>Headers/GTMStringEncoding.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			FPNHPaZhcfXt38QRM4F9Rbw1ghPvaLNlsi7F+TWbYwg=
 			</data>
 		</dict>
 		<key>Headers/GoogleToolboxForMac-umbrella.h</key>
