@@ -17,7 +17,7 @@ let package = Package(
     .package(url: "https://github.com/google/promises.git", exact: "2.4.0"),
     .package(url: "https://github.com/google/GoogleDataTransport.git", exact: "9.4.0"),
     .package(url: "https://github.com/google/GoogleUtilities.git", exact: "7.13.0"),
-    .package(url: "https://github.com/google/gtm-session-fetcher.git", from: "2.3.0"),
+    .package(url: "https://github.com/google/gtm-session-fetcher.git", from: "3.3.2"),
     .package(url: "https://github.com/firebase/nanopb.git", .upToNextMinor(from: "2.30910.0")),
   ],
   targets: [
