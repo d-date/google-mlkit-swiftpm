@@ -49,12 +49,10 @@ create-xcframework: bootstrap-builder build-cocoapods
 	-output GoogleMLKit
 	@xcframework-maker/.build/release/make-xcframework \
 	-ios ./Pods/MLKitBarcodeScanning/Frameworks/MLKitBarcodeScanning.framework \
-	-output GoogleMLKit \
-	-arm64sim
+	-output GoogleMLKit
 	@xcframework-maker/.build/release/make-xcframework \
 	-ios ./Pods/MLKitFaceDetection/Frameworks/MLKitFaceDetection.framework \
-	-output GoogleMLKit \
-	-arm64sim
+	-output GoogleMLKit
 
 archive: create-xcframework
 	@cd ./GoogleMLKit/MLKitBarcodeScanning.xcframework/ios-arm64/MLKitBarcodeScanning.framework \
