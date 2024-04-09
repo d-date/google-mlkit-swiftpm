@@ -11,7 +11,7 @@
 		D55A93462899396100177BD8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55A93452899396100177BD8 /* ContentView.swift */; };
 		D55A93482899396300177BD8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D55A93472899396300177BD8 /* Assets.xcassets */; };
 		D55A934C2899396300177BD8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D55A934B2899396300177BD8 /* Preview Assets.xcassets */; };
-		D5A77F2728AA566A007019A8 /* GoogleMVFaceDetectorResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D5A77F2628AA566A007019A8 /* GoogleMVFaceDetectorResources.bundle */; };
+		D57545FD2BC508DD00CBFC5A /* GoogleMVFaceDetectorResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D57545FC2BC508DD00CBFC5A /* GoogleMVFaceDetectorResources.bundle */; };
 		D5A77F2D28AA8F22007019A8 /* Camera in Frameworks */ = {isa = PBXBuildFile; productRef = D5A77F2C28AA8F22007019A8 /* Camera */; };
 /* End PBXBuildFile section */
 
@@ -35,7 +35,7 @@
 		D55A93472899396300177BD8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D55A93492899396300177BD8 /* Example.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Example.entitlements; sourceTree = "<group>"; };
 		D55A934B2899396300177BD8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		D5A77F2628AA566A007019A8 /* GoogleMVFaceDetectorResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = GoogleMVFaceDetectorResources.bundle; path = "../Pods/Pods/Build/Release-iphoneos/MLKitFaceDetection/GoogleMVFaceDetectorResources.bundle"; sourceTree = "<group>"; };
+		D57545FC2BC508DD00CBFC5A /* GoogleMVFaceDetectorResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = GoogleMVFaceDetectorResources.bundle; path = "../Pods/Pods/Build/Release-iphoneos/MLKitFaceDetection/GoogleMVFaceDetectorResources.bundle"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +53,7 @@
 		D55A93372899396100177BD8 = {
 			isa = PBXGroup;
 			children = (
-				D5A77F2628AA566A007019A8 /* GoogleMVFaceDetectorResources.bundle */,
+				D57545FC2BC508DD00CBFC5A /* GoogleMVFaceDetectorResources.bundle */,
 				D55A93422899396100177BD8 /* Example */,
 				D55A93412899396100177BD8 /* Products */,
 				D55A935228993CE500177BD8 /* Frameworks */,
@@ -159,7 +159,7 @@
 			files = (
 				D55A934C2899396300177BD8 /* Preview Assets.xcassets in Resources */,
 				D55A93482899396300177BD8 /* Assets.xcassets in Resources */,
-				D5A77F2728AA566A007019A8 /* GoogleMVFaceDetectorResources.bundle in Resources */,
+				D57545FD2BC508DD00CBFC5A /* GoogleMVFaceDetectorResources.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
