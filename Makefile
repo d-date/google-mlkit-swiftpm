@@ -27,8 +27,13 @@ build-cocoapods: bootstrap-cocoapods
 
 # copy-resource-bundle:
 # 	@cp -rf "./Pods/Pods/Build/Release-iphoneos/MLKitFaceDetection/GoogleMVFaceDetectorResources.bundle" "./Sources/FaceDetection/GoogleMVFaceDetectorResources.bundle"
-
-create-xcframework: bootstrap-builder build-cocoapods
+prepare-info-plist:
+	@cp -rf "./Resources/MLKitCommon-Info.plist" "./Pods/MLKitCommon/Frameworks/MLKitCommon.framework/Info.plist"
+	@cp -rf "./Resources/MLKitBarcodeScanning-Info.plist" "./Pods/MLKitBarcodeScanning/Frameworks/MLKitBarcodeScanning.framework/Info.plist"
+	@cp -rf "./Resources/MLKitFaceDetection-Info.plist" "./Pods/MLKitFaceDetection/Frameworks/MLKitFaceDetection.framework/Info.plist"
+	@cp -rf "./Resources/MLKitVision-Info.plist" "./Pods/MLKitVision/Frameworks/MLKitVision.framework/Info.plist"
+	@cp -rf "./Resources/MLImage-Info.plist" "./Pods/MLImage/Frameworks/MLImage.framework/Info.plist"
+create-xcframework: bootstrap-builder build-cocoapods prepare-info-plist
 	@rm -rf GoogleMLKit
 	@xcodebuild -create-xcframework \
 		-framework Pods/Pods/Build/Release-iphonesimulator/GoogleToolboxForMac/GoogleToolboxForMac.framework \
@@ -75,5 +80,13 @@ archive: create-xcframework
 	 && ar r MLKitFaceDetection MLKitFaceDetection.o \
 	 && ranlib MLKitFaceDetection \
 	 && rm MLKitFaceDetection.o
+	@cd ./GoogleMLKit \
+	 && zip -r MLKitBarcodeScanning.xcframework.zip MLKitBarcodeScanning.xcframework \
+	 && zip -r MLKitFaceDetection.xcframework.zip MLKitFaceDetection.xcframework \
+	 && zip -r GoogleToolboxForMac.xcframework.zip GoogleToolboxForMac.xcframework \
+	 && zip -r GoogleUtilitiesComponents.xcframework.zip GoogleUtilitiesComponents.xcframework \
+	 && zip -r MLImage.xcframework.zip MLImage.xcframework \
+	 && zip -r MLKitCommon.xcframework.zip MLKitCommon.xcframework \
+	 && zip -r MLKitVision.xcframework.zip MLKitVision.xcframework
 .PHONY:
 run: archive
