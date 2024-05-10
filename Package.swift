@@ -16,7 +16,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/google/promises.git", exact: "2.4.0"),
     .package(url: "https://github.com/google/GoogleDataTransport.git", exact: "9.4.0"),
-    .package(url: "https://github.com/google/GoogleUtilities.git", exact: "7.13.2"),
+    .package(url: "https://github.com/google/GoogleUtilities.git", exact: "7.13.3"),
     .package(url: "https://github.com/google/gtm-session-fetcher.git", exact: "3.4.1"),
     .package(url: "https://github.com/firebase/nanopb.git", exact: "2.30910.0"),
   ],
