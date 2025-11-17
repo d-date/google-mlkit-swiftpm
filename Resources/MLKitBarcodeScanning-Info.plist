@@ -21,13 +21,13 @@
 <key>CFBundlePackageType</key>
 <string>FMWK</string>
 <key>CFBundleShortVersionString</key>
-<string>5.0.0</string>
+<string>6.0.0</string>
 <key>CFBundleSupportedPlatforms</key>
 <array>
 <string>iPhoneOS</string>
 </array>
 <key>CFBundleInfoDictionaryVersion</key>
-<string>6.0</string>
+<string>7.0</string>
 <key>CFBundleExecutable</key>
 <string>MLKitBarcodeScanning</string>
 <key>DTCompiler</key>
@@ -37,7 +37,7 @@
 <string>arm64</string>
 </array>
 <key>MinimumOSVersion</key>
-<string>12.0</string>
+<string>15.5</string>
 <key>CFBundleSignature</key>
 <string>????</string>
 <key>DTPlatformVersion</key>
