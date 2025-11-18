@@ -18,7 +18,7 @@ let package = Package(
     .package(url: "https://github.com/google/GoogleDataTransport.git", exact: "10.1.0"),
     .package(url: "https://github.com/google/GoogleUtilities.git", exact: "8.1.0"),
     .package(url: "https://github.com/google/gtm-session-fetcher.git", exact: "3.5.0"),
-    .package(url: "https://github.com/nanopb/nanopb.git", revision: "b7e1104502eca3a213b46303391ca4d3bc8ddec1"),
+    .package(url: "https://github.com/firebase/nanopb.git", exact: "2.30910.0"),
   ],
   targets: [
     // For debugging
@@ -76,10 +76,8 @@ let package = Package(
       dependencies: [
         "MLKitCommon",
         "GoogleToolboxForMac",
-        "GoogleUtilitiesComponents",
         .product(name: "GULAppDelegateSwizzler", package: "GoogleUtilities"),
         .product(name: "GULEnvironment", package: "GoogleUtilities"),
-        .product(name: "GULISASwizzler", package: "GoogleUtilities"),
         .product(name: "GULLogger", package: "GoogleUtilities"),
         .product(name: "GULMethodSwizzler", package: "GoogleUtilities"),
         .product(name: "GULNSData", package: "GoogleUtilities"),
