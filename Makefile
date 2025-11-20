@@ -83,5 +83,11 @@ archive: create-xcframework
 	 && zip -r MLImage.xcframework.zip MLImage.xcframework \
 	 && zip -r MLKitCommon.xcframework.zip MLKitCommon.xcframework \
 	 && zip -r MLKitVision.xcframework.zip MLKitVision.xcframework
+	@echo "MLKitBarcodeScanning.xcframework.zip $$(swift package compute-checksum GoogleMLKit/MLKitBarcodeScanning.xcframework.zip)"
+	@echo "MLKitFaceDetection.xcframework.zip $$(swift package compute-checksum GoogleMLKit/MLKitFaceDetection.xcframework.zip)"
+	@echo "GoogleToolboxForMac.xcframework.zip $$(swift package compute-checksum GoogleMLKit/GoogleToolboxForMac.xcframework.zip)"
+	@echo "MLImage.xcframework.zip $$(swift package compute-checksum GoogleMLKit/MLImage.xcframework.zip)"
+	@echo "MLKitCommon.xcframework.zip $$(swift package compute-checksum GoogleMLKit/MLKitCommon.xcframework.zip)"
+	@echo "MLKitVision.xcframework.zip $$(swift package compute-checksum GoogleMLKit/MLKitVision.xcframework.zip)"
 .PHONY:
 run: archive
