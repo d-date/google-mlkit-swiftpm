@@ -39,19 +39,19 @@ create-xcframework: bootstrap-builder build-cocoapods prepare-info-plist
 		-framework Pods/Pods/Build/Release-iphonesimulator/GoogleToolboxForMac/GoogleToolboxForMac.framework \
 		-framework Pods/Pods/Build/Release-iphoneos/GoogleToolboxForMac/GoogleToolboxForMac.framework \
 		-output GoogleMLKit/GoogleToolboxForMac.xcframework
-	@xcframework-maker/.build/release/make-xcframework \
+	@xcframework-maker/.build/release/make-xcframework -verbose \
 	-ios ./Pods/MLImage/Frameworks/MLImage.framework \
 	-output GoogleMLKit
-	@xcframework-maker/.build/release/make-xcframework \
+	@xcframework-maker/.build/release/make-xcframework -verbose \
 	-ios ./Pods/MLKitCommon/Frameworks/MLKitCommon.framework \
 	-output GoogleMLKit
-	@xcframework-maker/.build/release/make-xcframework \
+	@xcframework-maker/.build/release/make-xcframework -verbose \
 	-ios ./Pods/MLKitVision/Frameworks/MLKitVision.framework \
 	-output GoogleMLKit
-	@xcframework-maker/.build/release/make-xcframework \
+	@xcframework-maker/.build/release/make-xcframework -verbose \
 	-ios ./Pods/MLKitBarcodeScanning/Frameworks/MLKitBarcodeScanning.framework \
 	-output GoogleMLKit
-	@xcframework-maker/.build/release/make-xcframework \
+	@xcframework-maker/.build/release/make-xcframework -verbose \
 	-ios ./Pods/MLKitFaceDetection/Frameworks/MLKitFaceDetection.framework \
 	-output GoogleMLKit
 
