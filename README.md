@@ -2,6 +2,8 @@
 
 This is experimental project for building MLKit in Swift Package Manager.
 
+**New:** This repository now includes automated tools to keep up-to-date with MLKit releases. See [AUTOMATION.md](AUTOMATION.md) for details.
+
 ## Requirements
 
 - iOS 14 and later
@@ -36,3 +38,27 @@ Download `GoogleMVFaceDetectorResources.bundle` from [Release](https://github.co
 ## Example
 
 Open `Example/Example.xcworkspace` and fixing code signing to yours.
+
+## Automation
+
+This repository includes automation tools for updating to new MLKit versions:
+
+- **Automated Version Checking**: Daily checks for new MLKit releases
+- **Build Automation**: Scripts to build and package new versions
+- **GitHub Actions**: Workflows for automated builds and releases
+
+For detailed information, see [AUTOMATION.md](AUTOMATION.md).
+
+### Quick Start for Maintainers
+
+To update to a new MLKit version:
+
+```bash
+# Check for updates
+ruby scripts/check_mlkit_version.rb
+
+# Build new version (replace 5.1.0 with actual version)
+./scripts/build_all.sh 5.1.0
+```
+
+Or use the GitHub Actions workflow for fully automated builds.
