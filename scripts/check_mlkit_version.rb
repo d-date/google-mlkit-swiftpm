@@ -11,8 +11,10 @@ def fetch_latest_mlkit_version
   uri = URI.parse('https://trunk.cocoapods.org/api/v1/pods/GoogleMLKit')
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
-  http.open_timeout = 10
-  http.read_timeout = 10
+  open_timeout = (ENV['MLKIT_HTTP_OPEN_TIMEOUT'] || 30).to_i
+  read_timeout = (ENV['MLKIT_HTTP_READ_TIMEOUT'] || 30).to_i
+  http.open_timeout = open_timeout
+  http.read_timeout = read_timeout
 
   request = Net::HTTP::Get.new(uri.request_uri)
   response = http.request(request)
