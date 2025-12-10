@@ -12,7 +12,7 @@ if [ -z "$VERSION" ]; then
 fi
 
 # Validate version format (semantic versioning: major.minor.patch with optional pre-release/build metadata)
-if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$ ]]; then
+if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?(\+[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?$ ]]; then
   echo "Error: Invalid version format '$VERSION'"
   echo "Expected semantic versioning format: MAJOR.MINOR.PATCH (e.g., 1.2.3, 2.0.0-beta.1, 3.1.4+build.123)"
   exit 1
