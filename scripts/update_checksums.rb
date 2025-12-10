@@ -54,6 +54,11 @@ end
 
 version = ARGV[0]
 
+# Validate semantic versioning format (X.Y.Z)
+unless version =~ /^\d+\.\d+\.\d+$/
+  puts "Error: Version '#{version}' is not in semantic versioning format (X.Y.Z)"
+  exit 1
+end
 begin
   puts "Calculating checksums for XCFrameworks..."
   checksums = scan_and_calculate_checksums
