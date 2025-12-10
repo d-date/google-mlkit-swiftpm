@@ -40,10 +40,6 @@ create-xcframework: bootstrap-builder build-cocoapods prepare-info-plist
 		-framework Pods/Pods/Build/Release-iphonesimulator/GoogleToolboxForMac/GoogleToolboxForMac.framework \
 		-framework Pods/Pods/Build/Release-iphoneos/GoogleToolboxForMac/GoogleToolboxForMac.framework \
 		-output GoogleMLKit/GoogleToolboxForMac.xcframework
-	@xcodebuild -create-xcframework \
-		-framework Pods/Pods/Build/Release-iphonesimulator/GoogleUtilitiesComponents/GoogleUtilitiesComponents.framework \
-		-framework Pods/Pods/Build/Release-iphoneos/GoogleUtilitiesComponents/GoogleUtilitiesComponents.framework \
-		-output GoogleMLKit/GoogleUtilitiesComponents.xcframework
 	@xcframework-maker/.build/release/make-xcframework \
 	-ios ./Pods/MLImage/Frameworks/MLImage.framework \
 	-output GoogleMLKit
@@ -85,7 +81,6 @@ archive: create-xcframework
 	 && zip -r MLKitBarcodeScanning.xcframework.zip MLKitBarcodeScanning.xcframework \
 	 && zip -r MLKitFaceDetection.xcframework.zip MLKitFaceDetection.xcframework \
 	 && zip -r GoogleToolboxForMac.xcframework.zip GoogleToolboxForMac.xcframework \
-	 && zip -r GoogleUtilitiesComponents.xcframework.zip GoogleUtilitiesComponents.xcframework \
 	 && zip -r MLImage.xcframework.zip MLImage.xcframework \
 	 && zip -r MLKitCommon.xcframework.zip MLKitCommon.xcframework \
 	 && zip -r MLKitVision.xcframework.zip MLKitVision.xcframework

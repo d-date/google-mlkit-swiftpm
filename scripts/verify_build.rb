@@ -9,8 +9,7 @@ def verify_xcframeworks
     'MLImage',
     'MLKitCommon',
     'MLKitVision',
-    'GoogleToolboxForMac',
-    'GoogleUtilitiesComponents'
+    'GoogleToolboxForMac'
   ]
 
   puts "Checking for XCFramework zip files..."
