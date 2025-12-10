@@ -6,6 +6,7 @@ IPHONEOS_DEPLOYMENT_TARGET = 12.0
 
 bootstrap-cocoapods:
 	@bundle install
+	@bundle exec pod repo update
 	@bundle exec pod install
 
 bootstrap-builder:
