@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+# Set UTF-8 encoding for CocoaPods
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 # Build script that automates the entire build process
 # Usage: ./scripts/build_all.sh <version>
 
