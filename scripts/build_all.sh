@@ -11,6 +11,13 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
+# Validate version format (semantic versioning: X.Y.Z)
+if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Error: Invalid version format '$VERSION'"
+  echo "Expected semantic versioning format: X.Y.Z (e.g., 1.2.3, 2.0.0)"
+  exit 1
+fi
+
 echo "==================================="
 echo "MLKit SwiftPM Build Automation"
 echo "Version: $VERSION"
