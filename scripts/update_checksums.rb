@@ -8,8 +8,28 @@ def calculate_checksum(file_path)
   Digest::SHA256.file(file_path).hexdigest
 end
 
-# Update Package.swift with new version and checksums
-def update_package_swift(version, checksums)
+# Parse Podfile.lock to extract dependency versions
+def parse_podfile_lock
+  podfile_lock = File.read('Podfile.lock')
+  versions = {}
+
+  # Extract version numbers from PODS section - only top-level entries
+  # Match entries like "  - GoogleDataTransport (10.1.0):" (with exactly 2 spaces before dash)
+  podfile_lock.scan(/^  - ([^\/\s]+)(?:\/[^\s]+)?\s+\(([^)]+)\):?/) do |name, version_str|
+    # Extract only the version number (digits and dots)
+    if match = version_str.match(/([\d.]+)/)
+      version = match[1]
+      # Normalize version: if it has only 1 dot (e.g., "10.0" or "8.0"), append ".0"
+      version = "#{version}.0" if version.count('.') == 1
+      versions[name] = version
+    end
+  end
+
+  versions
+end
+
+# Update Package.swift with new version, checksums, and dependency versions
+def update_package_swift(version, checksums, dependency_versions)
   package_swift = File.read('Package.swift')
 
   # Update each binary target with new URL and checksum
@@ -28,8 +48,27 @@ def update_package_swift(version, checksums)
     end
   end
 
+  # Update dependency versions
+  {
+    'GoogleDataTransport' => 'GoogleDataTransport',
+    'GoogleUtilities' => 'GoogleUtilities',
+    'GTMSessionFetcher' => 'gtm-session-fetcher',
+    'nanopb' => 'nanopb',
+    'PromisesObjC' => 'promises'
+  }.each do |podfile_name, package_name|
+    if dependency_versions[podfile_name]
+      dep_version = dependency_versions[podfile_name]
+      puts "  Updating #{package_name} to #{dep_version}"
+      # Update .package declaration - match any version specifier
+      package_swift.gsub!(
+        /\.package\(url:\s*"https:\/\/github\.com\/google\/#{Regexp.escape(package_name)}(\.git)?",\s*exact:\s*"[^"]+"\)/,
+        ".package(url: \"https://github.com/google/#{package_name}.git\", exact: \"#{dep_version}\")"
+      )
+    end
+  end
+
   File.write('Package.swift', package_swift)
-  puts "Updated Package.swift with version #{version} and checksums"
+  puts "Updated Package.swift with version #{version}, checksums, and dependency versions"
 end
 
 # Scan GoogleMLKit directory for xcframework.zip files and calculate checksums
@@ -67,8 +106,12 @@ begin
     raise "No XCFramework zip files found in GoogleMLKit directory"
   end
 
+  puts "\nParsing Podfile.lock for dependency versions..."
+  dependency_versions = parse_podfile_lock
+  puts "Found #{dependency_versions.size} dependencies"
+
   puts "\nUpdating Package.swift..."
-  update_package_swift(version, checksums)
+  update_package_swift(version, checksums, dependency_versions)
 
   puts "\nSuccessfully updated Package.swift"
 rescue => e
