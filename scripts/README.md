@@ -72,6 +72,35 @@ ruby scripts/verify_build.rb
 - After building (validation)
 - When troubleshooting build issues
 
+### verify_runtime.sh
+
+Performs static analysis on built XCFrameworks to catch potential runtime issues.
+
+**Usage:**
+```bash
+./scripts/verify_runtime.sh <version>
+```
+
+**Example:**
+```bash
+./scripts/verify_runtime.sh 7.0.0
+```
+
+**What it checks:**
+
+- XCFramework architectures (arm64, x86_64)
+- Info.plist presence in each framework binary
+- Symbol table validity
+- Package.swift target completeness
+
+**When to use:**
+
+- After building XCFrameworks
+- Before manual device testing
+- To catch obvious runtime issues early
+
+**Note:** This does NOT replace manual testing on a real device!
+
 ### build_all.sh
 
 Orchestrates the complete build process with validation.

@@ -55,6 +55,25 @@ for VERSION in "${VERSIONS[@]}"; do
     echo "✓ Successfully built version $VERSION"
     echo ""
 
+    # Prompt for manual testing before committing
+    echo "⚠️  Manual testing recommended before committing!"
+    echo "Test checklist:"
+    echo "  1. Build Example app on device"
+    echo "  2. Test MLKit features"
+    echo "  3. Check for runtime crashes"
+    echo ""
+    read -p "Have you tested this build? (y/n/skip) " -n 1 -r
+    echo
+
+    if [[ $REPLY =~ ^[Ss]$ ]]; then
+      echo "Skipping manual test for $VERSION"
+    elif [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo "Please test before continuing. See TESTING.md for details."
+      echo "Stopping batch build. You can resume later with:"
+      echo "  ./scripts/batch_build.sh ${VERSIONS[@]:$((${#SUCCESS_VERSIONS[@]}))}"
+      exit 1
+    fi
+
     # Create a git commit for this version
     echo "Creating git commit for version $VERSION..."
     git add Podfile Podfile.lock Package.swift Resources/
@@ -63,6 +82,7 @@ for VERSION in "${VERSIONS[@]}"; do
 - Updated Podfile to version $VERSION
 - Rebuilt XCFrameworks
 - Updated checksums in Package.swift
+- Runtime tested: $(date +%Y-%m-%d)
 
 🤖 Generated with batch build automation" || {
       echo "Warning: Could not create commit (may already exist)"
@@ -70,7 +90,9 @@ for VERSION in "${VERSIONS[@]}"; do
 
     # Create a git tag
     echo "Creating git tag $VERSION..."
-    git tag -a "$VERSION" -m "Release $VERSION" || {
+    git tag -a "$VERSION" -m "Release $VERSION
+
+Runtime tested: $(date +%Y-%m-%d)" || {
       echo "Warning: Tag $VERSION already exists"
     }
 

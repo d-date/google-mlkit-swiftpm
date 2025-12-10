@@ -125,6 +125,8 @@ For 3 versions: **45-75 minutes total**
 
 After building all versions:
 
+### Static Verification
+
 ```bash
 # Check git history
 git log --oneline -n 3
@@ -137,7 +139,51 @@ swift package dump-package
 
 # Check XCFramework sizes
 ls -lh GoogleMLKit/*.xcframework.zip
+
+# Run runtime verification
+./scripts/verify_runtime.sh 9.0.0
 ```
+
+### Manual Testing (CRITICAL)
+
+**You MUST test on a physical device before releasing!**
+
+```bash
+# Open Example project
+cd Example
+open Example.xcworkspace
+```
+
+**Test Checklist:**
+
+1. [ ] Build for physical iOS device (not simulator)
+2. [ ] App launches without crash
+3. [ ] Navigate to Barcode Scanner screen
+4. [ ] Scan a QR code or barcode
+5. [ ] Verify barcode is detected correctly
+6. [ ] Navigate to Face Detection screen
+7. [ ] Test face detection feature
+8. [ ] Check Xcode console for any warnings or errors
+9. [ ] No "unrecognized selector" errors
+10. [ ] No "bundle doesn't contain" errors
+
+**Common Runtime Issues:**
+
+- ❌ App crashes on launch → Missing Info.plist or symbol conflict
+- ❌ Crash when using MLKit → Missing `-ObjC` or `-all_load` linker flags
+- ❌ "Class X implemented in both..." → Symbol conflict with Firebase
+- ❌ Features don't work → Missing resources or incorrect linkage
+
+**If all tests pass:**
+
+```bash
+cd ..
+git add Podfile Podfile.lock Package.swift Resources/
+git commit -m "Update to MLKit 9.0.0 - tested on device"
+git tag -a 9.0.0 -m "Release 9.0.0"
+```
+
+**See [TESTING.md](TESTING.md) for detailed testing instructions.**
 
 ## Troubleshooting
 
