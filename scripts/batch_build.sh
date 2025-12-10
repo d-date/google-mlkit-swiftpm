@@ -2,17 +2,37 @@
 set -euo pipefail
 
 # Batch build script for multiple MLKit versions
-# Usage: ./scripts/batch_build.sh <version1> <version2> ...
+# Usage: ./scripts/batch_build.sh [--non-interactive] <version1> <version2> ...
 
-if [ $# -eq 0 ]; then
-  echo "Usage: $0 <version1> [version2] [version3] ..."
+# Parse flags
+NON_INTERACTIVE=false
+VERSIONS=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --non-interactive)
+      NON_INTERACTIVE=true
+      shift
+      ;;
+    *)
+      VERSIONS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+if [ ${#VERSIONS[@]} -eq 0 ]; then
+  echo "Usage: $0 [--non-interactive] <version1> [version2] [version3] ..."
+  echo ""
+  echo "Options:"
+  echo "  --non-interactive  Skip interactive prompts (useful for CI/CD)"
   echo ""
   echo "Example:"
   echo "  $0 7.0.0 8.0.0 9.0.0"
+  echo "  $0 --non-interactive 7.0.0 8.0.0 9.0.0"
   exit 1
 fi
 
-VERSIONS=("$@")
 FAILED_VERSIONS=()
 SUCCESS_VERSIONS=()
 
@@ -60,11 +80,15 @@ for VERSION in "${VERSIONS[@]}"; do
     echo "✗ Failed to build version $VERSION"
     echo ""
 
-    # Ask user if they want to continue
-    read -p "Continue with next version? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      break
+    # Ask user if they want to continue (only in interactive mode)
+    if [ "$NON_INTERACTIVE" = false ] && [ -t 0 ]; then
+      read -p "Continue with next version? (y/n) " -n 1 -r
+      echo
+      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        break
+      fi
+    else
+      echo "Continuing with next version automatically..."
     fi
   fi
 done
