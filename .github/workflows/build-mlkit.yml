@@ -163,7 +163,7 @@ jobs:
 
       - name: Upload XCFramework artifacts
         if: ${{ !inputs.create_release }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: xcframeworks-${{ inputs.version }}
           path: GoogleMLKit/*.xcframework.zip
