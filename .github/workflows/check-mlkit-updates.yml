@@ -7,6 +7,11 @@ on:
   workflow_dispatch:
     # Allow manual trigger
 
+# Prevent concurrent runs to avoid race condition when creating issues
+concurrency:
+  group: check-mlkit-updates
+  cancel-in-progress: false
+
 jobs:
   check-updates:
     runs-on: macos-latest
@@ -55,25 +60,29 @@ jobs:
 
             This issue was automatically created by the check-mlkit-updates workflow.`;
 
-            // Check if issue already exists
+            // Check if issue already exists by querying for issues with mlkit-update label
+            // This is more robust than just checking by title
             const issues = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: ['mlkit-update']
+              labels: 'mlkit-update'
             });
 
+            console.log(`Found ${issues.data.length} open mlkit-update issue(s)`);
+
+            // Check if an issue with this exact title already exists
             const existingIssue = issues.data.find(issue => issue.title === title);
 
-            if (!existingIssue) {
-              await github.rest.issues.create({
+            if (existingIssue) {
+              console.log(`Issue already exists for version ${newVersion}: #${existingIssue.number}`);
+            } else {
+              const newIssue = await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: title,
                 body: body,
                 labels: ['mlkit-update', 'automation']
               });
-              console.log('Created new issue for MLKit update');
-            } else {
-              console.log('Issue already exists for this version');
+              console.log(`Created new issue #${newIssue.data.number} for MLKit version ${newVersion}`);
             }
