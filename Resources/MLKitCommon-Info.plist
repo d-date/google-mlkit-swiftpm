@@ -21,7 +21,7 @@
 <key>CFBundlePackageType</key>
 <string>FMWK</string>
 <key>CFBundleShortVersionString</key>
-	<string>5.5.0</string>
+<string>10.0.0</string>
 <key>CFBundleSupportedPlatforms</key>
 <array>
 <string>iPhoneOS</string>
