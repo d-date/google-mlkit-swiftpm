@@ -76,6 +76,7 @@ ruby scripts/check_mlkit_version.rb
 ```
 
 This script will:
+
 - Fetch the latest MLKit version from CocoaPods
 - Compare it with the current version in Podfile
 - Output whether an update is available
@@ -87,22 +88,54 @@ This script will:
 ```
 
 Example:
+
 ```bash
-./scripts/build_all.sh 5.1.0
+./scripts/build_all.sh 7.0.0
 ```
 
 This script will:
-1. Update the Podfile with the new version
+
+1. Update the Podfile and Info.plist files with the new version
 2. Run the full build process (via `make run`)
 3. Calculate checksums for all XCFrameworks
 4. Update Package.swift with new URLs and checksums
+5. Verify the build output
 
 After running the script:
-1. Review the changes in `Package.swift` and `Podfile`
-2. Test the build locally
-3. Commit the changes
-4. Create a GitHub release with tag matching the version
-5. Upload the XCFramework zip files from `GoogleMLKit/` to the release
+
+1. Review the changes in `Package.swift`, `Podfile`, and `Resources/`
+2. Test the package: `swift package resolve`
+3. Upload artifacts to an existing GitHub release (see below)
+4. Commit the changes
+5. Push to GitHub
+
+### Upload Artifacts to GitHub Release
+
+After building XCFrameworks, you can upload them to an existing GitHub release:
+
+```bash
+./scripts/upload_release.sh <version>
+```
+
+Example:
+
+```bash
+./scripts/upload_release.sh 7.0.0
+```
+
+This script will:
+
+1. Check if the specified release exists
+2. Delete old XCFramework assets from the release (if any)
+3. Upload all newly built XCFramework zip files from `GoogleMLKit/`
+
+**Note:** The release must already exist. Create it first using:
+
+```bash
+gh release create <version> --title "Release <version>" --notes "Updated to MLKit <version>"
+```
+
+Or let GitHub Actions create it automatically (see "Triggering a Build via GitHub Actions" below).
 
 ### Update Individual Components
 
@@ -155,6 +188,7 @@ The automation scripts wrap these steps and add version management and verificat
 ### Required Secrets
 
 No additional secrets are required. The workflows use the default `GITHUB_TOKEN` for:
+
 - Creating issues
 - Creating releases
 - Pushing commits
@@ -162,6 +196,7 @@ No additional secrets are required. The workflows use the default `GITHUB_TOKEN`
 ### Permissions
 
 Ensure the repository has the following workflow permissions enabled:
+
 - Read and write permissions for workflows
 - Allow GitHub Actions to create and approve pull requests
 
@@ -177,6 +212,7 @@ You can configure this in: **Settings → Actions → General → Workflow permi
 6. Click **"Run workflow"**
 
 The workflow will:
+
 - Build the XCFrameworks
 - Update Package.swift
 - Create a release (if selected)

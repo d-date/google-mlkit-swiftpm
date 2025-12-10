@@ -63,26 +63,60 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Podfile Podfile.lock Package.swift
+          git add Podfile Podfile.lock Package.swift Resources/
           git commit -m "Update to MLKit ${{ inputs.version }}
 
           - Updated Podfile to version ${{ inputs.version }}
           - Rebuilt XCFrameworks
           - Updated checksums in Package.swift
+          - Updated Info.plist files
 
           🤖 Generated with GitHub Actions"
 
-      - name: Create tag
+      - name: Create or update tag
         if: inputs.create_release
         run: |
+          # Delete existing tag if it exists (for release updates)
+          if git tag -l | grep -q "^${{ inputs.version }}$"; then
+            git tag -d ${{ inputs.version }}
+            git push origin :refs/tags/${{ inputs.version }} || true
+          fi
           git tag ${{ inputs.version }}
 
       - name: Push changes and tag
         if: inputs.create_release
         run: |
-          git push origin main ${{ inputs.version }}
-      - name: Create GitHub Release
+          git push origin main
+          git push origin ${{ inputs.version }} --force
+      - name: Check if release exists
         if: inputs.create_release
+        id: check_release
+        run: |
+          if gh release view ${{ inputs.version }} &> /dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Release ${{ inputs.version }} already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Release ${{ inputs.version }} does not exist"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete old release assets
+        if: inputs.create_release && steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Deleting old assets from existing release..."
+          for asset in GoogleToolboxForMac.xcframework.zip MLImage.xcframework.zip MLKitBarcodeScanning.xcframework.zip MLKitCommon.xcframework.zip MLKitFaceDetection.xcframework.zip MLKitVision.xcframework.zip; do
+            if gh release view ${{ inputs.version }} --json assets --jq ".assets[].name" | grep -q "^${asset}$"; then
+              echo "  Deleting: $asset"
+              gh release delete-asset ${{ inputs.version }} "$asset" --yes || true
+            fi
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        if: inputs.create_release && steps.check_release.outputs.exists == 'false'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ inputs.version }}
@@ -116,6 +150,14 @@ jobs:
           prerelease: false
           files: |
             GoogleMLKit/*.xcframework.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload assets to existing release
+        if: inputs.create_release && steps.check_release.outputs.exists == 'true'
+        run: |
+          echo "Uploading new assets to existing release..."
+          gh release upload ${{ inputs.version }} GoogleMLKit/*.xcframework.zip --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
