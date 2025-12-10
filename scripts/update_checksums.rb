@@ -49,22 +49,28 @@ def update_package_swift(version, checksums, dependency_versions)
   end
 
   # Update dependency versions
+  # Note: nanopb is excluded because firebase/nanopb doesn't have SwiftPM-compatible tags for latest CocoaPods versions yet
   {
-    'GoogleDataTransport' => 'GoogleDataTransport',
-    'GoogleUtilities' => 'GoogleUtilities',
-    'GTMSessionFetcher' => 'gtm-session-fetcher',
-    'nanopb' => 'nanopb',
-    'PromisesObjC' => 'promises'
-  }.each do |podfile_name, package_name|
+    'GoogleDataTransport' => ['google', 'GoogleDataTransport'],
+    'GoogleUtilities' => ['google', 'GoogleUtilities'],
+    'GTMSessionFetcher' => ['google', 'gtm-session-fetcher'],
+    'PromisesObjC' => ['google', 'promises']
+  }.each do |podfile_name, (org, package_name)|
     if dependency_versions[podfile_name]
       dep_version = dependency_versions[podfile_name]
       puts "  Updating #{package_name} to #{dep_version}"
       # Update .package declaration - match any version specifier
       package_swift.gsub!(
-        /\.package\(url:\s*"https:\/\/github\.com\/google\/#{Regexp.escape(package_name)}(\.git)?",\s*exact:\s*"[^"]+"\)/,
-        ".package(url: \"https://github.com/google/#{package_name}.git\", exact: \"#{dep_version}\")"
+        /\.package\(url:\s*"https:\/\/github\.com\/#{Regexp.escape(org)}\/#{Regexp.escape(package_name)}(\.git)?",\s*exact:\s*"[^"]+"\)/,
+        ".package(url: \"https://github.com/#{org}/#{package_name}.git\", exact: \"#{dep_version}\")"
       )
     end
+  end
+
+  # Warn about nanopb if version changed
+  if dependency_versions['nanopb']
+    puts "  Warning: nanopb #{dependency_versions['nanopb']} found in Podfile.lock"
+    puts "           Manual update may be required if firebase/nanopb has a compatible tag"
   end
 
   File.write('Package.swift', package_swift)
