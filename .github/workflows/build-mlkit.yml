@@ -72,11 +72,15 @@ jobs:
 
           🤖 Generated with GitHub Actions"
 
-      - name: Push changes
+      - name: Create tag
         if: inputs.create_release
         run: |
-          git push origin main
+          git tag ${{ inputs.version }}
 
+      - name: Push changes and tag
+        if: inputs.create_release
+        run: |
+          git push origin main ${{ inputs.version }}
       - name: Create GitHub Release
         if: inputs.create_release
         uses: softprops/action-gh-release@v1
