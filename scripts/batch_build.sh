@@ -88,7 +88,7 @@ for VERSION in "${VERSIONS[@]}"; do
         break
       fi
     else
-      echo "Continuing with next version (non-interactive mode)..."
+      echo "Continuing with next version automatically..."
     fi
   fi
 done
