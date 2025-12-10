@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+# Set UTF-8 encoding for CocoaPods
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 # Build script that automates the entire build process
 # Usage: ./scripts/build_all.sh <version>
 
@@ -74,14 +78,14 @@ echo "==================================="
 echo ""
 echo "⚠️  IMPORTANT: Manual testing required!"
 echo ""
-echo "Before committing, you MUST:"
+echo "Before proceeding, you MUST:"
 echo "1. Test the Example app on a physical device"
 echo "2. Verify no runtime crashes occur"
 echo "3. Check the console for warnings"
 echo ""
 echo "See TESTING.md for detailed testing instructions"
 echo ""
-echo "Next steps (after testing):"
+echo "Next steps:"
 echo ""
 echo "1. Review the changes:"
 echo "   git diff Package.swift Podfile Resources/"
@@ -89,19 +93,17 @@ echo ""
 echo "2. Test the package:"
 echo "   swift package resolve"
 echo ""
-echo "3. Test the Example app:"
-echo "   cd Example && open Example.xcworkspace"
-echo "   (Build and run on device, test features)"
+echo "3. Upload artifacts to GitHub release (requires existing release):"
+echo "   ./scripts/upload_release.sh $VERSION"
 echo ""
-echo "4. If all tests pass, commit:"
+echo "4. Commit the changes:"
 echo "   git add Podfile Podfile.lock Package.swift Resources/"
 echo "   git commit -m \"Update to MLKit $VERSION\""
+echo ""
+echo "5. Push and create tag:"
+echo "   git push"
 echo "   git tag -a $VERSION -m \"Release $VERSION\""
+echo "   git push origin $VERSION"
 echo ""
-echo "5. Create a GitHub release:"
-echo "   gh release create $VERSION GoogleMLKit/*.xcframework.zip \\"
-echo "     --title \"Release $VERSION\" \\"
-echo "     --notes \"Updated to MLKit $VERSION\""
-echo ""
-echo "6. Or push and use GitHub Actions to create the release"
+echo "Or use GitHub Actions to automate steps 3-5"
 echo ""

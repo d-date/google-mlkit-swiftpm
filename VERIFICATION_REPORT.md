@@ -21,6 +21,7 @@ All automation scripts have been tested and verified to be working correctly. Th
 ```
 
 **Files checked:**
+
 - MLKitCommon-Info.plist
 - MLKitBarcodeScanning-Info.plist
 - MLKitFaceDetection-Info.plist
@@ -28,32 +29,35 @@ All automation scripts have been tested and verified to be working correctly. Th
 - MLImage-Info.plist
 
 **XCFrameworks verified:**
+
 - MLKitBarcodeScanning.xcframework.zip (13.9 MB)
 - MLKitFaceDetection.xcframework.zip (33.9 MB)
 - MLImage.xcframework.zip (15 KB)
 - MLKitCommon.xcframework.zip (2.2 MB)
 - MLKitVision.xcframework.zip (131 KB)
 - GoogleToolboxForMac.xcframework.zip (107 KB)
-- GoogleUtilitiesComponents.xcframework.zip (90 KB)
 
 ### 2. Runtime Verification (`verify_runtime.sh`)
 
 **Status:** ✅ PASS (with expected warnings)
 
 **Architecture Verification:**
+
 - ✅ All MLKit frameworks have arm64 (device) and x86_64 (simulator)
-- ⚠️ GoogleToolboxForMac/GoogleUtilitiesComponents have arm64-simulator (expected)
 
 **Info.plist Verification:**
+
 - ✅ All MLKit frameworks have Info.plist in device builds
 - ✅ All MLKit frameworks have Info.plist in simulator builds
 - ⚠️ GoogleToolbox/Utilities missing simulator Info.plist (not critical)
 
 **Symbol Table Verification:**
+
 - ✅ MLKitBarcodeScanning symbols are valid
 - ✅ 15 classes exported correctly
 
 **Package.swift Verification:**
+
 - ✅ All expected targets present
 
 ### 3. Version Check (`check_mlkit_version.rb`)
@@ -69,7 +73,7 @@ NEW_VERSION=9.0.0
 ```
 
 **API Used:** CocoaPods Trunk API
-**Endpoint:** https://trunk.cocoapods.org/api/v1/pods/GoogleMLKit
+**Endpoint:** <https://trunk.cocoapods.org/api/v1/pods/GoogleMLKit>
 **Response Time:** < 1 second
 
 ### 4. Version Update (`update_version.rb`)
@@ -79,6 +83,7 @@ NEW_VERSION=9.0.0
 **Test performed:** Updated from 5.0.0 → 7.0.0 (then reverted)
 
 **Files updated correctly:**
+
 - ✅ Podfile (both FaceDetection and BarcodeScanning)
 - ✅ MLKitCommon-Info.plist
 - ✅ MLKitBarcodeScanning-Info.plist
@@ -87,12 +92,14 @@ NEW_VERSION=9.0.0
 - ✅ MLImage-Info.plist
 
 **Before:**
+
 ```ruby
 pod 'GoogleMLKit/FaceDetection', '~> 5.0.0'
 pod 'GoogleMLKit/BarcodeScanning', '~> 5.0.0'
 ```
 
 **After:**
+
 ```ruby
 pod 'GoogleMLKit/FaceDetection', '~> 7.0.0'
 pod 'GoogleMLKit/BarcodeScanning', '~> 7.0.0'
@@ -105,6 +112,7 @@ pod 'GoogleMLKit/BarcodeScanning', '~> 7.0.0'
 **Test:** Calculated SHA256 for MLKitCommon.xcframework.zip
 
 **Result:**
+
 - Calculated: `c76791cf2f6c2dd358006feb85244d4ba482c148efcdd2d299309c7429957c94`
 - Package.swift: `6a03f89f6ea07d337ff76768742d3cc68d8f22ab2b13e3063e1b459767873c8d`
 
@@ -115,6 +123,7 @@ pod 'GoogleMLKit/BarcodeScanning', '~> 7.0.0'
 **Status:** ✅ READY
 
 **Workflow verified:**
+
 1. Pre-flight checks → verify_build.rb
 2. Version update → update_version.rb
 3. Build → make run
@@ -128,6 +137,7 @@ pod 'GoogleMLKit/BarcodeScanning', '~> 7.0.0'
 **Status:** ✅ READY
 
 **Features verified:**
+
 - Multiple version arguments accepted
 - Test prompt integration ready
 - Git commit/tag automation ready
@@ -137,7 +147,7 @@ pod 'GoogleMLKit/BarcodeScanning', '~> 7.0.0'
 
 ### Expected Behaviors
 
-1. **GoogleToolboxForMac & GoogleUtilitiesComponents**
+1. **GoogleToolboxForMac**
    - Have arm64-simulator slices (Apple Silicon support)
    - Missing simulator Info.plist (not critical for these frameworks)
 
@@ -172,6 +182,7 @@ Before each release, the following MUST be tested manually:
    - Option B: Batch build (faster, requires more monitoring)
 
 2. **Build Missing Versions:**
+
    ```bash
    # Option A: One at a time
    ./scripts/build_all.sh 7.0.0
@@ -187,6 +198,7 @@ Before each release, the following MUST be tested manually:
    - Must test on physical device before release
 
 4. **Release Process:**
+
    ```bash
    git push origin main
    git push origin --tags
@@ -222,6 +234,7 @@ Before each release, the following MUST be tested manually:
 **The automation system is fully operational and ready for production use.**
 
 All scripts have been tested and verified. The system successfully:
+
 - Detects new MLKit versions
 - Updates configuration files correctly
 - Verifies build outputs
