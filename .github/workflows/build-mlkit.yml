@@ -1,0 +1,161 @@
+name: Build MLKit XCFrameworks
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'MLKit version to build (e.g., 5.0.0)'
+        required: true
+        type: string
+      create_release:
+        description: 'Create GitHub release after build'
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install CocoaPods dependencies
+        run: bundle install
+
+      - name: Update version in Podfile
+        run: ruby scripts/update_version.rb ${{ inputs.version }}
+
+      - name: Build XCFramework maker
+        run: make bootstrap-builder
+
+      - name: Install CocoaPods
+        run: make bootstrap-cocoapods
+
+      - name: Build XCFrameworks
+        run: make create-xcframework
+
+      - name: Archive XCFrameworks
+        run: make archive
+
+      - name: Calculate checksums and update Package.swift
+        run: ruby scripts/update_checksums.rb ${{ inputs.version }}
+
+      - name: Verify Package.swift
+        run: swift package dump-package
+
+      - name: Create commit
+        if: inputs.create_release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Podfile Podfile.lock Package.swift
+          git commit -m "Update to MLKit ${{ inputs.version }}
+
+          - Updated Podfile to version ${{ inputs.version }}
+          - Rebuilt XCFrameworks
+          - Updated checksums in Package.swift
+
+          🤖 Generated with GitHub Actions"
+
+      - name: Create tag
+        if: inputs.create_release
+        run: |
+          git tag ${{ inputs.version }}
+
+      - name: Push changes and tag
+        if: inputs.create_release
+        run: |
+          git push origin main ${{ inputs.version }}
+      - name: Create GitHub Release
+        if: inputs.create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ inputs.version }}
+          name: Release ${{ inputs.version }}
+          body: |
+            # MLKit SwiftPM ${{ inputs.version }}
+
+            This release updates the MLKit frameworks to version ${{ inputs.version }}.
+
+            ## Installation
+
+            Add to your `Package.swift`:
+
+            ```swift
+            .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "${{ inputs.version }}")
+            ```
+
+            ## What's Changed
+
+            - Updated to GoogleMLKit ${{ inputs.version }}
+            - Rebuilt all XCFrameworks
+            - Updated checksums
+
+            ## Available Libraries
+
+            - MLKitBarcodeScanning
+            - MLKitFaceDetection
+
+            🤖 This release was automatically generated
+          draft: false
+          prerelease: false
+          files: |
+            GoogleMLKit/*.xcframework.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload XCFramework artifacts
+        if: ${{ !inputs.create_release }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcframeworks-${{ inputs.version }}
+          path: GoogleMLKit/*.xcframework.zip
+          retention-days: 30
+
+      - name: Comment on related issue
+        if: inputs.create_release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ inputs.version }}';
+
+            // Find the issue for this version
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['mlkit-update']
+            });
+
+            const issue = issues.data.find(i => i.title.includes(version));
+
+            if (issue) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ Successfully built and released version ${version}!\n\nRelease: https://github.com/${{ github.repository }}/releases/tag/${version}`
+              });
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+            }
