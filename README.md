@@ -14,7 +14,7 @@ This is experimental project for building MLKit in Swift Package Manager.
 ### Use Swift Package Manager to install
 
 ```swift
-    .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "3.2.1")
+    .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "5.0.0")
 ```
 
 ### Add Linker flags
