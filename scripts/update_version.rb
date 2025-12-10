@@ -37,6 +37,11 @@ end
 
 new_version = ARGV[0]
 
+# Validate semantic versioning format (X.Y.Z)
+unless new_version =~ /^\d+\.\d+\.\d+$/
+  puts "Error: Version '#{new_version}' is not in semantic versioning format (X.Y.Z)"
+  exit 1
+end
 begin
   update_podfile(new_version)
   update_info_plists(new_version)
