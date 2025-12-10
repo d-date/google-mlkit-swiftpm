@@ -40,45 +40,36 @@ let package = Package(
     // .binaryTarget(
     //   name: "GoogleToolboxForMac",
     //   path: "GoogleMLKit/GoogleToolboxForMac.xcframework"),
-    // .binaryTarget(
-    //   name: "GoogleUtilitiesComponents",
-    //   path: "GoogleMLKit/GoogleUtilitiesComponents.xcframework"),
 
     .binaryTarget(
       name: "MLImage",
       url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/7.0.0/MLImage.xcframework.zip",
-      checksum: "14a3b4903e8e604f8920236da49867a81be867410d17f6a694070a90b5a26ce6"),
+      checksum: "23520ced47912d96205e09bbc85d754a22132e9c330cc0ed1f59d384b7d86efa"),
     .binaryTarget(
       name: "MLKitBarcodeScanning",
       url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/7.0.0/MLKitBarcodeScanning.xcframework.zip",
-      checksum: "77e01b26ff771b4fadc0af295e25cb343f0d19c9b14f856e47ee6597106c9051"),
+      checksum: "d0ff4d8e706293569e476fd76c09fb7a7693ceacf7242beb6d06a7984b873aa2"),
     .binaryTarget(
       name: "MLKitCommon",
       url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/7.0.0/MLKitCommon.xcframework.zip",
-      checksum: "7eb16e9b6ba86b7cf1dba87f6b4b2e389b29f20e92cce30b38b3dd6ef732e71f"),
+      checksum: "144d18a4371f4e67215355a352c26a0285e643f27a7c523d7b3e0b6ce3f83c95"),
     .binaryTarget(
       name: "MLKitFaceDetection",
       url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/7.0.0/MLKitFaceDetection.xcframework.zip",
-      checksum: "9b04ab0f161d703c47c4fab99aded0ef5fb741b50f82dc87f69f0c6d5882a715"),
+      checksum: "b29397d7d523bb28181e750425a3e84509c42bf625814a10387e846f4ed116f6"),
     .binaryTarget(
       name: "MLKitVision",
       url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/7.0.0/MLKitVision.xcframework.zip",
-      checksum: "6e81fd283ddc91acbc4556ccbcdfb7e4fc81a954c9dc309179703068aac1820e"),
+      checksum: "b0784db458333bd992b6e93fc036022ddd9e543e0c1dbef48a62bf69e94445c5"),
     .binaryTarget(
       name: "GoogleToolboxForMac",
       url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/7.0.0/GoogleToolboxForMac.xcframework.zip",
-      checksum: "b08c68f44bf0db71fa7ff450df75beadb163c094a9f767ed8712112b1ad43730"),
-    .binaryTarget(
-      name: "GoogleUtilitiesComponents",
-      url:
-        "https://github.com/d-date/google-mlkit-swiftpm/releases/download/6.0.0/GoogleUtilitiesComponents.xcframework.zip",
-      checksum: "f34db62a980a77f68ee1ccb995edffdf5e68a758a521cdcd203bff5efb2d1722"),
+      checksum: "9e39db65bd9ca4a2d5e1569db8f3db6c66629253fa15cb92b1800017a0eae0ec"),
     .target(
       name: "Common",
       dependencies: [
         "MLKitCommon",
         "GoogleToolboxForMac",
-        "GoogleUtilitiesComponents",
         .product(name: "GULAppDelegateSwizzler", package: "GoogleUtilities"),
         .product(name: "GULEnvironment", package: "GoogleUtilities"),
         .product(name: "GULISASwizzler", package: "GoogleUtilities"),
