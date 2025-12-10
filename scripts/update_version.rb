@@ -31,7 +31,7 @@ end
 
 # Main execution
 if ARGV.length != 1
-  puts "Usage: #{$0} <version>"
+  puts "Usage: #{File.basename($PROGRAM_NAME)} <version>"
   exit 1
 end
 
