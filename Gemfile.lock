@@ -68,6 +68,7 @@ GEM
     escape (0.0.4)
     ethon (0.15.0)
       ffi (>= 1.15.0)
+    ffi (1.17.2-arm64-darwin)
     ffi (1.17.2-x86_64-darwin)
     fourflusher (2.3.1)
     fuzzy_match (2.0.4)
@@ -79,7 +80,6 @@ GEM
     logger (1.7.0)
     minitest (5.26.2)
     molinillo (0.8.0)
-    mutex_m (0.3.0)
     nanaimo (0.4.0)
     nap (1.1.0)
     netrc (0.11.0)
@@ -100,9 +100,9 @@ GEM
       rexml (>= 3.3.6, < 4.0)
 
 PLATFORMS
+  arm64-darwin-24
   x86_64-darwin-21
   x86_64-darwin-24
-  arm64-darwin-23
 
 DEPENDENCIES
   cocoapods (>= 1.16.1)
