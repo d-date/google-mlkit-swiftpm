@@ -26,11 +26,21 @@ def verify_xcframeworks
     end
   end
 
+  # Check for bundle
+  bundle_zip = 'GoogleMLKit/GoogleMVFaceDetectorResources.bundle.zip'
+  if File.exist?(bundle_zip)
+    size = File.size(bundle_zip)
+    puts "✓ GoogleMVFaceDetectorResources.bundle.zip (#{size} bytes)"
+  else
+    puts "✗ GoogleMVFaceDetectorResources.bundle.zip - NOT FOUND"
+    missing << 'GoogleMVFaceDetectorResources.bundle'
+  end
+
   if missing.empty?
-    puts "\n✓ All XCFrameworks built successfully!"
+    puts "\n✓ All XCFrameworks and bundle built successfully!"
     return true
   else
-    puts "\n✗ Missing XCFrameworks: #{missing.join(', ')}"
+    puts "\n✗ Missing files: #{missing.join(', ')}"
     return false
   end
 end

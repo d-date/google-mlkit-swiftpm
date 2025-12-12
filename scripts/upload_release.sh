@@ -55,6 +55,9 @@ FRAMEWORKS=(
   "MLKitVision"
 )
 
+# Resource bundle to upload
+BUNDLE_NAME="GoogleMVFaceDetectorResources.bundle"
+
 # Delete old assets if they exist
 echo "Removing old assets from release..."
 for framework in "${FRAMEWORKS[@]}"; do
@@ -64,10 +67,17 @@ for framework in "${FRAMEWORKS[@]}"; do
     $GH_CMD release delete-asset "$VERSION" "$ASSET_NAME" --yes || true
   fi
 done
+
+# Delete old bundle if it exists
+BUNDLE_ZIP="${BUNDLE_NAME}.zip"
+if $GH_CMD release view "$VERSION" --json assets --jq ".assets[].name" | grep -q "^${BUNDLE_ZIP}$"; then
+  echo "  Deleting old asset: $BUNDLE_ZIP"
+  $GH_CMD release delete-asset "$VERSION" "$BUNDLE_ZIP" --yes || true
+fi
 echo ""
 
 # Upload new assets
-echo "Uploading new XCFramework assets..."
+echo "Uploading new XCFramework assets and bundle..."
 UPLOAD_FILES=()
 for framework in "${FRAMEWORKS[@]}"; do
   ASSET_PATH="GoogleMLKit/${framework}.xcframework.zip"
@@ -78,6 +88,15 @@ for framework in "${FRAMEWORKS[@]}"; do
   UPLOAD_FILES+=("$ASSET_PATH")
   echo "  Prepared: $ASSET_PATH"
 done
+
+# Add bundle
+BUNDLE_PATH="GoogleMLKit/${BUNDLE_ZIP}"
+if [ ! -f "$BUNDLE_PATH" ]; then
+  echo "Error: File not found: $BUNDLE_PATH"
+  exit 1
+fi
+UPLOAD_FILES+=("$BUNDLE_PATH")
+echo "  Prepared: $BUNDLE_PATH"
 
 echo ""
 echo "Uploading ${#UPLOAD_FILES[@]} files to release $VERSION..."
