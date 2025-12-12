@@ -1,101 +1,122 @@
-# Build Plan for Missing MLKit Versions
+# Build Plan for Extended ML Kit Support
 
 ## Current State
 
-- Current version in repo: 5.0.0 (tag: 5.0.0)
-- Latest git tag: 6.0.0
-- Latest MLKit version: 9.0.0
+- Current version in repo: 9.0.0
+- **NEW**: Added support for 8 additional ML Kit modules
+- Total supported modules: 10 (was 2)
 
-## Missing Versions
+## New Modules Added
 
-The following versions need to be built and tagged:
+### Vision APIs (5 new)
+- **Text Recognition** - Recognize text in images (v2)
+- **Image Labeling** - Identify objects, locations, activities
+- **Object Detection** - Detect and track objects
+- **Pose Detection** - Detect body poses
+- **Selfie Segmentation** - Segment people from background
 
-- **7.0.0** - Released after 6.0.0
-- **8.0.0** - Released after 7.0.0
-- **9.0.0** - Latest version (current)
+### Language APIs (3 new)
+- **Language Identification** - Identify language of text
+- **Translation** - Translate text between languages  
+- **Smart Reply** - Generate contextual reply suggestions
+
+## Build Requirements
+
+Since the package structure has been updated to support new modules, a rebuild is required to:
+1. Generate XCFrameworks for all new modules
+2. Update checksums in Package.swift
+3. Verify all modules work correctly
 
 ## Build Strategy
 
-### Option 1: Manual Sequential Build (Recommended for First Time)
+### Rebuild with New Modules
 
-Build each version manually to ensure quality and catch any issues:
+Since this is an expansion of existing version 9.0.0, build with all new modules:
 
 ```bash
-# Build 7.0.0
-./scripts/build_all.sh 7.0.0
-git add Podfile Podfile.lock Package.swift Resources/
-git commit -m "Update to MLKit 7.0.0"
-git tag -a 7.0.0 -m "Release 7.0.0"
-
-# Build 8.0.0
-./scripts/build_all.sh 8.0.0
-git add Podfile Podfile.lock Package.swift Resources/
-git commit -m "Update to MLKit 8.0.0"
-git tag -a 8.0.0 -m "Release 8.0.0"
-
-# Build 9.0.0
+# Build 9.0.0 with all 10 modules
 ./scripts/build_all.sh 9.0.0
-git add Podfile Podfile.lock Package.swift Resources/
-git commit -m "Update to MLKit 9.0.0"
-git tag -a 9.0.0 -m "Release 9.0.0"
 
-# Push everything
-git push origin main
-git push origin --tags
-```
+# This will:
+# 1. Install all 10 ML Kit modules via CocoaPods
+# 2. Build XCFrameworks for each module
+# 3. Generate checksums
+# 4. Update Package.swift with correct checksums
+# 5. Run verification checks
 
-### Option 2: Batch Build (Faster but Less Control)
+# Review changes
+git diff Package.swift Podfile.lock
 
-Use the batch build script to build all versions automatically:
+# After successful build and testing:
+git add -A
+git commit -m "Rebuild MLKit 9.0.0 with 8 additional modules
 
-```bash
-./scripts/batch_build.sh 7.0.0 8.0.0 9.0.0
-```
-
-This will:
-- Build each version sequentially
-- Create git commits automatically
-- Create git tags automatically
-- Stop and ask if you want to continue on failure
-
-After successful batch build:
-
-```bash
-# Push everything
-git push origin main
-git push origin --tags
+- Add TextRecognition, ImageLabeling, ObjectDetection
+- Add PoseDetection, SelfieSegmentation  
+- Add LanguageID, Translate, SmartReply
+- Total 10 modules now supported (was 2)"
 ```
 
 ## Creating GitHub Releases
 
-After pushing tags, create GitHub releases for each version:
+After successful build and testing, update the existing 9.0.0 release with new XCFrameworks:
 
-### Option A: Using GitHub CLI
+### Option A: Using upload script
 
 ```bash
-# For each version
-gh release create 7.0.0 GoogleMLKit/*.xcframework.zip \
-  --title "Release 7.0.0" \
-  --notes "Updated to MLKit 7.0.0"
+# Upload all XCFrameworks to existing 9.0.0 release
+./scripts/upload_release.sh 9.0.0
 
-gh release create 8.0.0 GoogleMLKit/*.xcframework.zip \
-  --title "Release 8.0.0" \
-  --notes "Updated to MLKit 8.0.0"
-
-gh release create 9.0.0 GoogleMLKit/*.xcframework.zip \
-  --title "Release 9.0.0" \
-  --notes "Updated to MLKit 9.0.0"
+# This will replace the old XCFrameworks with new ones that include all modules
 ```
 
-### Option B: Using GitHub Actions
+### Option B: Manual upload via GitHub CLI
 
-1. Go to Actions tab
-2. Run "Build MLKit XCFrameworks" workflow
-3. Enter version number
-4. Select "Create GitHub release"
-5. Click "Run workflow"
+```bash
+# Delete old assets from release (optional)
+gh release delete-asset 9.0.0 MLKitBarcodeScanning.xcframework.zip --yes
+gh release delete-asset 9.0.0 MLKitFaceDetection.xcframework.zip --yes
+# ... repeat for all old assets
 
-**Note:** You'll need to run this for each version separately.
+# Upload all new XCFrameworks
+gh release upload 9.0.0 GoogleMLKit/*.xcframework.zip
+```
+
+### Update Release Notes
+
+Edit the 9.0.0 release to document the new modules:
+
+```markdown
+# MLKit 9.0.0 - Extended Module Support
+
+This release expands Swift Package Manager support from 2 to 10 ML Kit modules.
+
+## New Modules Added
+
+### Vision APIs
+✨ Text Recognition (v2)
+✨ Image Labeling
+✨ Object Detection & Tracking
+✨ Pose Detection
+✨ Selfie Segmentation
+
+### Language APIs
+✨ Language Identification
+✨ Translation
+✨ Smart Reply
+
+### Existing Modules
+✅ Barcode Scanning
+✅ Face Detection
+
+## Installation
+
+See README.md for detailed installation instructions.
+
+## Breaking Changes
+
+None - existing integrations continue to work without modification.
+```
 
 ## Pre-Build Checklist
 
@@ -156,16 +177,32 @@ open Example.xcworkspace
 
 **Test Checklist:**
 
+### Basic Tests (Required)
 1. [ ] Build for physical iOS device (not simulator)
 2. [ ] App launches without crash
-3. [ ] Navigate to Barcode Scanner screen
-4. [ ] Scan a QR code or barcode
-5. [ ] Verify barcode is detected correctly
-6. [ ] Navigate to Face Detection screen
-7. [ ] Test face detection feature
-8. [ ] Check Xcode console for any warnings or errors
-9. [ ] No "unrecognized selector" errors
-10. [ ] No "bundle doesn't contain" errors
+3. [ ] Check Xcode console for any errors during startup
+
+### Existing Modules (Must Pass)
+4. [ ] Navigate to Barcode Scanner screen
+5. [ ] Scan a QR code or barcode
+6. [ ] Verify barcode is detected correctly
+7. [ ] Navigate to Face Detection screen
+8. [ ] Test face detection feature
+
+### New Modules (Verify No Crashes)
+9. [ ] Import and initialize TextRecognition - no crash
+10. [ ] Import and initialize ImageLabeling - no crash
+11. [ ] Import and initialize ObjectDetection - no crash
+12. [ ] Import and initialize PoseDetection - no crash
+13. [ ] Import and initialize SelfieSegmentation - no crash
+14. [ ] Import and initialize LanguageID - no crash
+15. [ ] Import and initialize Translate - no crash
+16. [ ] Import and initialize SmartReply - no crash
+
+### Console Checks
+17. [ ] No "unrecognized selector" errors
+18. [ ] No "bundle doesn't contain" errors
+19. [ ] No unexpected warnings
 
 **Common Runtime Issues:**
 
