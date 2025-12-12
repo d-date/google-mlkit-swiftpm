@@ -20,6 +20,14 @@ let package = Package(
       dependencies: [
         .product(name: "MLKitBarcodeScanning", package: "google-mlkit-swiftpm"),
         .product(name: "MLKitFaceDetection", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitTextRecognition", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitImageLabeling", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitObjectDetection", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitPoseDetection", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitSegmentationSelfie", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitLanguageID", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitTranslate", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitSmartReply", package: "google-mlkit-swiftpm"),
         .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
       ]),
     .testTarget(
