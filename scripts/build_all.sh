@@ -46,6 +46,18 @@ echo "This will take several minutes..."
 make run
 echo ""
 
+# Step 2.5: Analyze pod update changes
+if [ -f "pod_update.log" ]; then
+  echo "Step 2.5: Analyzing component changes from pod update..."
+  ruby scripts/parse_pod_update.rb pod_update.log || {
+    echo "Note: No component changes detected or log parse failed"
+  }
+  echo ""
+
+  # Save summary for later use
+  OUTPUT_FORMAT=summary ruby scripts/parse_pod_update.rb pod_update.log > pod_changes_summary.txt 2>/dev/null || true
+fi
+
 # Step 3: Verify build output
 echo "Step 3: Verifying build output..."
 ruby scripts/verify_build.rb || {
@@ -98,17 +110,19 @@ echo ""
 echo "2. Test the package:"
 echo "   swift package resolve"
 echo ""
-echo "3. Upload artifacts to GitHub release (requires existing release):"
+echo "3. Create GitHub release and upload artifacts:"
+echo "   ./scripts/create_release.sh $VERSION"
 echo "   ./scripts/upload_release.sh $VERSION"
 echo ""
 echo "4. Commit the changes:"
-echo "   git add Podfile Podfile.lock Package.swift README.md Resources/"
+echo "   git add Podfile Podfile.lock Package.swift README.md Resources/ pod_update.log pod_changes_summary.txt release_notes_$VERSION.md"
 echo "   git commit -m \"Update to MLKit $VERSION\""
 echo ""
-echo "5. Push and create tag:"
+echo "5. Push and tag:"
 echo "   git push"
 echo "   git tag -a $VERSION -m \"Release $VERSION\""
 echo "   git push origin $VERSION"
 echo ""
-echo "Or use GitHub Actions to automate steps 3-5"
+echo "Or run automation script:"
+echo "   ./scripts/automate_release.sh $VERSION"
 echo ""

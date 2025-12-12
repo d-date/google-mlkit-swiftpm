@@ -96,6 +96,21 @@ begin
   puts "Updating Podfile to MLKit version #{new_version}..."
   update_podfile(new_version)
 
+  # Run pod update to fetch new versions and capture output
+  puts "\nRunning pod update to fetch MLKit #{new_version}..."
+  require 'open3'
+
+  pod_output, pod_status = Open3.capture2e('bundle', 'exec', 'pod', 'update')
+  File.write('pod_update.log', pod_output)
+
+  if pod_status.success?
+    puts "✓ Pod update completed successfully"
+    puts "  Log saved to pod_update.log"
+  else
+    puts "Warning: Pod update exited with status #{pod_status.exitstatus}"
+    puts "  Log saved to pod_update.log for review"
+  end
+
   puts "\nParsing Podfile.lock for framework versions..."
   framework_versions = parse_podfile_lock
 
