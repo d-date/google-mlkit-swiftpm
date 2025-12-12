@@ -59,16 +59,21 @@ echo "Step 4: Calculating checksums and updating Package.swift..."
 ruby scripts/update_checksums.rb "$VERSION"
 echo ""
 
-# Step 5: Final verification
-echo "Step 5: Final verification..."
+# Step 5: Update README.md
+echo "Step 5: Updating README.md..."
+ruby scripts/update_readme.rb "$VERSION"
+echo ""
+
+# Step 6: Final verification
+echo "Step 6: Final verification..."
 ruby scripts/verify_build.rb || {
   echo "Final verification failed!"
   exit 1
 }
 echo ""
 
-# Step 6: Runtime verification
-echo "Step 6: Runtime verification..."
+# Step 7: Runtime verification
+echo "Step 7: Runtime verification..."
 ./scripts/verify_runtime.sh "$VERSION"
 echo ""
 
@@ -88,7 +93,7 @@ echo ""
 echo "Next steps:"
 echo ""
 echo "1. Review the changes:"
-echo "   git diff Package.swift Podfile Resources/"
+echo "   git diff Package.swift Podfile README.md Resources/"
 echo ""
 echo "2. Test the package:"
 echo "   swift package resolve"
@@ -97,7 +102,7 @@ echo "3. Upload artifacts to GitHub release (requires existing release):"
 echo "   ./scripts/upload_release.sh $VERSION"
 echo ""
 echo "4. Commit the changes:"
-echo "   git add Podfile Podfile.lock Package.swift Resources/"
+echo "   git add Podfile Podfile.lock Package.swift README.md Resources/"
 echo "   git commit -m \"Update to MLKit $VERSION\""
 echo ""
 echo "5. Push and create tag:"
