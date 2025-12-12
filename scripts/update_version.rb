@@ -7,7 +7,7 @@ require 'fileutils'
 def update_podfile(new_version)
   podfile = File.read('Podfile')
   updated = podfile.gsub(
-    /pod\s+'GoogleMLKit\/(FaceDetection|BarcodeScanning)',\s+'~>\s+[0-9]+(?:\.[0-9]+)*'/,
+    /pod\s+'GoogleMLKit\/(FaceDetection|BarcodeScanning|TextRecognition|ImageLabeling|ObjectDetection|PoseDetection|SelfieSegmentation|LanguageID|Translate|SmartReply)',\s+'~>\s+[0-9]+(?:\.[0-9]+)*'/,
     "pod 'GoogleMLKit/\\1', '~> #{new_version}'"
   )
   File.write('Podfile', updated)
@@ -44,7 +44,15 @@ PLIST_TO_FRAMEWORK = {
   'MLKitBarcodeScanning-Info.plist' => 'MLKitBarcodeScanning',
   'MLKitFaceDetection-Info.plist' => 'MLKitFaceDetection',
   'MLKitVision-Info.plist' => 'MLKitVision',
-  'MLImage-Info.plist' => 'MLImage'
+  'MLImage-Info.plist' => 'MLImage',
+  'MLKitTextRecognition-Info.plist' => 'MLKitTextRecognition',
+  'MLKitImageLabeling-Info.plist' => 'MLKitImageLabeling',
+  'MLKitObjectDetection-Info.plist' => 'MLKitObjectDetection',
+  'MLKitPoseDetection-Info.plist' => 'MLKitPoseDetection',
+  'MLKitSegmentationSelfie-Info.plist' => 'MLKitSegmentationSelfie',
+  'MLKitLanguageID-Info.plist' => 'MLKitLanguageID',
+  'MLKitTranslate-Info.plist' => 'MLKitTranslate',
+  'MLKitSmartReply-Info.plist' => 'MLKitSmartReply'
 }.freeze
 
 # Update Info.plist files with versions from Podfile.lock

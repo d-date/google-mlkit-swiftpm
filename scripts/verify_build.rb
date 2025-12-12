@@ -6,6 +6,14 @@ def verify_xcframeworks
   required_frameworks = [
     'MLKitBarcodeScanning',
     'MLKitFaceDetection',
+    'MLKitTextRecognition',
+    'MLKitImageLabeling',
+    'MLKitObjectDetection',
+    'MLKitPoseDetection',
+    'MLKitSegmentationSelfie',
+    'MLKitLanguageID',
+    'MLKitTranslate',
+    'MLKitSmartReply',
     'MLImage',
     'MLKitCommon',
     'MLKitVision',
@@ -83,7 +91,15 @@ def verify_info_plists
     'MLKitBarcodeScanning-Info.plist',
     'MLKitFaceDetection-Info.plist',
     'MLKitVision-Info.plist',
-    'MLImage-Info.plist'
+    'MLImage-Info.plist',
+    'MLKitTextRecognition-Info.plist',
+    'MLKitImageLabeling-Info.plist',
+    'MLKitObjectDetection-Info.plist',
+    'MLKitPoseDetection-Info.plist',
+    'MLKitSegmentationSelfie-Info.plist',
+    'MLKitLanguageID-Info.plist',
+    'MLKitTranslate-Info.plist',
+    'MLKitSmartReply-Info.plist'
   ]
 
   missing = []
