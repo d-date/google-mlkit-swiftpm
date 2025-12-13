@@ -13,8 +13,32 @@ This is experimental project for building MLKit in Swift Package Manager.
 
 ### Use Swift Package Manager to install
 
+Add the package dependency to your `Package.swift`:
+
 ```swift
+dependencies: [
     .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "9.0.0")
+]
+```
+
+Then add the specific ML Kit modules you need to your target dependencies:
+
+```swift
+.target(
+    name: "YourTarget",
+    dependencies: [
+        .product(name: "MLKitBarcodeScanning", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitFaceDetection", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitTextRecognition", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitImageLabeling", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitObjectDetection", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitPoseDetection", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitSegmentationSelfie", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitLanguageID", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitTranslate", package: "google-mlkit-swiftpm"),
+        .product(name: "MLKitSmartReply", package: "google-mlkit-swiftpm"),
+    ]
+)
 ```
 
 ### Add Linker flags
@@ -24,16 +48,38 @@ Add these flags to `Other Linker Flags` in Build Settings of your Xcode projects
 - `-ObjC`
 - `-all_load`
 
-### Link `.bundle` to your project
+### Link resource bundles to your project (if needed)
 
-The `MLKitFaceDetection` contains `GoogleMVFaceDetectorResources.bundle`. Since the bundle can't be introduced via Swift PM, you need to link to your project by yourself.
+Some ML Kit modules require resource bundles. Currently:
 
-Download `GoogleMVFaceDetectorResources.bundle` from [Release](https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/GoogleMVFaceDetectorResources.bundle.zip) and add to your Xcode project and make it available in your build target.
+#### Face Detection
+The `MLKitFaceDetection` module requires `GoogleMVFaceDetectorResources.bundle`. Since bundles can't be automatically included via Swift Package Manager, you need to manually add it to your project.
+
+Download `GoogleMVFaceDetectorResources.bundle` from [Release](https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/GoogleMVFaceDetectorResources.bundle.zip) and add it to your Xcode project, ensuring it's included in your build target.
+
+**Note**: Other modules (Text Recognition, Pose Detection, Object Detection, Selfie Segmentation, Translation) may also require resource bundles or downloaded models at runtime. Check the official [ML Kit documentation](https://developers.google.com/ml-kit) for specific requirements.
+
+## Supported Features
+
+This package supports the following Google ML Kit features:
+
+### Vision APIs
+- **Barcode Scanning** - Scan and decode barcodes
+- **Face Detection** - Detect faces and facial features  
+- **Text Recognition** - Recognize text in images (v2)
+- **Image Labeling** - Identify objects, locations, activities, and more
+- **Object Detection & Tracking** - Detect and track objects in images and video
+- **Pose Detection** - Detect body poses and positions
+- **Selfie Segmentation** - Segment people from the background
+
+### Language APIs
+- **Language Identification** - Identify the language of text
+- **Translation** - Translate text between languages
+- **Smart Reply** - Generate contextual reply suggestions
 
 ## Limitation
 
 - Since pre-built MLKit binary missing `arm64` for iphonesimulator, this project enables to build in `arm64` for iphoneos and `x86_64` for iphonesimulator only.
-- Only supported `Face Detection` and `Barcode Scanning` right now.
 
 ## Example
 

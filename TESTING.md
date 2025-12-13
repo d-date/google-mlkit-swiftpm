@@ -61,6 +61,14 @@ open Example.xcworkspace
 6. [ ] Navigate to Face Detection
 7. [ ] Use face detection feature
 8. [ ] Check console for warnings
+9. [ ] Test Text Recognition (if UI available)
+10. [ ] Test Image Labeling (if UI available)
+11. [ ] Test Object Detection (if UI available)
+12. [ ] Test Pose Detection (if UI available)
+13. [ ] Test Selfie Segmentation (if UI available)
+14. [ ] Test Language ID (if UI available)
+15. [ ] Test Translation (if UI available)
+16. [ ] Test Smart Reply (if UI available)
 
 #### Simulator Testing (Optional)
 1. [ ] Build for iOS Simulator (Intel Mac)

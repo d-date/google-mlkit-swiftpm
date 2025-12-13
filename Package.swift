@@ -12,6 +12,51 @@ let package = Package(
     .library(
       name: "MLKitFaceDetection",
       targets: ["MLKitFaceDetection", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitTextRecognition",
+      targets: ["MLKitTextRecognition", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitTextRecognitionChinese",
+      targets: ["MLKitTextRecognitionChinese", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitTextRecognitionDevanagari",
+      targets: ["MLKitTextRecognitionDevanagari", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitTextRecognitionJapanese",
+      targets: ["MLKitTextRecognitionJapanese", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitTextRecognitionKorean",
+      targets: ["MLKitTextRecognitionKorean", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitImageLabeling",
+      targets: ["MLKitImageLabeling", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitImageLabelingCustom",
+      targets: ["MLKitImageLabelingCustom", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitObjectDetection",
+      targets: ["MLKitObjectDetection", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitObjectDetectionCustom",
+      targets: ["MLKitObjectDetectionCustom", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitPoseDetection",
+      targets: ["MLKitPoseDetection", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitPoseDetectionAccurate",
+      targets: ["MLKitPoseDetectionAccurate", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitSegmentationSelfie",
+      targets: ["MLKitSegmentationSelfie", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitLanguageID",
+      targets: ["MLKitLanguageID", "MLKitCommon", "Common"]),
+    .library(
+      name: "MLKitTranslate",
+      targets: ["MLKitTranslate", "MLKitCommon", "Common"]),
+    .library(
+      name: "MLKitSmartReply",
+      targets: ["MLKitSmartReply", "MLKitCommon", "Common"]),
   ],
   dependencies: [
     .package(url: "https://github.com/google/promises.git", exact: "2.4.0"),
@@ -40,6 +85,51 @@ let package = Package(
     // .binaryTarget(
     //   name: "GoogleToolboxForMac",
     //   path: "GoogleMLKit/GoogleToolboxForMac.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitTextRecognition",
+    //   path: "GoogleMLKit/MLKitTextRecognition.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitTextRecognitionChinese",
+    //   path: "GoogleMLKit/MLKitTextRecognitionChinese.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitTextRecognitionDevanagari",
+    //   path: "GoogleMLKit/MLKitTextRecognitionDevanagari.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitTextRecognitionJapanese",
+    //   path: "GoogleMLKit/MLKitTextRecognitionJapanese.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitTextRecognitionKorean",
+    //   path: "GoogleMLKit/MLKitTextRecognitionKorean.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitImageLabeling",
+    //   path: "GoogleMLKit/MLKitImageLabeling.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitImageLabelingCustom",
+    //   path: "GoogleMLKit/MLKitImageLabelingCustom.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitObjectDetection",
+    //   path: "GoogleMLKit/MLKitObjectDetection.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitObjectDetectionCustom",
+    //   path: "GoogleMLKit/MLKitObjectDetectionCustom.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitPoseDetection",
+    //   path: "GoogleMLKit/MLKitPoseDetection.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitPoseDetectionAccurate",
+    //   path: "GoogleMLKit/MLKitPoseDetectionAccurate.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitSegmentationSelfie",
+    //   path: "GoogleMLKit/MLKitSegmentationSelfie.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitLanguageID",
+    //   path: "GoogleMLKit/MLKitLanguageID.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitTranslate",
+    //   path: "GoogleMLKit/MLKitTranslate.xcframework"),
+    // .binaryTarget(
+    //   name: "MLKitSmartReply",
+    //   path: "GoogleMLKit/MLKitSmartReply.xcframework"),
 
     .binaryTarget(
       name: "MLImage",
@@ -65,6 +155,66 @@ let package = Package(
       name: "GoogleToolboxForMac",
       url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/GoogleToolboxForMac.xcframework.zip",
       checksum: "cae476b525ff05f2b5c126c55d1acc1cc6f068edd31e01bd3743db6d8fd8cc82"),
+    .binaryTarget(
+      name: "MLKitTextRecognition",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitTextRecognition.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitTextRecognitionChinese",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitTextRecognitionChinese.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitTextRecognitionDevanagari",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitTextRecognitionDevanagari.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitTextRecognitionJapanese",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitTextRecognitionJapanese.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitTextRecognitionKorean",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitTextRecognitionKorean.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitImageLabeling",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitImageLabeling.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitImageLabelingCustom",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitImageLabelingCustom.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitObjectDetection",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitObjectDetection.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitObjectDetectionCustom",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitObjectDetectionCustom.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitPoseDetection",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitPoseDetection.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitPoseDetectionAccurate",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitPoseDetectionAccurate.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitSegmentationSelfie",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitSegmentationSelfie.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitLanguageID",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitLanguageID.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitTranslate",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitTranslate.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
+    .binaryTarget(
+      name: "MLKitSmartReply",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitSmartReply.xcframework.zip",
+      checksum: "0000000000000000000000000000000000000000000000000000000000000000"),
     .target(
       name: "Common",
       dependencies: [
