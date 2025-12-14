@@ -12,6 +12,9 @@ let package = Package(
     .library(
       name: "MLKitFaceDetection",
       targets: ["MLKitFaceDetection", "MLImage", "MLKitVision", "Common"]),
+    .library(
+      name: "MLKitVision",
+      targets: ["MLKitVision", "Common"]),
   ],
   dependencies: [
     .package(url: "https://github.com/google/promises.git", exact: "2.4.0"),
