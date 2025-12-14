@@ -72,7 +72,6 @@ let package = Package(
         "GoogleToolboxForMac",
         .product(name: "GULAppDelegateSwizzler", package: "GoogleUtilities"),
         .product(name: "GULEnvironment", package: "GoogleUtilities"),
-        .product(name: "GULISASwizzler", package: "GoogleUtilities"),
         .product(name: "GULLogger", package: "GoogleUtilities"),
         .product(name: "GULMethodSwizzler", package: "GoogleUtilities"),
         .product(name: "GULNSData", package: "GoogleUtilities"),
