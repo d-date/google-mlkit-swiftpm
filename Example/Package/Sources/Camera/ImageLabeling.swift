@@ -9,7 +9,7 @@ public struct ImageLabelingClient {
 }
 
 public extension ImageLabelingClient {
-  static var live = Self(labelImageFromImage: { image, options in
+  @MainActor static let live = Self(labelImageFromImage: { image, options in
     let visionImage = VisionImage(image: image)
     visionImage.orientation = image.imageOrientation
 

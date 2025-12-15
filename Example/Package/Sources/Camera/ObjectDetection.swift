@@ -9,7 +9,7 @@ public struct ObjectDetectionClient {
 }
 
 public extension ObjectDetectionClient {
-  static var live = Self(detectObjectsFromImage: { image, options in
+  @MainActor static let live = Self(detectObjectsFromImage: { image, options in
     let visionImage = VisionImage(image: image)
     visionImage.orientation = image.imageOrientation
 

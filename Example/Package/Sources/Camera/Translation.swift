@@ -7,7 +7,7 @@ public struct TranslationClient {
 }
 
 public extension TranslationClient {
-  static var live = Self(translate: { text, sourceLanguage, targetLanguage in
+  @MainActor static var live = Self(translate: { text, sourceLanguage, targetLanguage in
     let options = TranslatorOptions(sourceLanguage: sourceLanguage, targetLanguage: targetLanguage)
     let translator = Translator.translator(options: options)
     return try await translator.translate(text)

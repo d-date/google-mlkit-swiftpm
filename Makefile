@@ -49,12 +49,27 @@ prepare-info-plist:
 	@cp -rf "./Resources/MLKitLanguageID-Info.plist" "./Pods/MLKitLanguageID/Frameworks/MLKitLanguageID.framework/Info.plist"
 	@cp -rf "./Resources/MLKitTranslate-Info.plist" "./Pods/MLKitTranslate/Frameworks/MLKitTranslate.framework/Info.plist"
 	@cp -rf "./Resources/MLKitSmartReply-Info.plist" "./Pods/MLKitSmartReply/Frameworks/MLKitSmartReply.framework/Info.plist"
+	@cp -rf "./Resources/MLKitVisionKit-Info.plist" "./Pods/MLKitVisionKit/Frameworks/MLKitVisionKit.framework/Info.plist"
+	@cp -rf "./Resources/MLKitImageLabelingCommon-Info.plist" "./Pods/MLKitImageLabelingCommon/Frameworks/MLKitImageLabelingCommon.framework/Info.plist"
+	@cp -rf "./Resources/MLKitObjectDetectionCommon-Info.plist" "./Pods/MLKitObjectDetectionCommon/Frameworks/MLKitObjectDetectionCommon.framework/Info.plist"
+	@cp -rf "./Resources/MLKitPoseDetectionCommon-Info.plist" "./Pods/MLKitPoseDetectionCommon/Frameworks/MLKitPoseDetectionCommon.framework/Info.plist"
+	@cp -rf "./Resources/MLKitSegmentationCommon-Info.plist" "./Pods/MLKitSegmentationCommon/Frameworks/MLKitSegmentationCommon.framework/Info.plist"
+	@cp -rf "./Resources/MLKitTextRecognitionCommon-Info.plist" "./Pods/MLKitTextRecognitionCommon/Frameworks/MLKitTextRecognitionCommon.framework/Info.plist"
+	@cp -rf "./Resources/MLKitXenoCommon-Info.plist" "./Pods/MLKitXenoCommon/Frameworks/MLKitXenoCommon.framework/Info.plist"
+	@cp -rf "./Resources/MLKitNaturalLanguage-Info.plist" "./Pods/MLKitNaturalLanguage/Frameworks/MLKitNaturalLanguage.framework/Info.plist"
 create-xcframework: bootstrap-builder build-cocoapods prepare-info-plist
 	@rm -rf GoogleMLKit
 	@xcodebuild -create-xcframework \
 		-framework Pods/Pods/Build/Release-iphonesimulator/GoogleToolboxForMac/GoogleToolboxForMac.framework \
 		-framework Pods/Pods/Build/Release-iphoneos/GoogleToolboxForMac/GoogleToolboxForMac.framework \
 		-output GoogleMLKit/GoogleToolboxForMac.xcframework
+	@xcodebuild -create-xcframework \
+		-framework Pods/Pods/Build/Release-iphonesimulator/SSZipArchive/SSZipArchive.framework \
+		-framework Pods/Pods/Build/Release-iphoneos/SSZipArchive/SSZipArchive.framework \
+		-output GoogleMLKit/SSZipArchive.xcframework
+	@xcframework-maker/.build/release/make-xcframework \
+	-ios ./Pods/MLKitNaturalLanguage/Frameworks/MLKitNaturalLanguage.framework \
+	-output GoogleMLKit
 	@xcframework-maker/.build/release/make-xcframework \
 	-ios ./Pods/MLImage/Frameworks/MLImage.framework \
 	-output GoogleMLKit
@@ -63,6 +78,27 @@ create-xcframework: bootstrap-builder build-cocoapods prepare-info-plist
 	-output GoogleMLKit
 	@xcframework-maker/.build/release/make-xcframework \
 	-ios ./Pods/MLKitVision/Frameworks/MLKitVision.framework \
+	-output GoogleMLKit
+	@xcframework-maker/.build/release/make-xcframework \
+	-ios ./Pods/MLKitVisionKit/Frameworks/MLKitVisionKit.framework \
+	-output GoogleMLKit
+	@xcframework-maker/.build/release/make-xcframework \
+	-ios ./Pods/MLKitImageLabelingCommon/Frameworks/MLKitImageLabelingCommon.framework \
+	-output GoogleMLKit
+	@xcframework-maker/.build/release/make-xcframework \
+	-ios ./Pods/MLKitObjectDetectionCommon/Frameworks/MLKitObjectDetectionCommon.framework \
+	-output GoogleMLKit
+	@xcframework-maker/.build/release/make-xcframework \
+	-ios ./Pods/MLKitPoseDetectionCommon/Frameworks/MLKitPoseDetectionCommon.framework \
+	-output GoogleMLKit
+	@xcframework-maker/.build/release/make-xcframework \
+	-ios ./Pods/MLKitSegmentationCommon/Frameworks/MLKitSegmentationCommon.framework \
+	-output GoogleMLKit
+	@xcframework-maker/.build/release/make-xcframework \
+	-ios ./Pods/MLKitTextRecognitionCommon/Frameworks/MLKitTextRecognitionCommon.framework \
+	-output GoogleMLKit
+	@xcframework-maker/.build/release/make-xcframework \
+	-ios ./Pods/MLKitXenoCommon/Frameworks/MLKitXenoCommon.framework \
 	-output GoogleMLKit
 	@xcframework-maker/.build/release/make-xcframework \
 	-ios ./Pods/MLKitBarcodeScanning/Frameworks/MLKitBarcodeScanning.framework \
@@ -140,56 +176,6 @@ archive: create-xcframework copy-resource-bundle
 	 && ar r MLKitFaceDetection MLKitFaceDetection.o \
 	 && ranlib MLKitFaceDetection \
 	 && rm MLKitFaceDetection.o
-	@cd ./GoogleMLKit/MLKitTextRecognition.xcframework/ios-arm64/MLKitTextRecognition.framework \
-	 && mv MLKitTextRecognition MLKitTextRecognition.o \
-	 && ar r MLKitTextRecognition MLKitTextRecognition.o \
-	 && ranlib MLKitTextRecognition \
-	 && rm MLKitTextRecognition.o
-	@cd ./GoogleMLKit/MLKitTextRecognition.xcframework/ios-x86_64-simulator/MLKitTextRecognition.framework \
-	 && mv MLKitTextRecognition MLKitTextRecognition.o \
-	 && ar r MLKitTextRecognition MLKitTextRecognition.o \
-	 && ranlib MLKitTextRecognition \
-	 && rm MLKitTextRecognition.o
-	@cd ./GoogleMLKit/MLKitTextRecognitionChinese.xcframework/ios-arm64/MLKitTextRecognitionChinese.framework \
-	 && mv MLKitTextRecognitionChinese MLKitTextRecognitionChinese.o \
-	 && ar r MLKitTextRecognitionChinese MLKitTextRecognitionChinese.o \
-	 && ranlib MLKitTextRecognitionChinese \
-	 && rm MLKitTextRecognitionChinese.o
-	@cd ./GoogleMLKit/MLKitTextRecognitionChinese.xcframework/ios-x86_64-simulator/MLKitTextRecognitionChinese.framework \
-	 && mv MLKitTextRecognitionChinese MLKitTextRecognitionChinese.o \
-	 && ar r MLKitTextRecognitionChinese MLKitTextRecognitionChinese.o \
-	 && ranlib MLKitTextRecognitionChinese \
-	 && rm MLKitTextRecognitionChinese.o
-	@cd ./GoogleMLKit/MLKitTextRecognitionDevanagari.xcframework/ios-arm64/MLKitTextRecognitionDevanagari.framework \
-	 && mv MLKitTextRecognitionDevanagari MLKitTextRecognitionDevanagari.o \
-	 && ar r MLKitTextRecognitionDevanagari MLKitTextRecognitionDevanagari.o \
-	 && ranlib MLKitTextRecognitionDevanagari \
-	 && rm MLKitTextRecognitionDevanagari.o
-	@cd ./GoogleMLKit/MLKitTextRecognitionDevanagari.xcframework/ios-x86_64-simulator/MLKitTextRecognitionDevanagari.framework \
-	 && mv MLKitTextRecognitionDevanagari MLKitTextRecognitionDevanagari.o \
-	 && ar r MLKitTextRecognitionDevanagari MLKitTextRecognitionDevanagari.o \
-	 && ranlib MLKitTextRecognitionDevanagari \
-	 && rm MLKitTextRecognitionDevanagari.o
-	@cd ./GoogleMLKit/MLKitTextRecognitionJapanese.xcframework/ios-arm64/MLKitTextRecognitionJapanese.framework \
-	 && mv MLKitTextRecognitionJapanese MLKitTextRecognitionJapanese.o \
-	 && ar r MLKitTextRecognitionJapanese MLKitTextRecognitionJapanese.o \
-	 && ranlib MLKitTextRecognitionJapanese \
-	 && rm MLKitTextRecognitionJapanese.o
-	@cd ./GoogleMLKit/MLKitTextRecognitionJapanese.xcframework/ios-x86_64-simulator/MLKitTextRecognitionJapanese.framework \
-	 && mv MLKitTextRecognitionJapanese MLKitTextRecognitionJapanese.o \
-	 && ar r MLKitTextRecognitionJapanese MLKitTextRecognitionJapanese.o \
-	 && ranlib MLKitTextRecognitionJapanese \
-	 && rm MLKitTextRecognitionJapanese.o
-	@cd ./GoogleMLKit/MLKitTextRecognitionKorean.xcframework/ios-arm64/MLKitTextRecognitionKorean.framework \
-	 && mv MLKitTextRecognitionKorean MLKitTextRecognitionKorean.o \
-	 && ar r MLKitTextRecognitionKorean MLKitTextRecognitionKorean.o \
-	 && ranlib MLKitTextRecognitionKorean \
-	 && rm MLKitTextRecognitionKorean.o
-	@cd ./GoogleMLKit/MLKitTextRecognitionKorean.xcframework/ios-x86_64-simulator/MLKitTextRecognitionKorean.framework \
-	 && mv MLKitTextRecognitionKorean MLKitTextRecognitionKorean.o \
-	 && ar r MLKitTextRecognitionKorean MLKitTextRecognitionKorean.o \
-	 && ranlib MLKitTextRecognitionKorean \
-	 && rm MLKitTextRecognitionKorean.o
 	@cd ./GoogleMLKit/MLKitImageLabeling.xcframework/ios-arm64/MLKitImageLabeling.framework \
 	 && mv MLKitImageLabeling MLKitImageLabeling.o \
 	 && ar r MLKitImageLabeling MLKitImageLabeling.o \
@@ -200,66 +186,6 @@ archive: create-xcframework copy-resource-bundle
 	 && ar r MLKitImageLabeling MLKitImageLabeling.o \
 	 && ranlib MLKitImageLabeling \
 	 && rm MLKitImageLabeling.o
-	@cd ./GoogleMLKit/MLKitImageLabelingCustom.xcframework/ios-arm64/MLKitImageLabelingCustom.framework \
-	 && mv MLKitImageLabelingCustom MLKitImageLabelingCustom.o \
-	 && ar r MLKitImageLabelingCustom MLKitImageLabelingCustom.o \
-	 && ranlib MLKitImageLabelingCustom \
-	 && rm MLKitImageLabelingCustom.o
-	@cd ./GoogleMLKit/MLKitImageLabelingCustom.xcframework/ios-x86_64-simulator/MLKitImageLabelingCustom.framework \
-	 && mv MLKitImageLabelingCustom MLKitImageLabelingCustom.o \
-	 && ar r MLKitImageLabelingCustom MLKitImageLabelingCustom.o \
-	 && ranlib MLKitImageLabelingCustom \
-	 && rm MLKitImageLabelingCustom.o
-	@cd ./GoogleMLKit/MLKitObjectDetection.xcframework/ios-arm64/MLKitObjectDetection.framework \
-	 && mv MLKitObjectDetection MLKitObjectDetection.o \
-	 && ar r MLKitObjectDetection MLKitObjectDetection.o \
-	 && ranlib MLKitObjectDetection \
-	 && rm MLKitObjectDetection.o
-	@cd ./GoogleMLKit/MLKitObjectDetection.xcframework/ios-x86_64-simulator/MLKitObjectDetection.framework \
-	 && mv MLKitObjectDetection MLKitObjectDetection.o \
-	 && ar r MLKitObjectDetection MLKitObjectDetection.o \
-	 && ranlib MLKitObjectDetection \
-	 && rm MLKitObjectDetection.o
-	@cd ./GoogleMLKit/MLKitObjectDetectionCustom.xcframework/ios-arm64/MLKitObjectDetectionCustom.framework \
-	 && mv MLKitObjectDetectionCustom MLKitObjectDetectionCustom.o \
-	 && ar r MLKitObjectDetectionCustom MLKitObjectDetectionCustom.o \
-	 && ranlib MLKitObjectDetectionCustom \
-	 && rm MLKitObjectDetectionCustom.o
-	@cd ./GoogleMLKit/MLKitObjectDetectionCustom.xcframework/ios-x86_64-simulator/MLKitObjectDetectionCustom.framework \
-	 && mv MLKitObjectDetectionCustom MLKitObjectDetectionCustom.o \
-	 && ar r MLKitObjectDetectionCustom MLKitObjectDetectionCustom.o \
-	 && ranlib MLKitObjectDetectionCustom \
-	 && rm MLKitObjectDetectionCustom.o
-	@cd ./GoogleMLKit/MLKitPoseDetection.xcframework/ios-arm64/MLKitPoseDetection.framework \
-	 && mv MLKitPoseDetection MLKitPoseDetection.o \
-	 && ar r MLKitPoseDetection MLKitPoseDetection.o \
-	 && ranlib MLKitPoseDetection \
-	 && rm MLKitPoseDetection.o
-	@cd ./GoogleMLKit/MLKitPoseDetection.xcframework/ios-x86_64-simulator/MLKitPoseDetection.framework \
-	 && mv MLKitPoseDetection MLKitPoseDetection.o \
-	 && ar r MLKitPoseDetection MLKitPoseDetection.o \
-	 && ranlib MLKitPoseDetection \
-	 && rm MLKitPoseDetection.o
-	@cd ./GoogleMLKit/MLKitPoseDetectionAccurate.xcframework/ios-arm64/MLKitPoseDetectionAccurate.framework \
-	 && mv MLKitPoseDetectionAccurate MLKitPoseDetectionAccurate.o \
-	 && ar r MLKitPoseDetectionAccurate MLKitPoseDetectionAccurate.o \
-	 && ranlib MLKitPoseDetectionAccurate \
-	 && rm MLKitPoseDetectionAccurate.o
-	@cd ./GoogleMLKit/MLKitPoseDetectionAccurate.xcframework/ios-x86_64-simulator/MLKitPoseDetectionAccurate.framework \
-	 && mv MLKitPoseDetectionAccurate MLKitPoseDetectionAccurate.o \
-	 && ar r MLKitPoseDetectionAccurate MLKitPoseDetectionAccurate.o \
-	 && ranlib MLKitPoseDetectionAccurate \
-	 && rm MLKitPoseDetectionAccurate.o
-	@cd ./GoogleMLKit/MLKitSegmentationSelfie.xcframework/ios-arm64/MLKitSegmentationSelfie.framework \
-	 && mv MLKitSegmentationSelfie MLKitSegmentationSelfie.o \
-	 && ar r MLKitSegmentationSelfie MLKitSegmentationSelfie.o \
-	 && ranlib MLKitSegmentationSelfie \
-	 && rm MLKitSegmentationSelfie.o
-	@cd ./GoogleMLKit/MLKitSegmentationSelfie.xcframework/ios-x86_64-simulator/MLKitSegmentationSelfie.framework \
-	 && mv MLKitSegmentationSelfie MLKitSegmentationSelfie.o \
-	 && ar r MLKitSegmentationSelfie MLKitSegmentationSelfie.o \
-	 && ranlib MLKitSegmentationSelfie \
-	 && rm MLKitSegmentationSelfie.o
 	@cd ./GoogleMLKit/MLKitLanguageID.xcframework/ios-arm64/MLKitLanguageID.framework \
 	 && mv MLKitLanguageID MLKitLanguageID.o \
 	 && ar r MLKitLanguageID MLKitLanguageID.o \
@@ -309,9 +235,18 @@ archive: create-xcframework copy-resource-bundle
 	 && zip -r MLKitTranslate.xcframework.zip MLKitTranslate.xcframework \
 	 && zip -r MLKitSmartReply.xcframework.zip MLKitSmartReply.xcframework \
 	 && zip -r GoogleToolboxForMac.xcframework.zip GoogleToolboxForMac.xcframework \
+	 && zip -r SSZipArchive.xcframework.zip SSZipArchive.xcframework \
+	 && zip -r MLKitNaturalLanguage.xcframework.zip MLKitNaturalLanguage.xcframework \
 	 && zip -r MLImage.xcframework.zip MLImage.xcframework \
 	 && zip -r MLKitCommon.xcframework.zip MLKitCommon.xcframework \
 	 && zip -r MLKitVision.xcframework.zip MLKitVision.xcframework \
+	 && zip -r MLKitVisionKit.xcframework.zip MLKitVisionKit.xcframework \
+	 && zip -r MLKitImageLabelingCommon.xcframework.zip MLKitImageLabelingCommon.xcframework \
+	 && zip -r MLKitObjectDetectionCommon.xcframework.zip MLKitObjectDetectionCommon.xcframework \
+	 && zip -r MLKitPoseDetectionCommon.xcframework.zip MLKitPoseDetectionCommon.xcframework \
+	 && zip -r MLKitSegmentationCommon.xcframework.zip MLKitSegmentationCommon.xcframework \
+	 && zip -r MLKitTextRecognitionCommon.xcframework.zip MLKitTextRecognitionCommon.xcframework \
+	 && zip -r MLKitXenoCommon.xcframework.zip MLKitXenoCommon.xcframework \
 	 && zip -r GoogleMVFaceDetectorResources.bundle.zip GoogleMVFaceDetectorResources.bundle
 .PHONY:
 run: archive

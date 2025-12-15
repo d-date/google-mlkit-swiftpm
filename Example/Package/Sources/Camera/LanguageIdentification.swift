@@ -7,7 +7,7 @@ public struct LanguageIdentificationClient {
 }
 
 public extension LanguageIdentificationClient {
-  static var live = Self(identifyLanguage: { text in
+  @MainActor static let live = Self(identifyLanguage: { text in
     let languageId = LanguageIdentification.languageIdentification()
     return try await languageId.identifyLanguage(for: text)
   }, identifyPossibleLanguages: { text in

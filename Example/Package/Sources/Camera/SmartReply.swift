@@ -1,13 +1,16 @@
 import Foundation
 @_exported import MLKitSmartReply
+@_exported import MLKitXenoCommon
 
 public struct SmartReplyClient {
-  public var suggestReplies: ([TextMessage]) async throws -> [SmartReplySuggestion]
+  public var suggestReplies: ([TextMessage]) async throws -> (
+    SmartReplyResultStatus, [SmartReplySuggestion]
+  )
 }
 
 public extension SmartReplyClient {
-  static var live = Self(suggestReplies: { messages in
-    let smartReply = NaturalLanguage.naturalLanguage().smartReply()
-    return try await smartReply.suggestReplies(for: messages)
+  @MainActor static let live = Self(suggestReplies: { messages in
+    let result = try await SmartReply.smartReply().suggestReplies(for: messages)
+    return (result.status, result.suggestions)
   })
 }

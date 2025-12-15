@@ -9,7 +9,7 @@ public struct PoseDetectionClient {
 }
 
 public extension PoseDetectionClient {
-  static var live = Self(detectPoseFromImage: { image, options in
+  @MainActor static let live = Self(detectPoseFromImage: { image, options in
     let visionImage = VisionImage(image: image)
     visionImage.orientation = image.imageOrientation
 

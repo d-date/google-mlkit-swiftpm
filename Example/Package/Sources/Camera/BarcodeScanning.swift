@@ -9,7 +9,7 @@ public struct BarcodeScanClient {
 }
 
 public extension BarcodeScanClient {
-  static var live = Self(barcodeScanFromImage: { image, formats in
+  @MainActor static let live = Self(barcodeScanFromImage: { image, formats in
     let barcodeOptions = BarcodeScannerOptions(formats: formats)
     let visionImage = VisionImage(image: image)
     visionImage.orientation = image.imageOrientation

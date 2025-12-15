@@ -7,7 +7,7 @@ require 'fileutils'
 def update_podfile(new_version)
   podfile = File.read('Podfile')
   updated = podfile.gsub(
-    /pod\s+'GoogleMLKit\/(FaceDetection|BarcodeScanning|TextRecognition|TextRecognitionChinese|TextRecognitionDevanagari|TextRecognitionJapanese|TextRecognitionKorean|ImageLabeling|ImageLabelingCustom|ObjectDetection|ObjectDetectionCustom|PoseDetection|PoseDetectionAccurate|SelfieSegmentation|LanguageID|Translate|SmartReply)',\s+'~>\s+[0-9]+(?:\.[0-9]+)*'/,
+    /pod\s+'GoogleMLKit\/(FaceDetection|BarcodeScanning|TextRecognition|TextRecognitionChinese|TextRecognitionDevanagari|TextRecognitionJapanese|TextRecognitionKorean|ImageLabeling|ImageLabelingCustom|ObjectDetection|ObjectDetectionCustom|PoseDetection|PoseDetectionAccurate|SegmentationSelfie|LanguageID|Translate|SmartReply)',\s+'~>\s+[0-9]+(?:\.[0-9]+)*'/,
     "pod 'GoogleMLKit/\\1', '~> #{new_version}'"
   )
   File.write('Podfile', updated)

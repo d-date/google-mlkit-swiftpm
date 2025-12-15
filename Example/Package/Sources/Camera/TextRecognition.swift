@@ -9,11 +9,12 @@ public struct TextRecognitionClient {
 }
 
 public extension TextRecognitionClient {
-  static var live = Self(recognizeTextFromImage: { image in
+  @MainActor static let live = Self(recognizeTextFromImage: { image in
     let visionImage = VisionImage(image: image)
     visionImage.orientation = image.imageOrientation
 
-    let textRecognizer = TextRecognizer.textRecognizer()
+    let options = TextRecognizerOptions()
+    let textRecognizer = TextRecognizer.textRecognizer(options: options)
     return try await textRecognizer.process(visionImage)
   }, recognizeTextFromBuffer: { sampleBuffer, cameraPosition in
     let visionImage = VisionImage(buffer: sampleBuffer)
@@ -21,7 +22,8 @@ public extension TextRecognitionClient {
       deviceOrientation: UIDevice.current.orientation,
       cameraPosition: cameraPosition)
 
-    let textRecognizer = TextRecognizer.textRecognizer()
+    let options = TextRecognizerOptions()
+    let textRecognizer = TextRecognizer.textRecognizer(options: options)
     return try await textRecognizer.process(visionImage)
   })
 }
