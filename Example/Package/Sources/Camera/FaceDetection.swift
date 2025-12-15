@@ -9,7 +9,7 @@ public struct FaceDetectionClient {
 }
 
 public extension FaceDetectionClient {
-  static var live = Self.init(faceDetectionWithImage: { image, options in
+  @MainActor static let live = Self.init(faceDetectionWithImage: { image, options in
     let visionImage = VisionImage(image: image)
     visionImage.orientation = image.imageOrientation
 

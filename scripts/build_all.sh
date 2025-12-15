@@ -1,11 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# Ensure rbenv ruby is used if available
-if [ -d "$HOME/.rbenv/shims" ]; then
-  export PATH="$HOME/.rbenv/shims:$PATH"
-fi
-
 # Set UTF-8 encoding for CocoaPods
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
