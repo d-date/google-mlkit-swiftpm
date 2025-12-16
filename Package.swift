@@ -154,7 +154,7 @@ let package = Package(
     .binaryTarget(
       name: "GoogleToolboxForMac",
       url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/GoogleToolboxForMac.xcframework.zip",
-      checksum: "cae476b525ff05f2b5c126c55d1acc1cc6f068edd31e01bd3743db6d8fd8cc82"),
+      checksum: "e73f79a048c95236ebc04829cc3b4fb0b0e1902d65650fc3cb187c233dbff5a1"),
     .binaryTarget(
       name: "MLKitTextRecognition",
       url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/MLKitTextRecognition.xcframework.zip",
