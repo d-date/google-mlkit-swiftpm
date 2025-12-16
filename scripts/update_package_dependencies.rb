@@ -3,6 +3,37 @@
 
 require 'open3'
 
+# Regex pattern for matching package declarations in Package.swift
+def package_url_regex(org, package_name)
+  /\.package\(url:\s*"https:\/\/github\.com\/#{Regexp.escape(org)}\/#{Regexp.escape(package_name)}(?:\.git)?",\s*exact:\s*"([^"]+)"\)/
+end
+
+# Check if a git tag exists in a remote repository
+def git_tag_exists?(repo_url, tag)
+  tag_check, status = Open3.capture2e('git', 'ls-remote', '--tags', repo_url, "refs/tags/#{tag}")
+  status.success? && !tag_check.empty?
+rescue => e
+  puts "  Warning: Failed to check git tag: #{e.message}"
+  false
+end
+
+# Get current version of a package from Package.swift
+def get_package_version(package_swift, org, package_name)
+  pattern = package_url_regex(org, package_name)
+  if package_swift =~ pattern
+    $1
+  end
+end
+
+# Update a package version in Package.swift
+def update_package_version(package_swift, org, package_name, new_version)
+  pattern = package_url_regex(org, package_name)
+  package_swift.gsub!(
+    pattern,
+    ".package(url: \"https://github.com/#{org}/#{package_name}.git\", exact: \"#{new_version}\")"
+  )
+end
+
 # Parse Podfile.lock to extract dependency versions
 def parse_podfile_lock
   unless File.exist?('Podfile.lock')
@@ -17,7 +48,8 @@ def parse_podfile_lock
   # Match entries like "  - GoogleDataTransport (10.1.0):" (with exactly 2 spaces before dash)
   podfile_lock.scan(/^  - ([^\/\s]+)(?:\/[^\s]+)?\s+\(([^)]+)\):?/) do |name, version_str|
     # Extract only the version number (digits and dots)
-    if match = version_str.match(/([\d.]+)/)
+    match = version_str.match(/([\d.]+)/)
+    if match
       version = match[1]
       versions[name] = version
     end
@@ -50,20 +82,13 @@ def update_package_swift(dependency_versions)
       dep_version = dependency_versions[podfile_name]
       
       # Get current version from Package.swift
-      current_version = nil
-      if package_swift =~ /\.package\(url:\s*"https:\/\/github\.com\/#{Regexp.escape(org)}\/#{Regexp.escape(package_name)}(?:\.git)?",\s*exact:\s*"([^"]+)"\)/
-        current_version = $1
-      end
+      current_version = get_package_version(package_swift, org, package_name)
       
       if current_version == dep_version
         puts "✓ #{package_name}: #{dep_version} (already up-to-date)"
       else
         puts "→ #{package_name}: #{current_version} → #{dep_version}"
-        # Update .package declaration - match any version specifier
-        package_swift.gsub!(
-          /\.package\(url:\s*"https:\/\/github\.com\/#{Regexp.escape(org)}\/#{Regexp.escape(package_name)}(?:\.git)?",\s*exact:\s*"[^"]+"\)/,
-          ".package(url: \"https://github.com/#{org}/#{package_name}.git\", exact: \"#{dep_version}\")"
-        )
+        update_package_version(package_swift, org, package_name, dep_version)
       end
     end
   end
@@ -73,10 +98,7 @@ def update_package_swift(dependency_versions)
     nanopb_version = dependency_versions['nanopb']
     
     # Get current version from Package.swift
-    current_version = nil
-    if package_swift =~ /\.package\(url:\s*"https:\/\/github\.com\/firebase\/nanopb(?:\.git)?",\s*exact:\s*"([^"]+)"\)/
-      current_version = $1
-    end
+    current_version = get_package_version(package_swift, 'firebase', 'nanopb')
     
     puts
     puts "Checking nanopb..."
@@ -85,18 +107,13 @@ def update_package_swift(dependency_versions)
     
     # Check if the tag exists on firebase/nanopb
     print "  Checking if tag #{nanopb_version} exists in firebase/nanopb... "
-    tag_check, status = Open3.capture2e('git', 'ls-remote', '--tags', 'https://github.com/firebase/nanopb.git', "refs/tags/#{nanopb_version}")
-    
-    if status.success? && !tag_check.empty?
+    if git_tag_exists?('https://github.com/firebase/nanopb.git', nanopb_version)
       puts "yes"
       if current_version == nanopb_version
         puts "  ✓ nanopb: #{nanopb_version} (already up-to-date)"
       else
         puts "  → nanopb: #{current_version} → #{nanopb_version}"
-        package_swift.gsub!(
-          /\.package\(url:\s*"https:\/\/github\.com\/firebase\/nanopb(?:\.git)?",\s*exact:\s*"[^"]+"\)/,
-          ".package(url: \"https://github.com/firebase/nanopb.git\", exact: \"#{nanopb_version}\")"
-        )
+        update_package_version(package_swift, 'firebase', 'nanopb', nanopb_version)
       end
     else
       puts "no"

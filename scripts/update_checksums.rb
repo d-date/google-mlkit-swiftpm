@@ -71,20 +71,25 @@ def update_package_swift(version, checksums, dependency_versions)
     nanopb_version = dependency_versions['nanopb']
     puts "  Checking nanopb #{nanopb_version}..."
     
-    # Check if the tag exists on firebase/nanopb
-    require 'open3'
-    tag_check, status = Open3.capture2e('git', 'ls-remote', '--tags', 'https://github.com/firebase/nanopb.git', "refs/tags/#{nanopb_version}")
-    
-    if status.success? && !tag_check.empty?
-      puts "  Updating nanopb to #{nanopb_version}"
-      package_swift.gsub!(
-        /\.package\(url:\s*"https:\/\/github\.com\/firebase\/nanopb(\.git)?",\s*exact:\s*"[^"]+"\)/,
-        ".package(url: \"https://github.com/firebase/nanopb.git\", exact: \"#{nanopb_version}\")"
-      )
-    else
-      puts "  Warning: nanopb #{nanopb_version} tag not found in firebase/nanopb repository"
+    begin
+      # Check if the tag exists on firebase/nanopb
+      require 'open3'
+      tag_check, status = Open3.capture2e('git', 'ls-remote', '--tags', 'https://github.com/firebase/nanopb.git', "refs/tags/#{nanopb_version}")
+      
+      if status.success? && !tag_check.empty?
+        puts "  Updating nanopb to #{nanopb_version}"
+        package_swift.gsub!(
+          /\.package\(url:\s*"https:\/\/github\.com\/firebase\/nanopb(?:\.git)?",\s*exact:\s*"[^"]+"\)/,
+          ".package(url: \"https://github.com/firebase/nanopb.git\", exact: \"#{nanopb_version}\")"
+        )
+      else
+        puts "  Warning: nanopb #{nanopb_version} tag not found in firebase/nanopb repository"
+        puts "           Keeping current version in Package.swift"
+        puts "           Note: CocoaPods and SwiftPM use different versioning schemes for nanopb"
+      end
+    rescue => e
+      puts "  Warning: Failed to check nanopb tag: #{e.message}"
       puts "           Keeping current version in Package.swift"
-      puts "           Note: CocoaPods and SwiftPM use different versioning schemes for nanopb"
     end
   end
 
