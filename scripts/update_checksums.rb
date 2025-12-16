@@ -23,7 +23,8 @@ def parse_podfile_lock
   # Match entries like "  - GoogleDataTransport (10.1.0):" (with exactly 2 spaces before dash)
   podfile_lock.scan(/^  - ([^\/\s]+)(?:\/[^\s]+)?\s+\(([^)]+)\):?/) do |name, version_str|
     # Extract only the version number (digits and dots)
-    if match = version_str.match(/([\d.]+)/)
+    match = version_str.match(/([\d.]+)/)
+    if match
       version = match[1]
       # Normalize version: if it has only 1 dot (e.g., "10.0" or "8.0"), append ".0"
       version = "#{version}.0" if version.count('.') == 1
