@@ -45,7 +45,8 @@ def parse_podfile_lock
   versions = {}
 
   # Extract version numbers from PODS section - only top-level entries
-  # Match entries like "  - GoogleDataTransport (10.1.0):" (with exactly 2 spaces before dash)
+  # Match entries like "  - PackageName (1.0.0):" (with exactly 2 spaces before dash)
+  # This pattern captures the package name and version string from Podfile.lock
   podfile_lock.scan(/^  - ([^\/\s]+)(?:\/[^\s]+)?\s+\(([^)]+)\):?/) do |name, version_str|
     # Extract only the version number (digits and dots)
     match = version_str.match(/([\d.]+)/)

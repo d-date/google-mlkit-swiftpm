@@ -2,10 +2,16 @@
 # frozen_string_literal: true
 
 require 'digest'
+require 'open3'
 
 # Calculate SHA256 checksum for a file
 def calculate_checksum(file_path)
   Digest::SHA256.file(file_path).hexdigest
+end
+
+# Regex pattern for matching package declarations in Package.swift
+def package_url_regex(org, package_name)
+  /\.package\(url:\s*"https:\/\/github\.com\/#{Regexp.escape(org)}\/#{Regexp.escape(package_name)}(?:\.git)?",\s*exact:\s*"([^"]+)"\)/
 end
 
 # Parse Podfile.lock to extract dependency versions
@@ -73,13 +79,12 @@ def update_package_swift(version, checksums, dependency_versions)
     
     begin
       # Check if the tag exists on firebase/nanopb
-      require 'open3'
       tag_check, status = Open3.capture2e('git', 'ls-remote', '--tags', 'https://github.com/firebase/nanopb.git', "refs/tags/#{nanopb_version}")
       
       if status.success? && !tag_check.empty?
         puts "  Updating nanopb to #{nanopb_version}"
         package_swift.gsub!(
-          /\.package\(url:\s*"https:\/\/github\.com\/firebase\/nanopb(?:\.git)?",\s*exact:\s*"[^"]+"\)/,
+          package_url_regex('firebase', 'nanopb'),
           ".package(url: \"https://github.com/firebase/nanopb.git\", exact: \"#{nanopb_version}\")"
         )
       else
