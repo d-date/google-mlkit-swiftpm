@@ -32,9 +32,41 @@ ruby scripts/update_version.rb <version>
 ruby scripts/update_version.rb 5.1.0
 ```
 
+### update_package_dependencies.rb
+
+Updates Package.swift dependency versions to match those in Podfile.lock.
+
+**Usage:**
+```bash
+ruby scripts/update_package_dependencies.rb
+```
+
+**What it does:**
+- Reads dependency versions from Podfile.lock
+- Updates the following dependencies in Package.swift:
+  - GoogleDataTransport
+  - GoogleUtilities
+  - GTMSessionFetcher (gtm-session-fetcher)
+  - PromisesObjC (promises)
+  - nanopb (with special handling - see below)
+- Verifies that nanopb tags exist before updating
+- Provides clear output showing which dependencies were updated
+
+**Special nanopb handling:**
+- CocoaPods uses version `3.30910.0` for nanopb
+- firebase/nanopb SwiftPM repository only has `2.30910.0` tags
+- The script checks if the CocoaPods version exists in SwiftPM
+- If not found, it keeps the current working version
+- This is expected behavior due to different versioning schemes
+
+**When to use:**
+- After running `pod update` or `pod install`
+- To ensure Package.swift dependencies match Podfile.lock
+- As part of version update workflow
+
 ### update_checksums.rb
 
-Calculates SHA256 checksums for built XCFrameworks and updates Package.swift.
+Calculates SHA256 checksums for built XCFrameworks and updates Package.swift with new checksums, release URLs, and dependency versions.
 
 **Usage:**
 ```bash
@@ -46,8 +78,15 @@ ruby scripts/update_checksums.rb <version>
 ruby scripts/update_checksums.rb 5.1.0
 ```
 
+**What it does:**
+- Calculates SHA256 checksums for all XCFramework zip files
+- Updates Package.swift binary target URLs to point to the new version
+- Updates Package.swift binary target checksums
+- Updates dependency versions from Podfile.lock (including nanopb handling)
+
 **Prerequisites:**
 - XCFramework zip files must exist in `GoogleMLKit/` directory
+- Podfile.lock must exist and be up-to-date
 - Run after `make archive`
 
 ### verify_build.rb
