@@ -15,3 +15,6 @@ vendor/
 /Package.resolved
 /Example/Package/Package.resolved
 /GoogleMLKit
+
+*.log
+pod_changes_summary.txt

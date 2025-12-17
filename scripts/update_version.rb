@@ -7,7 +7,7 @@ require 'fileutils'
 def update_podfile(new_version)
   podfile = File.read('Podfile')
   updated = podfile.gsub(
-    /pod\s+'GoogleMLKit\/(FaceDetection|BarcodeScanning)',\s+'~>\s+[0-9]+(?:\.[0-9]+)*'/,
+    /pod\s+'GoogleMLKit\/(FaceDetection|BarcodeScanning|TextRecognition|TextRecognitionChinese|TextRecognitionDevanagari|TextRecognitionJapanese|TextRecognitionKorean|ImageLabeling|ImageLabelingCustom|ObjectDetection|ObjectDetectionCustom|PoseDetection|PoseDetectionAccurate|SegmentationSelfie|LanguageID|Translate|SmartReply)',\s+'~>\s+[0-9]+(?:\.[0-9]+)*'/,
     "pod 'GoogleMLKit/\\1', '~> #{new_version}'"
   )
   File.write('Podfile', updated)
@@ -44,7 +44,22 @@ PLIST_TO_FRAMEWORK = {
   'MLKitBarcodeScanning-Info.plist' => 'MLKitBarcodeScanning',
   'MLKitFaceDetection-Info.plist' => 'MLKitFaceDetection',
   'MLKitVision-Info.plist' => 'MLKitVision',
-  'MLImage-Info.plist' => 'MLImage'
+  'MLImage-Info.plist' => 'MLImage',
+  'MLKitTextRecognition-Info.plist' => 'MLKitTextRecognition',
+  'MLKitTextRecognitionChinese-Info.plist' => 'MLKitTextRecognitionChinese',
+  'MLKitTextRecognitionDevanagari-Info.plist' => 'MLKitTextRecognitionDevanagari',
+  'MLKitTextRecognitionJapanese-Info.plist' => 'MLKitTextRecognitionJapanese',
+  'MLKitTextRecognitionKorean-Info.plist' => 'MLKitTextRecognitionKorean',
+  'MLKitImageLabeling-Info.plist' => 'MLKitImageLabeling',
+  'MLKitImageLabelingCustom-Info.plist' => 'MLKitImageLabelingCustom',
+  'MLKitObjectDetection-Info.plist' => 'MLKitObjectDetection',
+  'MLKitObjectDetectionCustom-Info.plist' => 'MLKitObjectDetectionCustom',
+  'MLKitPoseDetection-Info.plist' => 'MLKitPoseDetection',
+  'MLKitPoseDetectionAccurate-Info.plist' => 'MLKitPoseDetectionAccurate',
+  'MLKitSegmentationSelfie-Info.plist' => 'MLKitSegmentationSelfie',
+  'MLKitLanguageID-Info.plist' => 'MLKitLanguageID',
+  'MLKitTranslate-Info.plist' => 'MLKitTranslate',
+  'MLKitSmartReply-Info.plist' => 'MLKitSmartReply'
 }.freeze
 
 # Update Info.plist files with versions from Podfile.lock

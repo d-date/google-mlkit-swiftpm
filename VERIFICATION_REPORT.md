@@ -27,15 +27,31 @@ All automation scripts have been tested and verified to be working correctly. Th
 - MLKitFaceDetection-Info.plist
 - MLKitVision-Info.plist
 - MLImage-Info.plist
+- MLKitTextRecognition-Info.plist
+- MLKitImageLabeling-Info.plist
+- MLKitObjectDetection-Info.plist
+- MLKitPoseDetection-Info.plist
+- MLKitSegmentationSelfie-Info.plist
+- MLKitLanguageID-Info.plist
+- MLKitTranslate-Info.plist
+- MLKitSmartReply-Info.plist
 
-**XCFrameworks verified:**
+**XCFrameworks to be verified after build:**
 
-- MLKitBarcodeScanning.xcframework.zip (13.9 MB)
-- MLKitFaceDetection.xcframework.zip (33.9 MB)
-- MLImage.xcframework.zip (15 KB)
-- MLKitCommon.xcframework.zip (2.2 MB)
-- MLKitVision.xcframework.zip (131 KB)
-- GoogleToolboxForMac.xcframework.zip (107 KB)
+- MLKitBarcodeScanning.xcframework.zip
+- MLKitFaceDetection.xcframework.zip
+- MLKitTextRecognition.xcframework.zip
+- MLKitImageLabeling.xcframework.zip
+- MLKitObjectDetection.xcframework.zip
+- MLKitPoseDetection.xcframework.zip
+- MLKitSegmentationSelfie.xcframework.zip
+- MLKitLanguageID.xcframework.zip
+- MLKitTranslate.xcframework.zip
+- MLKitSmartReply.xcframework.zip
+- MLImage.xcframework.zip
+- MLKitCommon.xcframework.zip
+- MLKitVision.xcframework.zip
+- GoogleToolboxForMac.xcframework.zip
 
 ### 2. Runtime Verification (`verify_runtime.sh`)
 
@@ -84,12 +100,8 @@ NEW_VERSION=9.0.0
 
 **Files updated correctly:**
 
-- ✅ Podfile (both FaceDetection and BarcodeScanning)
-- ✅ MLKitCommon-Info.plist
-- ✅ MLKitBarcodeScanning-Info.plist
-- ✅ MLKitFaceDetection-Info.plist
-- ✅ MLKitVision-Info.plist
-- ✅ MLImage-Info.plist
+- ✅ Podfile (all 10 ML Kit modules)
+- ✅ All 13 Info.plist files in Resources/
 
 **Before:**
 
@@ -163,8 +175,10 @@ Before each release, the following MUST be tested manually:
 1. Build Example app on physical iOS device
 2. Test barcode scanning feature
 3. Test face detection feature
-4. Check Xcode console for warnings
-5. Verify no runtime crashes
+4. Test new vision modules (Text Recognition, Image Labeling, Object Detection, Pose Detection, Selfie Segmentation)
+5. Test new language modules (Language ID, Translation, Smart Reply)
+6. Check Xcode console for warnings
+7. Verify no runtime crashes
 
 ## Environment Information
 
