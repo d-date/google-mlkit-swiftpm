@@ -39,7 +39,7 @@ def fetch_latest_mlkit_version
     end
   rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, Errno::ECONNREFUSED => e
     retry_count += 1
-    if retry_count <= MAX_RETRIES
+    if retry_count < MAX_RETRIES
       puts "Network error (attempt #{retry_count}/#{MAX_RETRIES}): #{e.message}"
       sleep(2 ** retry_count) # Exponential backoff
       retry
