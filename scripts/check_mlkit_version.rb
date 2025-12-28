@@ -16,17 +16,31 @@ def fetch_latest_mlkit_version
   http.open_timeout = open_timeout
   http.read_timeout = read_timeout
 
-  request = Net::HTTP::Get.new(uri.request_uri)
-  response = http.request(request)
+  max_retries = 3
+  retry_count = 0
 
-  if response.is_a?(Net::HTTPSuccess)
-    data = JSON.parse(response.body)
-    versions = data['versions'].map { |v| v['name'] }
-    # Sort versions and get the latest
-    latest = versions.max_by { |v| Gem::Version.new(v) }
-    return latest
-  else
-    raise "Failed to fetch MLKit version info: HTTP #{response.code}"
+  begin
+    request = Net::HTTP::Get.new(uri.request_uri)
+    response = http.request(request)
+
+    if response.is_a?(Net::HTTPSuccess)
+      data = JSON.parse(response.body)
+      versions = data['versions'].map { |v| v['name'] }
+      # Sort versions and get the latest
+      latest = versions.max_by { |v| Gem::Version.new(v) }
+      return latest
+    else
+      raise "Failed to fetch MLKit version info: HTTP #{response.code}"
+    end
+  rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, Errno::ECONNREFUSED => e
+    retry_count += 1
+    if retry_count <= max_retries
+      puts "Network error (attempt #{retry_count}/#{max_retries}): #{e.message}"
+      sleep(2 ** retry_count) # Exponential backoff
+      retry
+    else
+      raise "Failed to connect to CocoaPods API after #{max_retries} attempts: #{e.message}"
+    end
   end
 end
 
@@ -60,7 +74,17 @@ begin
     puts "UPDATE_AVAILABLE=false"
     exit 0
   end
-rescue => e
+rescue StandardError => e
   puts "Error: #{e.message}"
-  exit 1
+  puts "UPDATE_AVAILABLE=false"
+  
+  # Exit with 0 for network errors to avoid failing the workflow on transient issues
+  # The workflow will simply report no updates available
+  if e.message.include?('Failed to connect') || e.message.include?('Network error')
+    puts "Warning: Treating network error as 'no update available' to avoid failing on transient issues"
+    exit 0
+  else
+    # Exit with 1 for actual errors (e.g., parsing errors, Podfile issues)
+    exit 1
+  end
 end
