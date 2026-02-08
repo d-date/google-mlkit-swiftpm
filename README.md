@@ -2,12 +2,10 @@
 
 This is experimental project for building MLKit in Swift Package Manager.
 
-**New:** This repository now includes automated tools to keep up-to-date with MLKit releases. See [AUTOMATION.md](AUTOMATION.md) for details.
-
 ## Requirements
 
-- iOS 14 and later
-- Xcode 13.2.1 and later
+- iOS 15 and later
+- Xcode 15 and later
 
 ## Installation
 
@@ -30,6 +28,8 @@ Then add the specific ML Kit modules you need to your target dependencies:
         .product(name: "MLKitBarcodeScanning", package: "google-mlkit-swiftpm"),
         .product(name: "MLKitFaceDetection", package: "google-mlkit-swiftpm"),
         .product(name: "MLKitTextRecognition", package: "google-mlkit-swiftpm"),
+        // Also available: MLKitTextRecognitionChinese, MLKitTextRecognitionDevanagari,
+        //                  MLKitTextRecognitionJapanese, MLKitTextRecognitionKorean
         .product(name: "MLKitImageLabeling", package: "google-mlkit-swiftpm"),
         .product(name: "MLKitObjectDetection", package: "google-mlkit-swiftpm"),
         .product(name: "MLKitPoseDetection", package: "google-mlkit-swiftpm"),
@@ -65,11 +65,11 @@ This package supports the following Google ML Kit features:
 
 ### Vision APIs
 - **Barcode Scanning** - Scan and decode barcodes
-- **Face Detection** - Detect faces and facial features  
-- **Text Recognition** - Recognize text in images (v2)
-- **Image Labeling** - Identify objects, locations, activities, and more
-- **Object Detection & Tracking** - Detect and track objects in images and video
-- **Pose Detection** - Detect body poses and positions
+- **Face Detection** - Detect faces and facial features
+- **Text Recognition** - Recognize text in images (v2) with variants for Chinese, Devanagari, Japanese, and Korean
+- **Image Labeling** - Identify objects, locations, activities, and more (standard and custom models)
+- **Object Detection & Tracking** - Detect and track objects in images and video (standard and custom models)
+- **Pose Detection** - Detect body poses and positions (standard and accurate)
 - **Selfie Segmentation** - Segment people from the background
 
 ### Language APIs
@@ -89,7 +89,7 @@ Open `Example/Example.xcworkspace` and fixing code signing to yours.
 
 This repository includes automation tools for updating to new MLKit versions:
 
-- **Automated Version Checking**: Daily checks for new MLKit releases
+- **Automated Version Checking**: Daily checks for new MLKit releases via GitHub Actions
 - **Build Automation**: Scripts to build and package new versions
 - **GitHub Actions**: Workflows for automated builds and releases
 
@@ -103,8 +103,8 @@ To update to a new MLKit version:
 # Check for updates
 ruby scripts/check_mlkit_version.rb
 
-# Build new version (replace 5.1.0 with actual version)
-./scripts/build_all.sh 5.1.0
+# Build new version (replace with actual version)
+./scripts/build_all.sh <version>
 ```
 
-Or use the GitHub Actions workflow for fully automated builds.
+Or trigger the **Build MLKit XCFrameworks** workflow from the GitHub Actions tab.

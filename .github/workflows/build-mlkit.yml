@@ -40,17 +40,8 @@ jobs:
       - name: Update version in Podfile
         run: ruby scripts/update_version.rb ${{ inputs.version }}
 
-      - name: Build XCFramework maker
-        run: make bootstrap-builder
-
-      - name: Install CocoaPods
-        run: make bootstrap-cocoapods
-
-      - name: Build XCFrameworks
-        run: make create-xcframework
-
-      - name: Archive XCFrameworks
-        run: make archive
+      - name: Build and archive XCFrameworks
+        run: make run
 
       - name: Calculate checksums and update Package.swift
         run: ruby scripts/update_checksums.rb ${{ inputs.version }}
@@ -106,8 +97,8 @@ jobs:
         if: inputs.create_release && steps.check_release.outputs.exists == 'true'
         run: |
           echo "Deleting old assets from existing release..."
-          for asset in GoogleToolboxForMac.xcframework.zip MLImage.xcframework.zip MLKitBarcodeScanning.xcframework.zip MLKitCommon.xcframework.zip MLKitFaceDetection.xcframework.zip MLKitVision.xcframework.zip; do
-            if gh release view ${{ inputs.version }} --json assets --jq ".assets[].name" | grep -q "^${asset}$"; then
+          gh release view ${{ inputs.version }} --json assets --jq ".assets[].name" | while read -r asset; do
+            if [[ "$asset" == *.xcframework.zip ]] || [[ "$asset" == *.bundle.zip ]]; then
               echo "  Deleting: $asset"
               gh release delete-asset ${{ inputs.version }} "$asset" --yes || true
             fi
@@ -142,14 +133,26 @@ jobs:
 
             ## Available Libraries
 
+            ### Vision APIs
             - MLKitBarcodeScanning
             - MLKitFaceDetection
+            - MLKitTextRecognition (+ Chinese, Devanagari, Japanese, Korean)
+            - MLKitImageLabeling (+ Custom)
+            - MLKitObjectDetection (+ Custom)
+            - MLKitPoseDetection (+ Accurate)
+            - MLKitSegmentationSelfie
+
+            ### Language APIs
+            - MLKitLanguageID
+            - MLKitTranslate
+            - MLKitSmartReply
 
             🤖 This release was automatically generated
           draft: false
           prerelease: false
           files: |
             GoogleMLKit/*.xcframework.zip
+            GoogleMLKit/*.bundle.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -157,7 +160,7 @@ jobs:
         if: inputs.create_release && steps.check_release.outputs.exists == 'true'
         run: |
           echo "Uploading new assets to existing release..."
-          gh release upload ${{ inputs.version }} GoogleMLKit/*.xcframework.zip --clobber
+          gh release upload ${{ inputs.version }} GoogleMLKit/*.xcframework.zip GoogleMLKit/*.bundle.zip --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -166,7 +169,9 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: xcframeworks-${{ inputs.version }}
-          path: GoogleMLKit/*.xcframework.zip
+          path: |
+            GoogleMLKit/*.xcframework.zip
+            GoogleMLKit/*.bundle.zip
           retention-days: 30
 
       - name: Comment on related issue

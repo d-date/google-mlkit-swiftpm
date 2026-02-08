@@ -36,7 +36,7 @@ Run after building to check for obvious issues:
 ```
 
 **What it checks:**
-- XCFramework architectures (arm64, x86_64)
+- XCFramework architectures (arm64 for device, x86_64 for simulator)
 - Info.plist presence in each framework
 - Symbol table validity
 - Package.swift target definitions
@@ -98,10 +98,10 @@ open Example.xcworkspace
 
 ```bash
 # 1. Build new version
-./scripts/build_all.sh 7.0.0
+./scripts/build_all.sh <version>
 
 # 2. Run static analysis
-./scripts/verify_runtime.sh 7.0.0
+./scripts/verify_runtime.sh <version>
 
 # 3. Test Example app
 cd Example
@@ -113,67 +113,8 @@ open Example.xcworkspace
 # 4. If all tests pass, commit
 cd ..
 git add Podfile Podfile.lock Package.swift Resources/
-git commit -m "Update to MLKit 7.0.0"
-git tag -a 7.0.0 -m "Release 7.0.0"
-```
-
-## Batch Build Testing Strategy
-
-When building multiple versions with `batch_build.sh`:
-
-### Option A: Test After Each Version
-
-Pause after each successful build and test:
-
-```bash
-# Build first version
-./scripts/build_all.sh 7.0.0
-
-# Test it
-./scripts/verify_runtime.sh 7.0.0
-cd Example && open Example.xcworkspace
-# Manual testing...
-
-# If good, commit and continue
-git add ... && git commit ... && git tag ...
-
-# Build next version
-./scripts/build_all.sh 8.0.0
-# ... repeat testing
-```
-
-### Option B: Build All, Then Test All
-
-Build all versions, then test the latest:
-
-```bash
-# Build all versions
-./scripts/batch_build.sh 7.0.0 8.0.0 9.0.0
-
-# Test the latest version (9.0.0)
-./scripts/verify_runtime.sh 9.0.0
-cd Example && open Example.xcworkspace
-# Manual testing...
-
-# If 9.0.0 works, assume others do too
-# (Not recommended for major version jumps)
-```
-
-### Option C: Sample Testing
-
-Test first and last versions only:
-
-```bash
-# Build all
-./scripts/batch_build.sh 7.0.0 8.0.0 9.0.0
-
-# Test first (7.0.0)
-./scripts/verify_runtime.sh 7.0.0
-# ... manual testing
-
-# Test last (9.0.0)
-./scripts/verify_runtime.sh 9.0.0
-# ... manual testing
+git commit -m "Update to MLKit <version>"
+git tag -a <version> -m "Release <version>"
 ```
 
 ## Known Issues and Workarounds
@@ -216,39 +157,6 @@ Test first and last versions only:
 - Test on Intel Mac simulator
 - Or test on physical device only
 - Known limitation documented in README
-
-## Automated Testing (Future Enhancement)
-
-Consider adding:
-
-1. **Unit Tests**
-   ```swift
-   // Test basic MLKit initialization
-   func testMLKitBarcodeScanner() {
-     let scanner = BarcodeScanner.barcodeScanner()
-     XCTAssertNotNil(scanner)
-   }
-   ```
-
-2. **Integration Tests**
-   - Use sample images
-   - Test barcode detection
-   - Test face detection
-
-3. **CI/CD Testing**
-   - GitHub Actions to build Example app
-   - Run basic smoke tests
-   - Fail if crashes detected
-
-## Regression Testing
-
-When updating to new MLKit versions, verify:
-
-- [ ] No new runtime errors
-- [ ] Same features work as before
-- [ ] Performance is similar or better
-- [ ] No new symbol conflicts
-- [ ] Backwards compatibility maintained
 
 ## Reporting Issues
 

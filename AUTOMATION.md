@@ -259,10 +259,7 @@ Possible enhancements:
    - Add automated tests to verify the built frameworks work correctly
    - Test integration with sample projects
 
-3. **Multi-Module Support**
-   - Extend to support more MLKit modules beyond BarcodeScanning and FaceDetection
-
-4. **Changelog Generation**
+3. **Changelog Generation**
    - Automatically generate changelogs based on MLKit release notes
 
 ## Contributing
