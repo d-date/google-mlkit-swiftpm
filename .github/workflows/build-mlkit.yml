@@ -166,7 +166,7 @@ jobs:
 
       - name: Upload XCFramework artifacts
         if: ${{ !inputs.create_release }}
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: xcframeworks-${{ inputs.version }}
           path: |
