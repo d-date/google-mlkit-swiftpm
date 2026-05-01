@@ -26,9 +26,11 @@ def parse_podfile_lock
   versions = {}
 
   # Extract version numbers from PODS section - only top-level entries
-  # Match entries like "  - MLKitCommon (12.0.0):" (with exactly 2 spaces before dash)
+  # Match entries like "  - MLKitCommon (12.0.0):" (with exactly 2 spaces before dash).
+  # Some pods (e.g. MLKitXenoCommon) use pre-release suffixes like "1.0.0-beta16";
+  # the [\d.]+ capture below intentionally drops the suffix because App Store
+  # rejects non-numeric CFBundleShortVersionString values.
   podfile_lock.scan(/^  - ([^\/\s]+)(?:\/[^\s]+)?\s+\(([^)]+)\):?/) do |name, version_str|
-    # Extract only the version number (digits and dots)
     if match = version_str.match(/([\d.]+)/)
       version = match[1]
       versions[name] = version
@@ -38,28 +40,40 @@ def parse_podfile_lock
   versions
 end
 
-# Map Info.plist filename to framework name in Podfile.lock
+# Map Info.plist filename to framework name in Podfile.lock.
+# Every Resources/<Name>-Info.plist must be listed here so update_version.rb
+# can rewrite CFBundleShortVersionString from Podfile.lock; otherwise the
+# file keeps a stale (and possibly App-Store-illegal) version string.
 PLIST_TO_FRAMEWORK = {
   'MLKitCommon-Info.plist' => 'MLKitCommon',
   'MLKitBarcodeScanning-Info.plist' => 'MLKitBarcodeScanning',
   'MLKitFaceDetection-Info.plist' => 'MLKitFaceDetection',
   'MLKitVision-Info.plist' => 'MLKitVision',
+  'MLKitVisionKit-Info.plist' => 'MLKitVisionKit',
   'MLImage-Info.plist' => 'MLImage',
   'MLKitTextRecognition-Info.plist' => 'MLKitTextRecognition',
   'MLKitTextRecognitionChinese-Info.plist' => 'MLKitTextRecognitionChinese',
   'MLKitTextRecognitionDevanagari-Info.plist' => 'MLKitTextRecognitionDevanagari',
   'MLKitTextRecognitionJapanese-Info.plist' => 'MLKitTextRecognitionJapanese',
   'MLKitTextRecognitionKorean-Info.plist' => 'MLKitTextRecognitionKorean',
+  'MLKitTextRecognitionCommon-Info.plist' => 'MLKitTextRecognitionCommon',
   'MLKitImageLabeling-Info.plist' => 'MLKitImageLabeling',
   'MLKitImageLabelingCustom-Info.plist' => 'MLKitImageLabelingCustom',
+  'MLKitImageLabelingCommon-Info.plist' => 'MLKitImageLabelingCommon',
   'MLKitObjectDetection-Info.plist' => 'MLKitObjectDetection',
   'MLKitObjectDetectionCustom-Info.plist' => 'MLKitObjectDetectionCustom',
+  'MLKitObjectDetectionCommon-Info.plist' => 'MLKitObjectDetectionCommon',
   'MLKitPoseDetection-Info.plist' => 'MLKitPoseDetection',
   'MLKitPoseDetectionAccurate-Info.plist' => 'MLKitPoseDetectionAccurate',
+  'MLKitPoseDetectionCommon-Info.plist' => 'MLKitPoseDetectionCommon',
   'MLKitSegmentationSelfie-Info.plist' => 'MLKitSegmentationSelfie',
+  'MLKitSegmentationCommon-Info.plist' => 'MLKitSegmentationCommon',
+  'MLKitXenoCommon-Info.plist' => 'MLKitXenoCommon',
+  'MLKitNaturalLanguage-Info.plist' => 'MLKitNaturalLanguage',
   'MLKitLanguageID-Info.plist' => 'MLKitLanguageID',
   'MLKitTranslate-Info.plist' => 'MLKitTranslate',
-  'MLKitSmartReply-Info.plist' => 'MLKitSmartReply'
+  'MLKitSmartReply-Info.plist' => 'MLKitSmartReply',
+  'SSZipArchive-Info.plist' => 'SSZipArchive'
 }.freeze
 
 # Update Info.plist files with versions from Podfile.lock
