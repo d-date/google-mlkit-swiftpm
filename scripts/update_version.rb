@@ -3,15 +3,18 @@
 
 require 'fileutils'
 
-# Update Podfile with new MLKit version
+# Update Podfile with new MLKit version. The Podfile tracks the upstream
+# CocoaPods version, so a wrapper-only pre-release (e.g. "9.0.0-1") must
+# write the base "9.0.0" pod constraint, not the suffixed string.
 def update_podfile(new_version)
+  pod_version = new_version.sub(/-.*\z/, '')
   podfile = File.read('Podfile')
   updated = podfile.gsub(
     /pod\s+'GoogleMLKit\/(FaceDetection|BarcodeScanning|TextRecognition|TextRecognitionChinese|TextRecognitionDevanagari|TextRecognitionJapanese|TextRecognitionKorean|ImageLabeling|ImageLabelingCustom|ObjectDetection|ObjectDetectionCustom|PoseDetection|PoseDetectionAccurate|SegmentationSelfie|LanguageID|Translate|SmartReply)',\s+'~>\s+[0-9]+(?:\.[0-9]+)*'/,
-    "pod 'GoogleMLKit/\\1', '~> #{new_version}'"
+    "pod 'GoogleMLKit/\\1', '~> #{pod_version}'"
   )
   File.write('Podfile', updated)
-  puts "Updated Podfile to version #{new_version}"
+  puts "Updated Podfile to version #{pod_version}"
 end
 
 # Parse Podfile.lock to extract framework versions
@@ -115,9 +118,11 @@ end
 
 new_version = ARGV[0]
 
-# Validate semantic versioning format (X.Y.Z)
-unless new_version =~ /^\d+\.\d+\.\d+$/
-  puts "Error: Version '#{new_version}' is not in semantic versioning format (X.Y.Z)"
+# Validate semantic versioning format. Accept an optional SemVer pre-release
+# suffix like "9.0.0-1" so wrapper-only repackages can ship without colliding
+# with the upstream MLKit tag of the same base version.
+unless new_version =~ /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/
+  puts "Error: Version '#{new_version}' is not in semantic versioning format (X.Y.Z[-PRERELEASE])"
   exit 1
 end
 

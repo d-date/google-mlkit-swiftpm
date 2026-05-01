@@ -114,10 +114,11 @@ if __FILE__ == $PROGRAM_NAME
   version = ARGV[0]
   pod_changes_file = ARGV[1]
 
-  # Validate version format
-  unless version =~ /^\d+\.\d+\.\d+$/
+  # Validate version format. Accept an optional SemVer pre-release suffix
+  # (e.g. "9.0.0-1") for wrapper repackages.
+  unless version =~ /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/
     puts "Error: Invalid version format '#{version}'"
-    puts "Expected semantic versioning format: X.Y.Z"
+    puts "Expected semantic versioning format: X.Y.Z[-PRERELEASE]"
     exit 1
   end
 

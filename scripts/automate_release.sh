@@ -17,10 +17,12 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-# Validate version format
-if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+# Validate version format. Accept an optional SemVer pre-release suffix
+# (e.g. "9.0.0-1") so wrapper repackages can ship with a tag distinct from
+# the upstream MLKit base version.
+if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
   echo "Error: Invalid version format '$VERSION'"
-  echo "Expected semantic versioning format: X.Y.Z"
+  echo "Expected semantic versioning format: X.Y.Z[-PRERELEASE]"
   exit 1
 fi
 

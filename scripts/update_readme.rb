@@ -62,9 +62,10 @@ end
 
 new_version = ARGV[0]
 
-# Validate semantic versioning format (X.Y.Z)
-unless new_version =~ /^\d+\.\d+\.\d+$/
-  puts "Error: Version '#{new_version}' is not in semantic versioning format (X.Y.Z)"
+# Validate semantic versioning format. Accept an optional SemVer pre-release
+# suffix (e.g. "9.0.0-1") for wrapper repackages.
+unless new_version =~ /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/
+  puts "Error: Version '#{new_version}' is not in semantic versioning format (X.Y.Z[-PRERELEASE])"
   exit 1
 end
 

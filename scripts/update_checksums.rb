@@ -125,9 +125,11 @@ end
 
 version = ARGV[0]
 
-# Validate semantic versioning format (X.Y.Z)
-unless version =~ /^\d+\.\d+\.\d+$/
-  puts "Error: Version '#{version}' is not in semantic versioning format (X.Y.Z)"
+# Validate semantic versioning format. Accept an optional SemVer pre-release
+# suffix like "9.0.0-1" so wrapper repackages can ship under a tag that
+# differs from the upstream MLKit version.
+unless version =~ /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/
+  puts "Error: Version '#{version}' is not in semantic versioning format (X.Y.Z[-PRERELEASE])"
   exit 1
 end
 begin
