@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'MLKit version to build (e.g., 5.0.0)'
+        description: 'Release tag to build (e.g., 9.0.0, or 9.0.0-1 for a wrapper-only repackage)'
         required: true
         type: string
       create_release:
@@ -149,7 +149,7 @@ jobs:
 
             🤖 This release was automatically generated
           draft: false
-          prerelease: false
+          prerelease: ${{ contains(inputs.version, '-') }}
           files: |
             GoogleMLKit/*.xcframework.zip
             GoogleMLKit/*.bundle.zip
