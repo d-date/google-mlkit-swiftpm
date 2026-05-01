@@ -10,6 +10,7 @@ bootstrap-cocoapods:
 	@bundle exec pod install
 
 bootstrap-builder:
+	@git submodule update --init --recursive xcframework-maker
 	@cd xcframework-maker && swift build -c release
 
 build-cocoapods: bootstrap-cocoapods
