@@ -29,25 +29,25 @@ let package = Package(
       targets: ["MLKitTextRecognitionKorean", "MLKitTextRecognitionCommon", "MLImage", "MLKitVision", "Common"]),
     .library(
       name: "MLKitImageLabeling",
-      targets: ["MLKitImageLabeling", "MLKitImageLabelingCommon", "MLKitVisionKit", "MLImage", "MLKitVision", "Common"]),
+      targets: ["MLKitImageLabeling", "MLKitImageLabelingCommon", "MLKitObjectDetectionCommon", "MLKitVisionKit", "MLImage", "MLKitVision", "Common"]),
     .library(
       name: "MLKitImageLabelingCustom",
-      targets: ["MLKitImageLabelingCustom", "MLKitImageLabelingCommon", "MLImage", "MLKitVision", "Common"]),
+      targets: ["MLKitImageLabelingCustom", "MLKitImageLabelingCommon", "MLKitObjectDetectionCommon", "MLKitVisionKit", "MLImage", "MLKitVision", "Common"]),
     .library(
       name: "MLKitObjectDetection",
-      targets: ["MLKitObjectDetection", "MLKitObjectDetectionCommon", "MLImage", "MLKitVision", "Common"]),
+      targets: ["MLKitObjectDetection", "MLKitObjectDetectionCommon", "MLKitImageLabelingCommon", "MLKitVisionKit", "MLImage", "MLKitVision", "Common"]),
     .library(
       name: "MLKitObjectDetectionCustom",
-      targets: ["MLKitObjectDetectionCustom", "MLKitObjectDetectionCommon", "MLImage", "MLKitVision", "Common"]),
+      targets: ["MLKitObjectDetectionCustom", "MLKitObjectDetectionCommon", "MLKitImageLabelingCommon", "MLKitVisionKit", "MLImage", "MLKitVision", "Common"]),
     .library(
       name: "MLKitPoseDetection",
-      targets: ["MLKitPoseDetection", "MLKitPoseDetectionCommon", "MLImage", "MLKitVision", "Common"]),
+      targets: ["MLKitPoseDetection", "MLKitPoseDetectionCommon", "MLKitXenoCommon", "MLImage", "MLKitVision", "Common"]),
     .library(
       name: "MLKitPoseDetectionAccurate",
-      targets: ["MLKitPoseDetectionAccurate", "MLKitPoseDetectionCommon", "MLImage", "MLKitVision", "Common"]),
+      targets: ["MLKitPoseDetectionAccurate", "MLKitPoseDetectionCommon", "MLKitXenoCommon", "MLImage", "MLKitVision", "Common"]),
     .library(
       name: "MLKitSegmentationSelfie",
-      targets: ["MLKitSegmentationSelfie", "MLKitSegmentationCommon", "MLImage", "MLKitVision", "Common"]),
+      targets: ["MLKitSegmentationSelfie", "MLKitSegmentationCommon", "MLKitXenoCommon", "MLImage", "MLKitVision", "Common"]),
     .library(
       name: "MLKitLanguageID",
       targets: ["MLKitLanguageID", "MLKitNaturalLanguage", "MLKitXenoCommon", "MLKitCommon", "GoogleToolboxForMac", "Common"]),
@@ -66,70 +66,6 @@ let package = Package(
     .package(url: "https://github.com/firebase/nanopb.git", exact: "2.30910.0"),
   ],
   targets: [
-    // For debugging
-    // .binaryTarget(
-    //   name: "MLImage",
-    //   path: "GoogleMLKit/MLImage.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitBarcodeScanning",
-    //   path: "GoogleMLKit/MLKitBarcodeScanning.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitCommon",
-    //   path: "GoogleMLKit/MLKitCommon.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitFaceDetection",
-    //   path: "GoogleMLKit/MLKitFaceDetection.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitVision",
-    //   path: "GoogleMLKit/MLKitVision.xcframework"),
-    // .binaryTarget(
-    //   name: "GoogleToolboxForMac",
-    //   path: "GoogleMLKit/GoogleToolboxForMac.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitTextRecognition",
-    //   path: "GoogleMLKit/MLKitTextRecognition.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitTextRecognitionChinese",
-    //   path: "GoogleMLKit/MLKitTextRecognitionChinese.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitTextRecognitionDevanagari",
-    //   path: "GoogleMLKit/MLKitTextRecognitionDevanagari.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitTextRecognitionJapanese",
-    //   path: "GoogleMLKit/MLKitTextRecognitionJapanese.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitTextRecognitionKorean",
-    //   path: "GoogleMLKit/MLKitTextRecognitionKorean.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitImageLabeling",
-    //   path: "GoogleMLKit/MLKitImageLabeling.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitImageLabelingCustom",
-    //   path: "GoogleMLKit/MLKitImageLabelingCustom.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitObjectDetection",
-    //   path: "GoogleMLKit/MLKitObjectDetection.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitObjectDetectionCustom",
-    //   path: "GoogleMLKit/MLKitObjectDetectionCustom.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitPoseDetection",
-    //   path: "GoogleMLKit/MLKitPoseDetection.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitPoseDetectionAccurate",
-    //   path: "GoogleMLKit/MLKitPoseDetectionAccurate.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitSegmentationSelfie",
-    //   path: "GoogleMLKit/MLKitSegmentationSelfie.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitLanguageID",
-    //   path: "GoogleMLKit/MLKitLanguageID.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitTranslate",
-    //   path: "GoogleMLKit/MLKitTranslate.xcframework"),
-    // .binaryTarget(
-    //   name: "MLKitSmartReply",
-    //   path: "GoogleMLKit/MLKitSmartReply.xcframework"),
 
     .binaryTarget(
       name: "MLImage",
