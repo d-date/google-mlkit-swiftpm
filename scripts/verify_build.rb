@@ -3,29 +3,10 @@
 
 # Verify that the build completed successfully
 def verify_xcframeworks
-  required_frameworks = [
-    'MLKitBarcodeScanning',
-    'MLKitFaceDetection',
-    'MLKitTextRecognition',
-    'MLKitTextRecognitionChinese',
-    'MLKitTextRecognitionDevanagari',
-    'MLKitTextRecognitionJapanese',
-    'MLKitTextRecognitionKorean',
-    'MLKitImageLabeling',
-    'MLKitImageLabelingCustom',
-    'MLKitObjectDetection',
-    'MLKitObjectDetectionCustom',
-    'MLKitPoseDetection',
-    'MLKitPoseDetectionAccurate',
-    'MLKitSegmentationSelfie',
-    'MLKitLanguageID',
-    'MLKitTranslate',
-    'MLKitSmartReply',
-    'MLImage',
-    'MLKitCommon',
-    'MLKitVision',
-    'GoogleToolboxForMac'
-  ]
+  # Resources/<Name>-Info.plist is the module list: one file per framework the
+  # build repackages. GoogleToolboxForMac is built from source and has none.
+  required_frameworks =
+    Dir.glob('Resources/*-Info.plist').map { |f| File.basename(f, '-Info.plist') } + ['GoogleToolboxForMac']
 
   puts "Checking for XCFramework zip files..."
   missing = []
@@ -93,28 +74,7 @@ end
 # Verify Info.plist files exist
 def verify_info_plists
   puts "\nChecking Info.plist files..."
-  required_plists = [
-    'MLKitCommon-Info.plist',
-    'MLKitBarcodeScanning-Info.plist',
-    'MLKitFaceDetection-Info.plist',
-    'MLKitVision-Info.plist',
-    'MLImage-Info.plist',
-    'MLKitTextRecognition-Info.plist',
-    'MLKitTextRecognitionChinese-Info.plist',
-    'MLKitTextRecognitionDevanagari-Info.plist',
-    'MLKitTextRecognitionJapanese-Info.plist',
-    'MLKitTextRecognitionKorean-Info.plist',
-    'MLKitImageLabeling-Info.plist',
-    'MLKitImageLabelingCustom-Info.plist',
-    'MLKitObjectDetection-Info.plist',
-    'MLKitObjectDetectionCustom-Info.plist',
-    'MLKitPoseDetection-Info.plist',
-    'MLKitPoseDetectionAccurate-Info.plist',
-    'MLKitSegmentationSelfie-Info.plist',
-    'MLKitLanguageID-Info.plist',
-    'MLKitTranslate-Info.plist',
-    'MLKitSmartReply-Info.plist'
-  ]
+  required_plists = Dir.glob('Resources/*-Info.plist').map { |f| File.basename(f) }
 
   missing = []
   required_plists.each do |plist|

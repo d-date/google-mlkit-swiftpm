@@ -43,41 +43,12 @@ def parse_podfile_lock
   versions
 end
 
-# Map Info.plist filename to framework name in Podfile.lock.
-# Every Resources/<Name>-Info.plist must be listed here so update_version.rb
-# can rewrite CFBundleShortVersionString from Podfile.lock; otherwise the
-# file keeps a stale (and possibly App-Store-illegal) version string.
-PLIST_TO_FRAMEWORK = {
-  'MLKitCommon-Info.plist' => 'MLKitCommon',
-  'MLKitBarcodeScanning-Info.plist' => 'MLKitBarcodeScanning',
-  'MLKitFaceDetection-Info.plist' => 'MLKitFaceDetection',
-  'MLKitVision-Info.plist' => 'MLKitVision',
-  'MLKitVisionKit-Info.plist' => 'MLKitVisionKit',
-  'MLImage-Info.plist' => 'MLImage',
-  'MLKitTextRecognition-Info.plist' => 'MLKitTextRecognition',
-  'MLKitTextRecognitionChinese-Info.plist' => 'MLKitTextRecognitionChinese',
-  'MLKitTextRecognitionDevanagari-Info.plist' => 'MLKitTextRecognitionDevanagari',
-  'MLKitTextRecognitionJapanese-Info.plist' => 'MLKitTextRecognitionJapanese',
-  'MLKitTextRecognitionKorean-Info.plist' => 'MLKitTextRecognitionKorean',
-  'MLKitTextRecognitionCommon-Info.plist' => 'MLKitTextRecognitionCommon',
-  'MLKitImageLabeling-Info.plist' => 'MLKitImageLabeling',
-  'MLKitImageLabelingCustom-Info.plist' => 'MLKitImageLabelingCustom',
-  'MLKitImageLabelingCommon-Info.plist' => 'MLKitImageLabelingCommon',
-  'MLKitObjectDetection-Info.plist' => 'MLKitObjectDetection',
-  'MLKitObjectDetectionCustom-Info.plist' => 'MLKitObjectDetectionCustom',
-  'MLKitObjectDetectionCommon-Info.plist' => 'MLKitObjectDetectionCommon',
-  'MLKitPoseDetection-Info.plist' => 'MLKitPoseDetection',
-  'MLKitPoseDetectionAccurate-Info.plist' => 'MLKitPoseDetectionAccurate',
-  'MLKitPoseDetectionCommon-Info.plist' => 'MLKitPoseDetectionCommon',
-  'MLKitSegmentationSelfie-Info.plist' => 'MLKitSegmentationSelfie',
-  'MLKitSegmentationCommon-Info.plist' => 'MLKitSegmentationCommon',
-  'MLKitXenoCommon-Info.plist' => 'MLKitXenoCommon',
-  'MLKitNaturalLanguage-Info.plist' => 'MLKitNaturalLanguage',
-  'MLKitLanguageID-Info.plist' => 'MLKitLanguageID',
-  'MLKitTranslate-Info.plist' => 'MLKitTranslate',
-  'MLKitSmartReply-Info.plist' => 'MLKitSmartReply',
-  'SSZipArchive-Info.plist' => 'SSZipArchive'
-}.freeze
+# Every Resources/<Name>-Info.plist is named after the pod it belongs to, so
+# the framework name is derived rather than listed -- adding a module means
+# dropping in one file, not editing a table here as well.
+def framework_name_for(plist)
+  File.basename(plist, "-Info.plist")
+end
 
 # Update Info.plist files with versions from Podfile.lock
 def update_info_plists_from_podfile_lock(framework_versions)
@@ -87,12 +58,7 @@ def update_info_plists_from_podfile_lock(framework_versions)
 
   plist_files.each do |file|
     basename = File.basename(file)
-    framework_name = PLIST_TO_FRAMEWORK[basename]
-
-    unless framework_name
-      puts "Warning: Unknown Info.plist file: #{basename}, skipping"
-      next
-    end
+    framework_name = framework_name_for(file)
 
     version = framework_versions[framework_name]
     unless version
