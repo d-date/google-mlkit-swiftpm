@@ -75,12 +75,24 @@ for xctest in "$DERIVED_DATA"/Build/Products/*-iphonesimulator/*.xctest; do
 done
 
 echo "==> Running ML Kit on the arm64 Simulator"
-xcodebuild test-without-building \
+TEST_LOG="$DERIVED_DATA/runtime-tests.log"
+if ! xcodebuild test-without-building \
   -workspace "$WORKSPACE" -scheme "$SCHEME" \
   -destination "$SIMULATOR" \
   -derivedDataPath "$DERIVED_DATA" \
-  CODE_SIGNING_ALLOWED=NO \
-  -quiet
+  CODE_SIGNING_ALLOWED=NO > "$TEST_LOG" 2>&1; then
+  grep -E '✘|error:|Invalid model|recorded an issue' "$TEST_LOG" | tail -20 >&2
+  echo "error: the runtime tests failed -- full log at $TEST_LOG" >&2
+  exit 1
+fi
+
+# `test-without-building` exits 0 when it runs no tests at all, so the count
+# has to be asserted or this check passes vacuously.
+if ! grep -qE 'Test run with [1-9][0-9]* test' "$TEST_LOG"; then
+  echo "error: no runtime tests ran -- full log at $TEST_LOG" >&2
+  exit 1
+fi
+grep -E '✔ Test |Test run with' "$TEST_LOG"
 
 echo "==> Archiving for device"
 rm -rf "$ARCHIVE_PATH"
