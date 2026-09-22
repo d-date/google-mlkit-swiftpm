@@ -13,8 +13,14 @@
 #   * GoogleMLKit/ from `make run`
 #   * an App Store Connect app record for $BUNDLE_ID
 #   * an Apple Distribution certificate in the keychain
-#   * `asc auth login` credentials, and the matching .p8 under
-#     ~/.appstoreconnect/private_keys/ so xcodebuild can create the profile
+#   * `asc auth login` credentials for the team that owns the app record
+#   * an installed App Store provisioning profile named $PROFILE. Xcode's own
+#     account is not used, so automatic signing cannot create one; make it with
+#       asc certificates list
+#       asc profiles create --name "$PROFILE" --profile-type IOS_APP_STORE \
+#         --bundle <bundle-id-resource-id> --certificate <distribution-cert-id>
+#       asc profiles download --id <profile-id> --output <path>
+#       asc profiles local install --path <path>
 #
 # Usage: ./scripts/verify_app_store_upload.sh [--upload]
 
@@ -24,9 +30,12 @@ WORKSPACE="Example/Example.xcworkspace"
 SCHEME="Example"
 BUNDLE_ID="${MLKIT_ASC_BUNDLE_ID:-com.d-date.google-mlkit-swiftpm}"
 TEAM_ID="${MLKIT_ASC_TEAM_ID:-N5U649DS4Z}"
+PROFILE="${MLKIT_ASC_PROFILE:-SwiftPM Binary Verify App Store}"
 ARTIFACTS="${TMPDIR:-/tmp}/mlkit-appstore"
 ARCHIVE="$ARTIFACTS/Example.xcarchive"
 IPA="$ARTIFACTS/Example.ipa"
+EXPORT_OPTIONS="$ARTIFACTS/ExportOptions.plist"
+PACKAGE_BACKUP="$ARTIFACTS/Package.swift.orig"
 # App Store Connect rejects a build number it has already seen.
 BUILD_NUMBER="${MLKIT_ASC_BUILD_NUMBER:-$(date +%y%m%d%H%M)}"
 
@@ -43,25 +52,59 @@ if [ ! -d GoogleMLKit ]; then
   exit 1
 fi
 
-KEY_PATH="${MLKIT_ASC_KEY_PATH:-$(find ~/.appstoreconnect/private_keys -name 'AuthKey_*.p8' 2>/dev/null | head -1)}"
-if [ -z "$KEY_PATH" ]; then
-  echo "error: no AuthKey_*.p8 under ~/.appstoreconnect/private_keys" >&2
+if ! asc profiles local list --output json | grep -q "$PROFILE"; then
+  echo "error: provisioning profile \"$PROFILE\" is not installed -- see the header" >&2
   exit 1
 fi
-KEY_ID="${MLKIT_ASC_KEY_ID:-$(basename "$KEY_PATH" .p8 | sed 's/^AuthKey_//')}"
-ISSUER_ID="${MLKIT_ASC_ISSUER_ID:-$(asc auth issuer-id)}"
 
-# Restore from a copy rather than with `git checkout`: Package.swift normally
-# has uncommitted changes while a fix is being verified.
-PACKAGE_BACKUP="${TMPDIR:-/tmp}/Package.swift.appstore-orig"
+KEY_ID="${MLKIT_ASC_KEY_ID:-$(asc auth status --output json |
+  python3 -c 'import json,sys; print(next((c["keyId"] for c in json.load(sys.stdin).get("credentials", []) if c.get("isDefault")), ""))')}"
+ISSUER_ID="${MLKIT_ASC_ISSUER_ID:-$(asc auth issuer-id)}"
+if [ -z "$KEY_ID" ] || [ -z "$ISSUER_ID" ]; then
+  echo "error: no default App Store Connect API credentials -- run 'asc auth login'" >&2
+  exit 1
+fi
+
+KEY_FILE="$HOME/.appstoreconnect/private_keys/AuthKey_$KEY_ID.p8"
+EXPORTED_KEY=false
+
+cleanup() {
+  if [ -f "$PACKAGE_BACKUP" ]; then
+    cp "$PACKAGE_BACKUP" Package.swift
+    echo "Restored Package.swift"
+  fi
+  rm -f "$PACKAGE_BACKUP"
+  if [ "$EXPORTED_KEY" = true ]; then
+    rm -f "$KEY_FILE"
+    echo "Removed the staged API key"
+  fi
+  return 0
+}
+trap cleanup EXIT
+
+mkdir -p "$ARTIFACTS"
 cp Package.swift "$PACKAGE_BACKUP"
 
-restore() {
-  cp "$PACKAGE_BACKUP" Package.swift
-  rm -f "$PACKAGE_BACKUP"
-  echo "Restored Package.swift"
-}
-trap restore EXIT
+# altool only looks for its API key in a handful of directories, and the key
+# may well sit somewhere else (asc keeps the path in the keychain entry, often
+# still in ~/Downloads). Copy it into place for this run and take it back out
+# afterwards rather than leaving a credential where it was not before.
+if [ ! -f "$KEY_FILE" ]; then
+  SOURCE_KEY=""
+  for candidate in "$HOME/private_keys" "$HOME/.private_keys" "$HOME/Downloads" "$PWD/private_keys"; do
+    if [ -f "$candidate/AuthKey_$KEY_ID.p8" ]; then
+      SOURCE_KEY="$candidate/AuthKey_$KEY_ID.p8"
+      break
+    fi
+  done
+  if [ -z "$SOURCE_KEY" ]; then
+    echo "error: AuthKey_$KEY_ID.p8 not found; put it in ~/.appstoreconnect/private_keys" >&2
+    exit 1
+  fi
+  mkdir -p "$(dirname "$KEY_FILE")"
+  install -m 600 "$SOURCE_KEY" "$KEY_FILE"
+  EXPORTED_KEY=true
+fi
 
 echo "==> Pointing Package.swift at local XCFrameworks"
 ruby scripts/use_local_binaries.rb
@@ -70,9 +113,11 @@ echo "==> Refreshing the resource bundles the Example app carries"
 mkdir -p Example/Example/Resources/Bundles
 cp -rf GoogleMLKit/*.bundle Example/Example/Resources/Bundles/
 
-mkdir -p "$ARTIFACTS"
-
-echo "==> Archiving $BUNDLE_ID build $BUILD_NUMBER for distribution"
+# Signing settings are deliberately not passed here: a command-line build
+# setting reaches every target in the graph, and SwiftPM's resource-bundle
+# targets reject a provisioning profile outright. The distribution identity and
+# profile are applied at export instead, which is per-app.
+echo "==> Archiving $BUNDLE_ID build $BUILD_NUMBER"
 asc xcode archive \
   --workspace "$WORKSPACE" --scheme "$SCHEME" \
   --configuration Release \
@@ -80,20 +125,27 @@ asc xcode archive \
   --xcodebuild-flag="PRODUCT_BUNDLE_IDENTIFIER=$BUNDLE_ID" \
   --xcodebuild-flag="CURRENT_PROJECT_VERSION=$BUILD_NUMBER" \
   --xcodebuild-flag="DEVELOPMENT_TEAM=$TEAM_ID" \
-  --xcodebuild-flag=-allowProvisioningUpdates \
-  --xcodebuild-flag=-authenticationKeyPath --xcodebuild-flag="$KEY_PATH" \
-  --xcodebuild-flag=-authenticationKeyID --xcodebuild-flag="$KEY_ID" \
-  --xcodebuild-flag=-authenticationKeyIssuerID --xcodebuild-flag="$ISSUER_ID" \
   --output table
 
 echo "==> Exporting an App Store IPA"
+cat > "$EXPORT_OPTIONS" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key><string>app-store-connect</string>
+  <key>teamID</key><string>$TEAM_ID</string>
+  <key>signingStyle</key><string>manual</string>
+  <key>signingCertificate</key><string>Apple Distribution</string>
+  <key>provisioningProfiles</key>
+  <dict><key>$BUNDLE_ID</key><string>$PROFILE</string></dict>
+</dict>
+</plist>
+PLIST
+
 asc xcode export \
   --archive-path "$ARCHIVE" --ipa-path "$IPA" --overwrite \
-  --method app-store-connect --signing-style automatic --team-id "$TEAM_ID" \
-  --xcodebuild-flag=-allowProvisioningUpdates \
-  --xcodebuild-flag=-authenticationKeyPath --xcodebuild-flag="$KEY_PATH" \
-  --xcodebuild-flag=-authenticationKeyID --xcodebuild-flag="$KEY_ID" \
-  --xcodebuild-flag=-authenticationKeyIssuerID --xcodebuild-flag="$ISSUER_ID" \
+  --export-options "$EXPORT_OPTIONS" \
   --output table
 
 echo
@@ -110,7 +162,13 @@ if [ -d "$APP/Frameworks" ]; then
     exit 1
   fi
 fi
-echo "bundled ML Kit models: $(ls "$APP" | grep -c '\.bundle$')"
+for bundle in GoogleMLKit/*.bundle; do
+  if [ ! -d "$APP/$(basename "$bundle")" ]; then
+    echo "error: the IPA is missing $(basename "$bundle")" >&2
+    exit 1
+  fi
+done
+echo "ML Kit model bundles: $(ls -d GoogleMLKit/*.bundle | wc -l | tr -d ' ')"
 
 echo
 echo "==> Validating with Apple"
@@ -119,7 +177,7 @@ asc xcode validate --ipa "$IPA" --api-key "$KEY_ID" --api-issuer "$ISSUER_ID" --
 if [ "$UPLOAD" = false ]; then
   echo
   echo "Validation passed. Re-run with --upload to deliver the build and see"
-  echo "App Store Connect's post-processing result (where ITMS-91065 appears)."
+  echo "App Store Connect's post-processing result, where ITMS-91065 appears."
   exit 0
 fi
 

@@ -72,27 +72,44 @@ def verify_xcframework_maker
 end
 
 # Verify Info.plist files exist
+# These templates are copied verbatim into the frameworks, so a key missing
+# here is a key missing in every consumer's app. App Store Connect rejects an
+# upload with "Invalid MinimumOSVersion ... is \'\'" (90530) when a framework
+# has no MinimumOSVersion -- MLKitNaturalLanguage shipped without one, which
+# blocked uploads for anyone using the language APIs.
+REQUIRED_PLIST_KEYS = %w[CFBundleShortVersionString MinimumOSVersion].freeze
+
 def verify_info_plists
   puts "\nChecking Info.plist files..."
-  required_plists = Dir.glob('Resources/*-Info.plist').map { |f| File.basename(f) }
+  plists = Dir.glob('Resources/*-Info.plist').sort
+  problems = []
 
-  missing = []
-  required_plists.each do |plist|
-    path = "Resources/#{plist}"
-    if File.exist?(path)
-      puts "✓ #{plist}"
+  if plists.empty?
+    puts '✗ No Info.plist templates found in Resources/'
+    return false
+  end
+
+  plists.each do |path|
+    name = File.basename(path)
+    empty = REQUIRED_PLIST_KEYS.reject do |key|
+      value = `/usr/bin/plutil -extract #{key} raw #{path} 2>/dev/null`.strip
+      $?.success? && !value.empty?
+    end
+
+    if empty.empty?
+      puts "✓ #{name}"
     else
-      puts "✗ #{plist} - NOT FOUND"
-      missing << plist
+      puts "✗ #{name} - missing or empty: #{empty.join(', ')}"
+      problems << name
     end
   end
 
-  if missing.empty?
-    puts "✓ All Info.plist files present"
-    return true
+  if problems.empty?
+    puts '✓ All Info.plist templates carry the keys consumers need'
+    true
   else
-    puts "✗ Missing Info.plist files: #{missing.join(', ')}"
-    return false
+    puts "✗ Info.plist problems in: #{problems.join(', ')}"
+    false
   end
 end
 

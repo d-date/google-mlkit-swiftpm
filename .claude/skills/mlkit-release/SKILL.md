@@ -21,6 +21,7 @@ app, because it links every product at once.
 | A framework binary that is ~33KB in the app | The framework binary is a bare Mach-O object, so Xcode relinks it as a dylib and dead-strips the data | `file GoogleMLKit/<name>.xcframework/*/<name>.framework/<name>` — must say `ar archive` |
 | `ITMS-91065: Missing signature` on upload | A framework bundle on Apple's commonly-used-SDK list is embedded in the app. Xcode embeds a stub bundle for every static framework bundle it links. | `./scripts/verify_local_archive.sh` |
 | Cannot build for the Simulator on Apple Silicon | The simulator slice has no arm64. Xcode 26 dropped Rosetta simulators, so an x86_64-only slice is unusable. | `lipo -archs` on the simulator slice |
+| `Invalid MinimumOSVersion … is ''` (90530) on upload | A `Resources/*-Info.plist` template is missing the key; the templates ship verbatim into consumers' apps | `ruby scripts/verify_build.rb` |
 
 Reports about **missing dSYMs** are expected and harmless: Google ships no
 DWARF, the frameworks are static, and their symbols land in the consumer's own
@@ -59,9 +60,31 @@ recurring reports would have been caught years earlier by it.
 
 `verify_app_store_upload.sh --upload` is what closes out ITMS-91065: Apple
 reports it during post-upload processing, so no local check can stand in for a
-real delivery. It needs an App Store Connect app record for the bundle ID, and
-creating one needs a web session (`asc web auth login`) -- the public API
-cannot.
+real delivery. The App Store Connect side is already set up:
+
+- app record **SwiftPM Binary Verify** (`6814873277`), bundle ID
+  `com.d-date.google-mlkit-swiftpm` (`7Y76Y69Z42`), team `N5U649DS4Z`
+- provisioning profile **SwiftPM Binary Verify App Store** (`MJ47UVM4SC`),
+  built from the `Apple Distribution` certificate `JWTYWVHM8Z`
+
+Four things cost time the first time round; they are worth knowing:
+
+- **Creating an app record needs a web session** (`asc web auth login`); the
+  public API cannot do it. The session defaults to whichever provider Apple
+  returns first, which may be another organisation entirely -- check with
+  `asc web bundle-ids list` before creating anything, and select the right one
+  with `--provider-id <numeric> --developer-team N5U649DS4Z` (passing a wrong
+  `--public-provider-id` conveniently lists the valid ones).
+- **Automatic signing does not work here**: Xcode has no signed-in account, so
+  the profile has to be created through the API and installed with
+  `asc profiles local install`.
+- **Signing settings must not be passed to `xcodebuild` on the command line.**
+  They reach every target in the graph, and SwiftPM's resource-bundle targets
+  fail with "does not support provisioning profiles". Put them in
+  ExportOptions.plist instead.
+- **altool wants its API key as a file** in one of a few fixed directories,
+  while `asc auth login` keeps it in the keychain. The script stages a copy and
+  removes it afterwards.
 
 To reproduce a consumer's single-product setup, the static closure check is
 enough — do not rely on the Example app.
