@@ -75,7 +75,14 @@ if $PROGRAM_NAME == __FILE__
   available = binary_targets(package)
   failures = []
 
-  products(package).each do |name, declared|
+  found = products(package)
+  declared_count = package.scan(/\.library\(/).length
+  if found.length != declared_count
+    abort "read #{found.length} of #{declared_count} .library products -- " \
+          "a product declaration has a shape this script cannot parse"
+  end
+
+  found.each do |name, declared|
     unless graph.key?(name)
       warn "#{name}: no pod of this name in Podfile.lock, skipping"
       next

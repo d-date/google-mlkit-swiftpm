@@ -113,17 +113,25 @@ def make_static(binary)
   return false unless [:object, :fat].include?(binary_kind(binary))
 
   Dir.mktmpdir do |tmp|
-    archives = archs(binary).map do |arch|
+    slices = archs(binary).map do |arch|
       object = File.join(tmp, "#{arch}.o")
       thin(binary, arch, object)
-      break nil unless binary_kind(object) == :object
+      [object, binary_kind(object)]
+    end
+    kinds = slices.map(&:last).uniq
 
-      archive = File.join(tmp, "#{arch}.a")
+    # A fat wrapper around `ar` archives needs nothing doing; a fat binary that
+    # mixes kinds is not something this script knows how to handle, and
+    # silently leaving it alone would reintroduce the dead-stripping bug.
+    return false unless kinds.include?(:object)
+    raise "#{binary}: architectures disagree on binary kind (#{kinds.join(", ")})" if kinds.length > 1
+
+    archives = slices.map do |object, _|
+      archive = "#{object}.a"
       sh("ar", "r", archive, object)
       sh("ranlib", archive)
       archive
     end
-    return false if archives.nil?
 
     if archives.one?
       FileUtils.cp(archives.first, binary)
