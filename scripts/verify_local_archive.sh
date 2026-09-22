@@ -94,6 +94,27 @@ if ! grep -qE 'Test run with [1-9][0-9]* test' "$TEST_LOG"; then
 fi
 grep -E '✔ Test |Test run with' "$TEST_LOG"
 
+echo "==> Launching the app on the Simulator"
+DEVICE="${SIMULATOR##*name=}"
+APP_SIM=$(find "$DERIVED_DATA/Build/Products" -maxdepth 2 -name 'Example.app' -path '*-iphonesimulator*' | head -1)
+if [ -z "$APP_SIM" ]; then
+  echo "error: no simulator build of Example.app" >&2
+  exit 1
+fi
+APP_BUNDLE_ID=$(plutil -extract CFBundleIdentifier raw "$APP_SIM/Info.plist")
+xcrun simctl bootstatus "$DEVICE" -b > /dev/null 2>&1 || true
+xcrun simctl install "$DEVICE" "$APP_SIM"
+APP_PID=$(xcrun simctl launch --terminate-running-process "$DEVICE" "$APP_BUNDLE_ID" | awk '{print $NF}')
+sleep 5
+# Simulator apps are host processes, so this catches a launch-time crash.
+if ! kill -0 "$APP_PID" 2> /dev/null; then
+  echo "error: $APP_BUNDLE_ID died within 5s of launch" >&2
+  xcrun simctl spawn "$DEVICE" log show --last 1m --predicate "process == \"Example\"" 2>/dev/null | tail -20 >&2
+  exit 1
+fi
+echo "$APP_BUNDLE_ID still running (pid $APP_PID)"
+xcrun simctl terminate "$DEVICE" "$APP_BUNDLE_ID" > /dev/null 2>&1 || true
+
 echo "==> Archiving for device"
 rm -rf "$ARCHIVE_PATH"
 xcodebuild archive \
@@ -136,6 +157,19 @@ if otool -L "$APP/$(basename "$APP" .app)" | grep -qE 'MLKit|MLImage|GoogleToolb
   otool -L "$APP/$(basename "$APP" .app)" | grep -E 'MLKit|MLImage|GoogleToolboxForMac|SSZipArchive' >&2
   exit 1
 fi
+
+# Every bundle the release publishes has to reach the app, or the module that
+# needs it throws at runtime on device even though the Simulator tests passed
+# from the staged copies.
+MISSING_BUNDLES=""
+for bundle in GoogleMLKit/*.bundle; do
+  [ -d "$APP/$(basename "$bundle")" ] || MISSING_BUNDLES="$MISSING_BUNDLES $(basename "$bundle")"
+done
+if [ -n "$MISSING_BUNDLES" ]; then
+  echo "error: the archived app is missing model bundles:$MISSING_BUNDLES" >&2
+  exit 1
+fi
+echo "ML Kit model bundles in the app: $(ls -d GoogleMLKit/*.bundle | wc -l | tr -d ' ')"
 
 # The OCR model alone is ~58MB of data inside MLKitTextRecognitionCommon; if it
 # were dead-stripped the app binary could not reach this size.

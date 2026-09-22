@@ -40,9 +40,11 @@ dSYM. Close with that explanation.
 ## Fix, then verify before publishing
 
 ```bash
-make run                          # full pipeline into GoogleMLKit/
-make verify                       # closure + artifacts + Package.swift parse
-./scripts/verify_local_archive.sh # builds for arm64 Simulator, archives for device
+make run                            # full pipeline into GoogleMLKit/
+make verify                         # closure + artifacts + Package.swift parse
+./scripts/verify_runtime.sh         # slices, Info.plists, symbol table
+./scripts/verify_local_archive.sh   # runs ML Kit on the Simulator, archives for device
+./scripts/verify_app_store_upload.sh --upload   # Apple-side validation and delivery
 ```
 
 `verify_local_archive.sh` is the gate. It repoints `Package.swift` at the local
@@ -54,6 +56,12 @@ publish without a green run.
 The runtime step is not optional theatre: a missing model bundle links and
 archives perfectly and only fails when inference runs. Two of the four
 recurring reports would have been caught years earlier by it.
+
+`verify_app_store_upload.sh --upload` is what closes out ITMS-91065: Apple
+reports it during post-upload processing, so no local check can stand in for a
+real delivery. It needs an App Store Connect app record for the bundle ID, and
+creating one needs a web session (`asc web auth login`) -- the public API
+cannot.
 
 To reproduce a consumer's single-product setup, the static closure check is
 enough — do not rely on the Example app.
