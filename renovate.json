@@ -2,5 +2,19 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
+  ],
+  "packageRules": [
+    {
+      "description": "The Google dependency pins in the root Package.swift are generated from Podfile.lock by scripts/update_package_dependencies.rb. Bumping them here either reverts on the next release build or breaks the version range the ML Kit pods were built against (e.g. GTMSessionFetcher is pinned < 4.0).",
+      "matchManagers": ["swift"],
+      "matchFileNames": ["Package.swift"],
+      "enabled": false
+    },
+    {
+      "description": "Ruby is pinned to 3.x on purpose: Ruby 4.0 broke CocoaPods on the macOS runners (regression in PR #86).",
+      "matchPackageNames": ["ruby"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
   ]
 }
