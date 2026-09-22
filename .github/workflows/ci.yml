@@ -16,7 +16,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.4.9'
+          ruby-version: '3.4.10'
 
       - name: Check Ruby syntax
         run: ruby -c scripts/*.rb
