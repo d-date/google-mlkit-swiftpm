@@ -4,10 +4,14 @@
 # so a release can be validated before it is published. Checks the three things
 # that repeatedly broke consumers:
 #
+#   * ML Kit actually runs: the tests recognise text, scan a barcode and
+#     identify a language on the arm64 Simulator. This is the only check that
+#     catches a missing model bundle (issue #106/#109: text recognition threw
+#     "Invalid model path." because LatinOCRResources.bundle was never shipped)
+#     and the only one that proves the synthesised arm64 simulator slices
+#     execute rather than merely link (issue #112)
 #   * the app links and archives for a real device (issue #110: a product that
 #     omits a transitive framework fails at link time)
-#   * the app builds for the arm64 Simulator (issue #112: Xcode 26 dropped
-#     Rosetta, so an x86_64-only simulator slice cannot be used at all)
 #   * no ML Kit framework is embedded in the archive (issue #102: an embedded
 #     dynamic copy of a "commonly used third-party SDK" is rejected with
 #     ITMS-91065) and MLKitTextRecognitionCommon keeps its OCR model data
@@ -23,6 +27,7 @@ set -euo pipefail
 WORKSPACE="Example/Example.xcworkspace"
 SCHEME="Example"
 DERIVED_DATA="${TMPDIR:-/tmp}/mlkit-verify-derived"
+SIMULATOR="${MLKIT_VERIFY_SIMULATOR:-platform=iOS Simulator,name=iPhone 17 Pro}"
 ARCHIVE_PATH="${TMPDIR:-/tmp}/mlkit-verify.xcarchive"
 
 if [ ! -d GoogleMLKit ]; then
@@ -52,10 +57,27 @@ echo "==> Refreshing the resource bundles the Example app carries"
 mkdir -p Example/Example/Resources/Bundles
 cp -rf GoogleMLKit/*.bundle Example/Example/Resources/Bundles/
 
-echo "==> Building for the arm64 Simulator"
-xcodebuild build \
+echo "==> Building the runtime tests for the arm64 Simulator"
+xcodebuild build-for-testing \
   -workspace "$WORKSPACE" -scheme "$SCHEME" \
-  -destination 'generic/platform=iOS Simulator' \
+  -destination "$SIMULATOR" \
+  -derivedDataPath "$DERIVED_DATA" \
+  CODE_SIGNING_ALLOWED=NO \
+  -quiet
+
+# ML Kit looks for its models in the main bundle, which for a SwiftPM test
+# target is the test runner -- so the bundles have to be dropped in beside it
+# rather than declared as package resources (that would mean committing ~25MB
+# of Google's models to this repo).
+echo "==> Staging resource bundles into the test runner"
+for xctest in "$DERIVED_DATA"/Build/Products/*-iphonesimulator/*.xctest; do
+  cp -rf GoogleMLKit/*.bundle "$xctest/"
+done
+
+echo "==> Running ML Kit on the arm64 Simulator"
+xcodebuild test-without-building \
+  -workspace "$WORKSPACE" -scheme "$SCHEME" \
+  -destination "$SIMULATOR" \
   -derivedDataPath "$DERIVED_DATA" \
   CODE_SIGNING_ALLOWED=NO \
   -quiet

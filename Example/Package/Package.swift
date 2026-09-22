@@ -39,6 +39,11 @@ let package = Package(
       ]),
     .testTarget(
       name: "CameraTests",
-      dependencies: ["Camera"]),
+      dependencies: ["Camera"],
+      // The same flags the README requires of consumers. ML Kit ships as static
+      // archives, and without -all_load the linker drops the archive members
+      // holding the OCR model data -- text recognition then fails at runtime
+      // with "Invalid model path.".
+      linkerSettings: [.unsafeFlags(["-Xlinker", "-ObjC", "-Xlinker", "-all_load"])]),
   ]
 )

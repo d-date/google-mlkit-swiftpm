@@ -17,7 +17,8 @@ app, because it links every product at once.
 | Symptom | Mechanism | Check with |
 | --- | --- | --- |
 | `Undefined symbols … _OBJC_CLASS_$_MLKXeno*` when adopting one product | The `.library` product omits a transitive framework. A product links only the targets it lists. | `ruby scripts/check_product_closure.rb` |
-| `MLKTextRecognizerInternalErrorCreationFailure "Invalid model path."`, or a framework binary that is ~33KB in the app | The framework binary is a bare Mach-O object, so Xcode relinks it as a dylib and dead-strips the model data | `file GoogleMLKit/<name>.xcframework/*/<name>.framework/<name>` — must say `ar archive` |
+| `MLKTextRecognizerInternalErrorCreationFailure "Invalid model path."` | The module's model bundle was never published. `Pods/<module>/Resources/<Name>/` is the full list; ten of them exist only there, not nested in any framework | `ls GoogleMLKit/*.bundle` against `ls -d Pods/*/Resources/*/`, and `./scripts/verify_local_archive.sh` |
+| A framework binary that is ~33KB in the app | The framework binary is a bare Mach-O object, so Xcode relinks it as a dylib and dead-strips the data | `file GoogleMLKit/<name>.xcframework/*/<name>.framework/<name>` — must say `ar archive` |
 | `ITMS-91065: Missing signature` on upload | A framework bundle on Apple's commonly-used-SDK list is embedded in the app. Xcode embeds a stub bundle for every static framework bundle it links. | `./scripts/verify_local_archive.sh` |
 | Cannot build for the Simulator on Apple Silicon | The simulator slice has no arm64. Xcode 26 dropped Rosetta simulators, so an x86_64-only slice is unusable. | `lipo -archs` on the simulator slice |
 
@@ -45,9 +46,14 @@ make verify                       # closure + artifacts + Package.swift parse
 ```
 
 `verify_local_archive.sh` is the gate. It repoints `Package.swift` at the local
-XCFrameworks, builds and archives, and fails if an ITMS-scanned SDK is embedded,
-if anything is linked dynamically, or if the app binary is too small to still
-contain the ML Kit model data. Never publish without a green run.
+XCFrameworks, **runs ML Kit on the arm64 Simulator**, archives for device, and
+fails if an ITMS-scanned SDK is embedded, if anything is linked dynamically, or
+if the app binary is too small to still contain the ML Kit model data. Never
+publish without a green run.
+
+The runtime step is not optional theatre: a missing model bundle links and
+archives perfectly and only fails when inference runs. Two of the four
+recurring reports would have been caught years earlier by it.
 
 To reproduce a consumer's single-product setup, the static closure check is
 enough — do not rely on the Example app.

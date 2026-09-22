@@ -10,6 +10,11 @@ OUTPUT_DIR = GoogleMLKit
 STAGING_DIR = $(OUTPUT_DIR)/.staging
 MAKE_XCFRAMEWORK = xcframework-maker/.build/release/make-xcframework
 
+# Every recipe loop below ends its body with `|| exit 1`: a POSIX `for` loop
+# exits with the status of its last command, so without it a mid-loop failure
+# is swallowed and `make run` reports success with a release asset missing.
+# (.SHELLFLAGS would be tidier but GNU Make 3.81, which macOS ships, ignores it.)
+
 # Pods that ship pre-built fat frameworks. These are repackaged by
 # xcframework-maker rather than compiled, and each one needs a matching
 # Resources/<name>-Info.plist because ML Kit ships them without a usable one.
@@ -80,7 +85,7 @@ build-cocoapods: bootstrap-cocoapods
 prepare-info-plist:
 	@for module in $(MLKIT_MODULES); do \
 		cp -rf "./Resources/$$module-Info.plist" \
-			"$(PODS_ROOT)/$$module/Frameworks/$$module.framework/Info.plist"; \
+			"$(PODS_ROOT)/$$module/Frameworks/$$module.framework/Info.plist" || exit 1; \
 	done
 
 create-xcframework: bootstrap-builder build-cocoapods prepare-info-plist
@@ -89,23 +94,23 @@ create-xcframework: bootstrap-builder build-cocoapods prepare-info-plist
 		echo "Creating $$module.xcframework"; \
 		for sdk in iphoneos iphonesimulator; do \
 			staging="$(STAGING_DIR)/$$module/$$sdk"; \
-			mkdir -p "$$staging"; \
-			cp "$(BUILD_DIR)/Release-$$sdk/$$module/$$module.framework/$$module" "$$staging/lib$$module.a"; \
-			cp -rf "$(BUILD_DIR)/Release-$$sdk/$$module/$$module.framework/Headers" "$$staging/Headers"; \
+			mkdir -p "$$staging" || exit 1; \
+			cp "$(BUILD_DIR)/Release-$$sdk/$$module/$$module.framework/$$module" "$$staging/lib$$module.a" || exit 1; \
+			cp -rf "$(BUILD_DIR)/Release-$$sdk/$$module/$$module.framework/Headers" "$$staging/Headers" || exit 1; \
 		done; \
 		xcodebuild -create-xcframework \
 			-library "$(STAGING_DIR)/$$module/iphoneos/lib$$module.a" \
 			-headers "$(STAGING_DIR)/$$module/iphoneos/Headers" \
 			-library "$(STAGING_DIR)/$$module/iphonesimulator/lib$$module.a" \
 			-headers "$(STAGING_DIR)/$$module/iphonesimulator/Headers" \
-			-output "$(OUTPUT_DIR)/$$module.xcframework" >/dev/null; \
+			-output "$(OUTPUT_DIR)/$$module.xcframework" >/dev/null || exit 1; \
 	done
 	@rm -rf $(STAGING_DIR)
 	@for module in $(MLKIT_MODULES); do \
 		echo "Creating $$module.xcframework"; \
 		$(MAKE_XCFRAMEWORK) \
 			-ios "$(PODS_ROOT)/$$module/Frameworks/$$module.framework" \
-			-output $(OUTPUT_DIR); \
+			-output $(OUTPUT_DIR) || exit 1; \
 	done
 
 # Injects the arm64 simulator slice and converts object-file binaries into `ar`
@@ -115,16 +120,32 @@ postprocess: create-xcframework
 		ruby scripts/postprocess_xcframeworks.rb $(OUTPUT_DIR)
 
 # SwiftPM cannot carry resource bundles inside a binary target, so every bundle
-# nested in a framework ships as its own release asset for consumers to add to
-# their app target manually.
+# ships as its own release asset for consumers to add to their app target.
+#
+# Pods/<module>/Resources/<Name>/ is the authoritative set: it is what each
+# podspec declares as `resource_bundles`, and it includes the OCR, pose
+# detection and selfie segmentation models that are *not* nested inside any
+# framework. Shipping only the nested copies left text recognition failing at
+# runtime with "Invalid model path." (issues #106/#109).
+#
+# The nested copies are scanned too. Their contents are identical, but ML Kit's
+# SmartReply framework nests its bundle under a different name than the podspec
+# key (PredictOnDevice_resource vs PredictOnDeviceResource), and earlier
+# releases shipped the nested spelling.
 copy-resource-bundle: create-xcframework
-	@find $(PODS_ROOT)/*/Frameworks -maxdepth 2 -name '*.bundle' -exec cp -rf {} $(OUTPUT_DIR)/ \;
+	@for module in $(MLKIT_MODULES); do \
+		[ -d "$(PODS_ROOT)/$$module/Resources" ] || continue; \
+		for resources in "$(PODS_ROOT)/$$module/Resources"/*/; do \
+			cp -rf "$$resources" "$(OUTPUT_DIR)/$$(basename $$resources).bundle" || exit 1; \
+		done; \
+	done
+	@find $(PODS_ROOT)/*/Frameworks -maxdepth 2 -name '*.bundle' -exec cp -rf {} $(OUTPUT_DIR)/ \; || exit 1
 	@ls -d $(OUTPUT_DIR)/*.bundle | xargs -n1 basename
 
 archive: postprocess copy-resource-bundle
 	@cd $(OUTPUT_DIR) && for item in *.xcframework *.bundle; do \
 		echo "Zipping $$item"; \
-		zip -qr "$$item.zip" "$$item"; \
+		zip -qr "$$item.zip" "$$item" || exit 1; \
 	done
 
 verify:

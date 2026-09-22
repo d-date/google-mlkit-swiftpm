@@ -56,27 +56,38 @@ Add these flags to `Other Linker Flags` in Build Settings of your Xcode projects
 - `-ObjC`
 - `-all_load`
 
-### Link resource bundles to your project (if needed)
+### Link resource bundles to your project
 
-Swift Package Manager cannot carry a resource bundle inside a binary target, so
-each bundle ML Kit nests in its framework is published as a separate release
-asset. Download the ones your modules need, add them to your Xcode project and
-make sure they are in **Copy Bundle Resources** of your app target.
+Every ML Kit module keeps its model in a resource bundle, and Swift Package
+Manager cannot carry a resource bundle inside a binary target. Each bundle is
+published as a separate release asset: download the ones your modules need, add
+them to your Xcode project, and make sure they are in **Copy Bundle Resources**
+of your app target. Without them the module throws at runtime -- text
+recognition fails with `MLKTextRecognizerInternalErrorCreationFailure`,
+"Invalid model path.".
+
+`scripts/download_bundles.sh <version>` fetches all of them at once.
 
 | Bundle | Needed by |
 | --- | --- |
 | `GoogleMVFaceDetectorResources.bundle` | `MLKitFaceDetection` |
+| `LatinOCRResources.bundle` | `MLKitTextRecognition` |
+| `ChineseOCRResources.bundle` | `MLKitTextRecognitionChinese` |
+| `DevanagariOCRResources.bundle` | `MLKitTextRecognitionDevanagari` |
+| `JapaneseOCRResources.bundle` | `MLKitTextRecognitionJapanese` |
+| `KoreanOCRResources.bundle` | `MLKitTextRecognitionKorean` |
 | `MLKitImageLabelingResources.bundle` | `MLKitImageLabeling` |
 | `MLKitObjectDetectionResources.bundle` | `MLKitObjectDetection` |
 | `MLKitObjectDetectionCommonResources.bundle` | `MLKitImageLabeling`, `MLKitImageLabelingCustom`, `MLKitObjectDetection`, `MLKitObjectDetectionCustom` |
+| `MLKitPoseDetectionFastResources.bundle` | `MLKitPoseDetection` |
+| `MLKitPoseDetectionAccurateResources.bundle` | `MLKitPoseDetectionAccurate` |
+| `MLKitPoseDetectionCommonResources.bundle` | `MLKitPoseDetection`, `MLKitPoseDetectionAccurate` |
+| `MLKitSegmentationSelfieResources.bundle` | `MLKitSegmentationSelfie` |
+| `MLKitSegmentationCommonResources.bundle` | `MLKitSegmentationSelfie` |
 | `MLKitXenoResources.bundle` | `MLKitPoseDetection`, `MLKitPoseDetectionAccurate`, `MLKitSegmentationSelfie` |
 | `MLKitTranslate_resource.bundle` | `MLKitTranslate` |
-| `PredictOnDevice_resource.bundle` | `MLKitSmartReply` |
-
-`scripts/download_bundles.sh <version>` fetches all of them at once.
-
-Text recognition needs no bundle: its OCR model is linked into your app from
-`MLKitTextRecognitionCommon`.
+| `PredictOnDeviceResource.bundle` | `MLKitSmartReply` |
+| `PredictOnDevice_resource.bundle` | `MLKitSmartReply` (the spelling ML Kit nests inside its framework; earlier releases shipped this one) |
 
 ## Supported Features
 
