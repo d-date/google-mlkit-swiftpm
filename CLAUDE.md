@@ -16,13 +16,17 @@ For deeper detail see `AGENTS.md` (short agent guide), `AUTOMATION.md` (full aut
 
 - `git submodule update --init` — required before first build (initialises `xcframework-maker/`)
 - `make bootstrap-builder` — build the `xcframework-maker` tool only
-- `make run` — full pipeline: pod install → xcodebuild for both SDKs → inject Info.plists → create XCFrameworks → ar/ranlib FAT-object fix → zip everything into `GoogleMLKit/`
+- `make run` — full pipeline: pod install → xcodebuild for both SDKs → inject Info.plists → create XCFrameworks → post-process (arm64 simulator slice + static archives) → copy resource bundles → zip everything into `GoogleMLKit/`
 - `./build_with_asdf.sh` — same as `make run`, but sets up the asdf-shimmed Ruby first
 - `./scripts/build_all.sh <version>` — bumps `Podfile` + `Resources/*-Info.plist`, runs `make run`, recomputes SHA256s, rewrites `Package.swift` binary target URLs/checksums, verifies
 - `./scripts/batch_build.sh <v1> [v2] …` — sequential `build_all.sh` over multiple versions with auto commit + tag
 
 ### Inspect / verify
 
+- `make verify` — closure check + `verify_build.rb` + `swift package dump-package`
+- `ruby scripts/check_product_closure.rb` — asserts every `.library` product lists the full transitive framework set from `Podfile.lock` (catches the issue #110 class, which building the Example app cannot)
+- `./scripts/verify_local_archive.sh` — repoints `Package.swift` at `GoogleMLKit/`, builds for the arm64 Simulator, archives for device, and asserts nothing is embedded and no model data was stripped. Run this before publishing a release.
+- `ruby scripts/test_patch_macho_platform.rb` — self-check for the hand-written `ar`/Mach-O parser
 - `swift package dump-package` — validate `Package.swift` syntax (CI runs this too)
 - `ruby scripts/verify_build.rb` — pre/post-flight (Info.plists present, `xcframework-maker` built, zips present, `Package.swift` parses)
 - `./scripts/verify_runtime.sh <version>` — static checks on built XCFrameworks (architectures, embedded Info.plist, symbol table)
@@ -33,43 +37,54 @@ For deeper detail see `AGENTS.md` (short agent guide), `AUTOMATION.md` (full aut
 - `ruby scripts/update_version.rb <version>` — rewrite `Podfile` pod versions and `CFBundleShortVersionString` in every `Resources/*-Info.plist`
 - `ruby scripts/update_checksums.rb <version>` — recompute SHA256 of every zip in `GoogleMLKit/`, rewrite each `binaryTarget(url:checksum:)` in `Package.swift`, and sync transitive Google deps from `Podfile.lock`
 - `ruby scripts/update_package_dependencies.rb` — sync only the SwiftPM `dependencies:` block (GoogleDataTransport, GoogleUtilities, gtm-session-fetcher, promises, nanopb) from `Podfile.lock`
+- `ruby scripts/postprocess_xcframeworks.rb [dir]` — inject the arm64 simulator slice and convert object-file binaries to `ar` archives (run by `make postprocess`)
+- `ruby scripts/use_local_binaries.rb` — repoint every `binaryTarget` at `GoogleMLKit/*.xcframework`; undo with `git checkout Package.swift`
 - `./scripts/upload_release.sh <version>` — upload `GoogleMLKit/*.xcframework.zip` to an existing GitHub Release (run `gh release create <version>` first if it doesn't exist)
 
 ### Example app
 
-- `cd Example && open Example.xcworkspace` — SwiftUI demo app. Depends on the package via `path: "../../"` and is used for device validation. **Run on a real iOS device** — the simulator is not supported on Apple Silicon (see Gotchas).
+- `cd Example && open Example.xcworkspace` — SwiftUI demo app depending on the package via `path: "../../"`. Runs on both a real device and the Apple Silicon simulator. It needs the resource bundles first: `./scripts/download_bundles.sh <version>`, or `cp -rf GoogleMLKit/*.bundle Example/Example/Resources/Bundles/` after a local build.
+- The app links **every** product at once, so it cannot catch a product that omits a transitive framework — that is what `check_product_closure.rb` is for.
 
 ### CI (GitHub Actions)
 
 - `Build MLKit XCFrameworks` (`.github/workflows/build-mlkit.yml`) — manual `workflow_dispatch` with a `version` input. Runs `make run` + `update_checksums.rb` and creates/updates the GitHub Release. Preferred over local builds for shipping a version.
 - `Check MLKit Updates` (`.github/workflows/check-mlkit-updates.yml`) — daily cron at 09:00 UTC. Opens an issue when CocoaPods has a newer version.
+- `CI` (`.github/workflows/ci.yml`) — runs on every PR: Ruby/shell syntax, `swift package dump-package`, the product-closure check and the Mach-O patcher self-check.
 
 ## Architecture / pipeline shape
 
-The Makefile is the single source of truth for the build. Targets form a 6-stage flow — when something breaks, locate the right file by stage:
+The Makefile is the single source of truth for the build. Targets form a 7-stage
+flow driven by the `MLKIT_MODULES` / `SOURCE_MODULES` lists at the top of the
+Makefile — when something breaks, locate the right file by stage:
 
-1. **`bootstrap-cocoapods`** — `bundle install` + `pod install` with `integrate_targets: false`. We only want the downloaded frameworks, not Xcode project integration.
+1. **`bootstrap-cocoapods`** — `bundle install` + `pod install` with `integrate_targets: false`. We only want the downloaded frameworks, not Xcode project integration. The Podfile uses `use_frameworks! :linkage => :static` so the two source pods don't ship as dynamic frameworks (see Gotchas, ITMS-91065).
 2. **`bootstrap-builder`** — `swift build -c release` inside the `xcframework-maker/` git submodule. This tool wraps `xcodebuild -create-xcframework` and patches Info.plists for frameworks that ship without one.
-3. **`build-cocoapods`** — runs `xcodebuild` against the generated `Pods.xcodeproj` for both `iphoneos` and `iphonesimulator` SDKs at iOS 12.0 deployment target.
+3. **`build-cocoapods`** — runs `xcodebuild` against the generated `Pods.xcodeproj` for both `iphoneos` and `iphonesimulator` SDKs at `IPHONEOS_DEPLOYMENT_TARGET` (15.0 — Xcode 26 rejects anything lower).
 4. **`prepare-info-plist`** — copies each `Resources/<Name>-Info.plist` template into `Pods/<Name>/Frameworks/<Name>.framework/Info.plist`. ML Kit pods ship without proper Info.plists; without this step the SwiftPM consumer crashes at launch with "The bundle doesn't contain…".
-5. **`create-xcframework`** — calls `xcframework-maker/.build/release/make-xcframework` for every MLKit module, plus raw `xcodebuild -create-xcframework` for `GoogleToolboxForMac` and `SSZipArchive`. Output lands in `GoogleMLKit/`.
-6. **`archive`** — for static frameworks shipped as FAT object files (BarcodeScanning, FaceDetection, ImageLabeling, LanguageID, Translate, SmartReply), runs `mv → ar r → ranlib` inside both slices to convert the Mach-O object into a real `ar` archive. Then `zip -r` every `.xcframework` and `GoogleMVFaceDetectorResources.bundle` into `GoogleMLKit/`.
+5. **`create-xcframework`** — `make-xcframework` for every `MLKIT_MODULES` entry, plus raw `xcodebuild -create-xcframework` for `SOURCE_MODULES` (`GoogleToolboxForMac`, `SSZipArchive`). Output lands in `GoogleMLKit/`.
+6. **`postprocess`** — `scripts/postprocess_xcframeworks.rb` injects the arm64 simulator slice and converts every object-file binary into an `ar` archive. This replaced ~150 lines of hardcoded `mv → ar r → ranlib` blocks; the script detects what needs converting instead of naming modules, so the list cannot drift.
+7. **`copy-resource-bundle`** + **`archive`** — copies *every* `.bundle` nested in a pod framework out to `GoogleMLKit/` (discovered with `find`, not listed), then `zip -qr` each `.xcframework` and `.bundle`.
 
 ### Module surface in `Package.swift`
 
 - 17 `.library` products and ~30 `.binaryTarget` entries. Each binary target points at `https://github.com/d-date/google-mlkit-swiftpm/releases/download/<version>/<Name>.xcframework.zip` with a SHA256 checksum.
 - One real `.target` named `Common` re-exports `MLKitCommon` and pulls in non-binary Google SwiftPM dependencies (GoogleUtilities, gtm-session-fetcher, GoogleDataTransport, nanopb, promises). Every public library composes its binary target with `Common`, so consumers don't have to wire these themselves.
-- A block of commented-out `.binaryTarget(name:path:)` entries near the top is intentionally kept for local debugging — uncomment them (and comment the URL-based ones) to point SwiftPM at `GoogleMLKit/*.xcframework` directly.
+- To point SwiftPM at `GoogleMLKit/*.xcframework` for local debugging, run `ruby scripts/use_local_binaries.rb`.
 
 ## Gotchas
 
-- **No arm64 iOS Simulator slice.** ML Kit's pre-built binaries don't include arm64 simulator. The Makefile only produces `arm64` for iphoneos and `x86_64` for iphonesimulator. Apple Silicon Macs cannot use the simulator — test on a real device.
+- **The arm64 simulator slice is synthesised, not shipped by Google.** `scripts/postprocess_xcframeworks.rb` copies the device arm64 binary and rewrites the Mach-O platform to `PLATFORM_IOSSIMULATOR` (7). For `ar` archives the platform field is patched **in place** — extracting and repacking collapses ML Kit's duplicate member names (three `globals.o` in MLKitCommon) into ~115 duplicate symbols at link time. Four binaries (`MLKitBarcodeScanning`, `MLKitFaceDetection`, `MLKitTextRecognitionCommon`, `MLKitVisionKit`) declare no platform at all; xcframework-maker gives them an `LC_VERSION_MIN_IPHONEOS`, which `vtool -set-build-version 7 … -replace` can swap. `vtool` cannot add a load command to a bare object file ("not enough space to hold load commands"), which is why the in-place path exists.
 - **Consumer linker flags.** Apps consuming this package must add `-ObjC` and `-all_load` to *Other Linker Flags*, otherwise they crash at runtime with `unrecognized selector`.
-- **`MLKitFaceDetection` resource bundle.** `GoogleMVFaceDetectorResources.bundle` cannot ride along inside SwiftPM. It ships as a separate `.zip` on the GitHub Release; consumers must add it to their Xcode project manually.
+- **Resource bundles can't ride along inside SwiftPM.** All seven bundles nested in the pod frameworks (`GoogleMVFaceDetectorResources`, `MLKitImageLabelingResources`, `MLKitObjectDetectionResources`, `MLKitObjectDetectionCommonResources`, `MLKitXenoResources`, `MLKitTranslate_resource`, `PredictOnDevice_resource`) ship as separate `.zip` assets; consumers add the ones they need manually. `copy-resource-bundle` discovers them, so a new bundle needs no Makefile edit.
+- **Framework binaries must end up as `ar` archives.** Xcode treats a framework whose binary is a bare Mach-O object as *dynamic*, relinks it and dead-strips unreferenced data. That is how `MLKitTextRecognitionCommon` lost its ~58MB OCR model and crashed with "Invalid model path." (issues #106/#109). `postprocess` converts all of them; `verify_local_archive.sh` fails if the archived app binary is suspiciously small.
+- **ITMS-91065 comes from embedding.** Xcode embeds a *stub* framework bundle (~33KB, zero exported symbols) into the consumer app for every static framework bundle it links, even though the real code is linked into the app binary. Apple's scanner still sees `Frameworks/GoogleToolboxForMac.framework/GoogleToolboxForMac` and demands a signature this repo cannot provide (issue #102). Hence `SOURCE_MODULES` ship as **library-type** XCFrameworks (`.a` + headers): a library slice is linked, never embedded. The ML Kit frameworks keep their bundles — they need their module maps — and are not on Apple's commonly-used-SDK list.
+- **A product only links the targets it lists.** The Example app depends on every product at once, so a framework missing from one product's `targets:` is still pulled in by another and the build passes — while a consumer adopting that single product gets undefined symbols (issue #110). `scripts/check_product_closure.rb` derives the correct closure from `Podfile.lock`; run it after any `Package.swift` product edit.
 - **Submodule + Ruby version mismatch.** `xcframework-maker/` is a git submodule (`git submodule update --init` required). `.tool-versions` pins Ruby 4.0.1 for local dev but CI workflows pin Ruby 3.3 — a recent regression (PR #86) was caused by Ruby 4.0 incompatibility on macos-15 runners. Don't bump CI back to 4.x without verifying.
-- **Adding a new MLKit module is a multi-file change.** It touches `Podfile`, a new `Resources/<Name>-Info.plist` (copy from a sibling), the `Makefile` (`prepare-info-plist` + `create-xcframework` + `archive` zip list, plus the ar/ranlib block if it's static-only), `Package.swift` (new `.binaryTarget` and either a new `.library` or addition to an existing product's target list), and possibly `scripts/update_checksums.rb` if it enumerates frameworks.
+- **Adding a new MLKit module.** Touch `Podfile`, add `Resources/<Name>-Info.plist` (copy from a sibling), add the name to `MLKIT_MODULES` in the `Makefile`, and add the `.binaryTarget` plus product wiring in `Package.swift`. The Info.plist glob, the zip list, the ar conversion and the resource-bundle copy all derive from those, so nothing else needs editing. Finish with `ruby scripts/check_product_closure.rb`.
 - **Don't hand-edit Pods.** The Podfile's `post_install` strips `ARCHS` so the Makefile can drive architecture choice. Don't `pod install` outside `make bootstrap-cocoapods`.
-- **`Package.swift` URLs/checksums are generated.** Run `scripts/update_checksums.rb` rather than editing checksum strings — the next release run will overwrite manual edits anyway.
+- **`Package.swift` URLs/checksums are generated.** Run `scripts/update_checksums.rb` rather than editing checksum strings — the next release run will overwrite manual edits anyway. The `dependencies:` pins are generated too (from `Podfile.lock`), so `renovate.json` disables the `swift` manager for the root `Package.swift`.
+- **To build against local XCFrameworks**, run `ruby scripts/use_local_binaries.rb` and undo with `git checkout Package.swift`. The block of commented-out `path:`-based targets that used to live in `Package.swift` is gone.
 
 ## Conventions (from AGENTS.md, abbreviated)
 
