@@ -69,8 +69,22 @@ def products(package)
   end
 end
 
+# scripts/use_local_binaries.rb rewrites the binary targets to point at
+# GoogleMLKit/ so a release can be verified before it is published, and
+# `git checkout Package.swift` is easy to forget. A published package whose
+# targets point at a local directory cannot be resolved by anyone.
+def check_no_local_binaries(package)
+  local = package.scan(/\.binaryTarget\(\s*name: "([^"]+)",\s*path:/).flatten
+  return true if local.empty?
+
+  warn "#{local.length} binary target(s) still point at a local path: #{local.join(", ")}"
+  warn "run `ruby scripts/update_checksums.rb <version>` or `git checkout Package.swift`"
+  false
+end
+
 if $PROGRAM_NAME == __FILE__
   package = uncommented(File.read("Package.swift"))
+  abort unless check_no_local_binaries(package)
   graph = pod_dependencies("Podfile.lock")
   available = binary_targets(package)
   failures = []

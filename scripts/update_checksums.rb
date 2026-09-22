@@ -11,20 +11,24 @@ end
 def update_package_swift(version, checksums)
   package_swift = File.read('Package.swift')
 
-  # Update each binary target with new URL and checksum
+  # Point each binary target at this version's release asset. Both forms are
+  # accepted: a released `url:`/`checksum:` pair, and the `path:` form that
+  # scripts/use_local_binaries.rb writes for local verification -- a release
+  # must never go out still pointing at GoogleMLKit/.
   checksums.each do |name, checksum|
-    # Match the binaryTarget block for this framework
-    package_swift.gsub!(
-      /\.binaryTarget\(\s*name:\s*"#{name}",\s*url:\s*"[^"]+",\s*checksum:\s*"[^"]+"\)/m
-    ) do |match|
-      match.gsub(
-        %r{url:\s*"https://github\.com/d-date/google-mlkit-swiftpm/releases/download/[^/]+/},
-        "url: \"https://github.com/d-date/google-mlkit-swiftpm/releases/download/#{version}/"
-      ).gsub(
-        /checksum:\s*"[^"]+"/,
-        "checksum: \"#{checksum}\""
-      )
-    end
+    url = "https://github.com/d-date/google-mlkit-swiftpm/releases/download/#{version}/#{name}.xcframework.zip"
+    replacement = <<~TARGET.chomp
+      .binaryTarget(
+            name: "#{name}",
+            url: "#{url}",
+            checksum: "#{checksum}")
+    TARGET
+
+    rewritten = package_swift.gsub!(
+      /\.binaryTarget\(\s*name:\s*"#{name}",\s*(?:url:\s*"[^"]*",\s*checksum:\s*"[^"]*"|path:\s*"[^"]*")\)/m,
+      replacement
+    )
+    puts "  Warning: no binary target named #{name} in Package.swift" if rewritten.nil?
   end
 
   File.write('Package.swift', package_swift)
