@@ -3,9 +3,32 @@
 
 require 'open3'
 
-# Regex pattern for matching package declarations in Package.swift
+# Matches a package declaration in Package.swift whatever version specifier it
+# carries, capturing the version.
 def package_url_regex(org, package_name)
-  /\.package\(url:\s*"https:\/\/github\.com\/#{Regexp.escape(org)}\/#{Regexp.escape(package_name)}(?:\.git)?",\s*exact:\s*"([^"]+)"\)/
+  %r{
+    \.package\(url:\s*"https://github\.com/#{Regexp.escape(org)}/#{Regexp.escape(package_name)}(?:\.git)?",\s*
+    (?:exact|from|\.upToNextMinor\(from|\.upToNextMajor\(from):\s*"([^"]+)"\)?\)
+  }x
+end
+
+# The version requirement to write for a package.
+#
+# The resolved Podfile.lock version is the lower bound, not an exact pin: the
+# ML Kit binaries were built against these pods' own constraints, which are all
+# "up to next major" (`~> 8.0`, `~> 10.0`, `~> 2.4`, `>= 3.3.2 < 4.0`). Pinning
+# exactly made this package unusable alongside anything else that depends on
+# them -- Firebase 12.19.2 needs GoogleUtilities >= 8.1.3, and an
+# `exact: "8.1.0"` here made the dependency graph unsolvable.
+#
+# nanopb is the exception: CocoaPods numbers it 3.30910.x and SwiftPM 2.30910.x,
+# and the pod constraint `~> 3.30910.0` only allows that one minor.
+def version_requirement(package_name, version)
+  if package_name == 'nanopb'
+    %(.upToNextMinor(from: "#{version}"))
+  else
+    %(from: "#{version}")
+  end
 end
 
 # Check if a git tag exists in a remote repository
@@ -27,10 +50,10 @@ end
 
 # Update a package version in Package.swift
 def update_package_version(package_swift, org, package_name, new_version)
-  pattern = package_url_regex(org, package_name)
   package_swift.gsub!(
-    pattern,
-    ".package(url: \"https://github.com/#{org}/#{package_name}.git\", exact: \"#{new_version}\")"
+    package_url_regex(org, package_name),
+    ".package(url: \"https://github.com/#{org}/#{package_name}.git\", " \
+    "#{version_requirement(package_name, new_version)})"
   )
 end
 
@@ -81,15 +104,15 @@ def update_package_swift(dependency_versions)
   }.each do |podfile_name, (org, package_name)|
     if dependency_versions[podfile_name]
       dep_version = dependency_versions[podfile_name]
-      
-      # Get current version from Package.swift
-      current_version = get_package_version(package_swift, org, package_name)
-      
-      if current_version == dep_version
+      # Rewrite unconditionally and compare the result: the requirement form can
+      # need updating (an old `exact:` pin) even when the version has not moved.
+      before = package_swift.dup
+      update_package_version(package_swift, org, package_name, dep_version)
+
+      if package_swift == before
         puts "✓ #{package_name}: #{dep_version} (already up-to-date)"
       else
-        puts "→ #{package_name}: #{current_version} → #{dep_version}"
-        update_package_version(package_swift, org, package_name, dep_version)
+        puts "→ #{package_name}: #{version_requirement(package_name, dep_version)}"
       end
     end
   end
@@ -110,14 +133,16 @@ def update_package_swift(dependency_versions)
     print "  Checking if tag #{nanopb_version} exists in firebase/nanopb... "
     if git_tag_exists?('https://github.com/firebase/nanopb.git', nanopb_version)
       puts "yes"
-      if current_version == nanopb_version
+      before = package_swift.dup
+      update_package_version(package_swift, 'firebase', 'nanopb', nanopb_version)
+      if package_swift == before
         puts "  ✓ nanopb: #{nanopb_version} (already up-to-date)"
       else
-        puts "  → nanopb: #{current_version} → #{nanopb_version}"
-        update_package_version(package_swift, 'firebase', 'nanopb', nanopb_version)
+        puts "  → nanopb: #{version_requirement('nanopb', nanopb_version)}"
       end
     else
       puts "no"
+      update_package_version(package_swift, 'firebase', 'nanopb', current_version) if current_version
       puts "  ℹ nanopb: Keeping #{current_version} (CocoaPods version #{nanopb_version} not available in SwiftPM)"
       puts "           Note: CocoaPods and firebase/nanopb use different versioning schemes"
     end

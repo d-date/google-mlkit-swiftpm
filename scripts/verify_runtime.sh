@@ -34,16 +34,21 @@ for framework in GoogleMLKit/*.xcframework; do
       echo "  ✗ ios-arm64 (device) MISSING"
     fi
 
-    # Check x86_64 simulator (Intel Mac)
-    if [ -d "$framework/ios-x86_64-simulator" ]; then
-      echo "  ✓ ios-x86_64-simulator present"
+    # Check the simulator slice. Since the arm64 slice is synthesised from the
+    # device binary it is named ios-arm64_x86_64-simulator; older releases
+    # carried x86_64 only.
+    if [ -d "$framework/ios-arm64_x86_64-simulator" ]; then
+      echo "  ✓ ios-arm64_x86_64-simulator present"
+    elif [ -d "$framework/ios-x86_64-simulator" ]; then
+      echo "  ⚠ ios-x86_64-simulator only -- no arm64 simulator slice, unusable on Apple Silicon"
     else
       echo "  ✗ ios-x86_64-simulator MISSING"
     fi
 
-    # Check for arm64 simulator (Apple Silicon)
-    if [ -d "$framework/ios-arm64-simulator" ] || [ -d "$framework/ios-arm64_x86_64-simulator" ]; then
-      echo "  ⚠ ios-arm64-simulator found (unexpected for MLKit)"
+    # Warn about a device-only XCFramework, which cannot be used in the
+    # Simulator at all.
+    if [ ! -d "$framework/ios-arm64_x86_64-simulator" ] && [ ! -d "$framework/ios-x86_64-simulator" ]; then
+      echo "  ✗ no simulator slice at all"
     fi
   fi
 done
@@ -52,24 +57,26 @@ echo ""
 echo "Step 2: Checking for common runtime issues..."
 echo ""
 
-# Check if frameworks have proper Info.plist
+# ML Kit ships its frameworks without a usable Info.plist, and a consumer whose
+# app is missing one crashes at launch with "The bundle doesn't contain...".
+# Library-type XCFrameworks (a static archive plus headers) have no bundle and
+# so have nothing to check.
 for framework in GoogleMLKit/*.xcframework; do
   if [ -d "$framework" ]; then
     name=$(basename "$framework" .xcframework)
 
-    # Check device framework
-    if [ -f "$framework/ios-arm64/$name.framework/Info.plist" ]; then
-      echo "✓ $name (device) has Info.plist"
-    else
-      echo "✗ $name (device) MISSING Info.plist - may crash at runtime!"
-    fi
+    for slice in "$framework"/ios-*; do
+      [ -d "$slice" ] || continue
+      label=$(basename "$slice")
 
-    # Check simulator framework
-    if [ -f "$framework/ios-x86_64-simulator/$name.framework/Info.plist" ]; then
-      echo "✓ $name (simulator) has Info.plist"
-    else
-      echo "✗ $name (simulator) MISSING Info.plist - may crash at runtime!"
-    fi
+      if [ ! -d "$slice/$name.framework" ]; then
+        echo "- $name ($label) is a library, no bundle to check"
+      elif [ -f "$slice/$name.framework/Info.plist" ]; then
+        echo "✓ $name ($label) has Info.plist"
+      else
+        echo "✗ $name ($label) MISSING Info.plist - may crash at runtime!"
+      fi
+    done
   fi
 done
 
@@ -110,7 +117,7 @@ echo "⚠️  IMPORTANT NOTES:"
 echo ""
 echo "1. Built frameworks support:"
 echo "   - iphoneos: arm64 only"
-echo "   - iphonesimulator: x86_64 only (Intel Mac)"
+echo "   - iphonesimulator: arm64 (synthesised from the device slice) + x86_64"
 echo ""
 echo "2. Apple Silicon Macs:"
 echo "   - Simulator will run in Rosetta mode"

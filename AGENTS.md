@@ -17,7 +17,7 @@ You are a **Senior iOS Engineer** maintaining a SwiftPM binary distribution pack
 
 - `Package.swift` - Swift package definition with 17 library products and 30+ binary targets
 - `Podfile` - CocoaPods dependencies for downloading ML Kit frameworks
-- `Makefile` - Build orchestration (bootstrap, build, create-xcframework, archive)
+- `Makefile` - Build orchestration (bootstrap, build, create-xcframework, postprocess, archive), driven by the `MLKIT_MODULES` / `SOURCE_MODULES` lists at the top
 - `scripts/` - Ruby and shell automation scripts
 - `Resources/` - Info.plist templates for frameworks that lack them
 - `xcframework-maker/` - Submodule for XCFramework conversion tool
@@ -39,5 +39,12 @@ You are a **Senior iOS Engineer** maintaining a SwiftPM binary distribution pack
 ## PR instructions
 
 - Test automation scripts locally before committing
-- Verify Package.swift syntax: `swift package dump-package`
+- Run `make verify` (product closure, artifacts, `swift package dump-package`)
+- Run `./scripts/verify_local_archive.sh` before publishing a release
 - Update documentation if adding new modules or changing build process
+
+## Triage
+
+For incoming issues and PRs, follow the `mlkit-release` skill in
+`.claude/skills/mlkit-release/` -- it maps the four failure modes consumers
+keep reporting to their mechanisms and checks.

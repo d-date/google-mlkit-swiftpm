@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4.9'
+
+      - name: Check Ruby syntax
+        run: ruby -c scripts/*.rb
+
+      - name: Check shell syntax
+        run: bash -n scripts/*.sh build_with_asdf.sh
+
+      - name: Verify Package.swift parses
+        run: swift package dump-package > /dev/null
+
+      - name: Verify every product links its full dependency closure
+        run: ruby scripts/check_product_closure.rb
+
+      - name: Verify the Mach-O platform patcher
+        run: ruby scripts/test_patch_macho_platform.rb

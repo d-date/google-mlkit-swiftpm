@@ -89,6 +89,64 @@ ruby scripts/update_checksums.rb 5.1.0
 - Podfile.lock must exist and be up-to-date
 - Run after `make archive`
 
+### postprocess_xcframeworks.rb
+
+Post-processes `GoogleMLKit/*.xcframework` after `create-xcframework`. Run by
+`make postprocess`; takes the directory as an optional argument.
+
+Per XCFramework it does two things, in this order:
+
+1. **Injects an arm64 simulator architecture** derived from the device arm64
+   slice by rewriting the Mach-O platform to `PLATFORM_IOSSIMULATOR`. ML Kit
+   ships no arm64 simulator code and Xcode 26 dropped Rosetta simulators, so
+   without this the package cannot run in the Simulator on Apple Silicon.
+   Slices that already contain arm64 are left alone.
+2. **Converts bare Mach-O object binaries into `ar` archives.** Xcode treats a
+   framework whose binary is an object file as dynamic, relinks it and
+   dead-strips unreferenced data -- which is how `MLKitTextRecognitionCommon`
+   lost its ~58MB OCR model.
+
+### patch_macho_platform.rb
+
+`patch_macho_platform.rb <file> <platform-number>` rewrites the `platform`
+field of every `LC_BUILD_VERSION` in a thin Mach-O file or `ar` archive, in
+place. Used by `postprocess_xcframeworks.rb`.
+
+Patching in place matters: ML Kit's archives contain duplicate member names
+(three `globals.o` in MLKitCommon), which cannot survive an extract/repack
+round trip without turning into duplicate symbols at link time.
+
+### test_patch_macho_platform.rb
+
+Self-check for the hand-written `ar`/Mach-O parser above. Compiles throwaway
+object files with clang, including an archive with duplicate member names, and
+asserts the patch rewrites every member without changing the file layout. Run
+by CI.
+
+### check_product_closure.rb
+
+Asserts that every `.library` product in `Package.swift` links the full
+transitive framework set that pod needs according to `Podfile.lock`.
+
+A SwiftPM product links only the targets it lists, and the Example app depends
+on every product at once -- so a framework missing from one product still gets
+pulled in by another and the build passes, while a consumer adopting that
+single product gets undefined symbols. Run by CI, and after any product edit.
+
+### use_local_binaries.rb
+
+Rewrites every `.binaryTarget` in `Package.swift` to point at
+`GoogleMLKit/*.xcframework` instead of a release asset, so the package can be
+built before anything is published. Undo with `git checkout Package.swift`.
+
+### verify_local_archive.sh
+
+The pre-release gate. Repoints `Package.swift` at the local XCFrameworks,
+builds the Example app for the arm64 Simulator, archives it for device, and
+fails if an SDK on Apple's commonly-used list is embedded (ITMS-91065), if
+anything is linked dynamically, or if the app binary is too small to still
+contain the ML Kit model data. Restores `Package.swift` on exit.
+
 ### verify_build.rb
 
 Validates that all required files and build outputs are present and correct.

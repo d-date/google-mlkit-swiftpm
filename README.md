@@ -56,16 +56,38 @@ Add these flags to `Other Linker Flags` in Build Settings of your Xcode projects
 - `-ObjC`
 - `-all_load`
 
-### Link resource bundles to your project (if needed)
+### Link resource bundles to your project
 
-Some ML Kit modules require resource bundles. Currently:
+Every ML Kit module keeps its model in a resource bundle, and Swift Package
+Manager cannot carry a resource bundle inside a binary target. Each bundle is
+published as a separate release asset: download the ones your modules need, add
+them to your Xcode project, and make sure they are in **Copy Bundle Resources**
+of your app target. Without them the module throws at runtime -- text
+recognition fails with `MLKTextRecognizerInternalErrorCreationFailure`,
+"Invalid model path.".
 
-#### Face Detection
-The `MLKitFaceDetection` module requires `GoogleMVFaceDetectorResources.bundle`. Since bundles can't be automatically included via Swift Package Manager, you need to manually add it to your project.
+`scripts/download_bundles.sh <version>` fetches all of them at once.
 
-Download `GoogleMVFaceDetectorResources.bundle` from [Release](https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.0/GoogleMVFaceDetectorResources.bundle.zip) and add it to your Xcode project, ensuring it's included in your build target.
-
-**Note**: Other modules (Text Recognition, Pose Detection, Object Detection, Selfie Segmentation, Translation) may also require resource bundles or downloaded models at runtime. Check the official [ML Kit documentation](https://developers.google.com/ml-kit) for specific requirements.
+| Bundle | Needed by |
+| --- | --- |
+| `GoogleMVFaceDetectorResources.bundle` | `MLKitFaceDetection` |
+| `LatinOCRResources.bundle` | `MLKitTextRecognition` |
+| `ChineseOCRResources.bundle` | `MLKitTextRecognitionChinese` |
+| `DevanagariOCRResources.bundle` | `MLKitTextRecognitionDevanagari` |
+| `JapaneseOCRResources.bundle` | `MLKitTextRecognitionJapanese` |
+| `KoreanOCRResources.bundle` | `MLKitTextRecognitionKorean` |
+| `MLKitImageLabelingResources.bundle` | `MLKitImageLabeling` |
+| `MLKitObjectDetectionResources.bundle` | `MLKitObjectDetection` |
+| `MLKitObjectDetectionCommonResources.bundle` | `MLKitImageLabeling`, `MLKitImageLabelingCustom`, `MLKitObjectDetection`, `MLKitObjectDetectionCustom` |
+| `MLKitPoseDetectionFastResources.bundle` | `MLKitPoseDetection` |
+| `MLKitPoseDetectionAccurateResources.bundle` | `MLKitPoseDetectionAccurate` |
+| `MLKitPoseDetectionCommonResources.bundle` | `MLKitPoseDetection`, `MLKitPoseDetectionAccurate` |
+| `MLKitSegmentationSelfieResources.bundle` | `MLKitSegmentationSelfie` |
+| `MLKitSegmentationCommonResources.bundle` | `MLKitSegmentationSelfie` |
+| `MLKitXenoResources.bundle` | `MLKitPoseDetection`, `MLKitPoseDetectionAccurate`, `MLKitSegmentationSelfie` |
+| `MLKitTranslate_resource.bundle` | `MLKitTranslate` |
+| `PredictOnDeviceResource.bundle` | `MLKitSmartReply` |
+| `PredictOnDevice_resource.bundle` | `MLKitSmartReply` (the spelling ML Kit nests inside its framework; earlier releases shipped this one) |
 
 ## Supported Features
 
@@ -87,7 +109,15 @@ This package supports the following Google ML Kit features:
 
 ## Limitation
 
-- Since pre-built MLKit binary missing `arm64` for iphonesimulator, this project enables to build in `arm64` for iphoneos and `x86_64` for iphonesimulator only.
+- ML Kit's pre-built binaries carry no arm64 simulator code, so this project
+  synthesises that slice from the device slice by rewriting the Mach-O platform
+  (see `scripts/postprocess_xcframeworks.rb`). Published XCFrameworks therefore
+  cover `arm64` for iphoneos and `arm64` + `x86_64` for iphonesimulator, and no
+  `EXCLUDED_ARCHS` workaround is needed on Apple Silicon.
+- Google ships ML Kit without dSYMs, so Xcode's archive step reports
+  "Upload Symbols Failed" for each ML Kit framework. The frameworks are linked
+  statically, so their symbols land in your app's own dSYM; the warnings are
+  spurious and do not block submission.
 
 ## Example
 
