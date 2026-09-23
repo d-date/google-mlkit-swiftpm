@@ -2,7 +2,7 @@
 
 set -e
 
-VERSION=${1:-9.0.0}
+VERSION=${1:-9.0.1}
 DEST_DIR="Example/Example/Resources/Bundles"
 
 echo "Downloading ML Kit resource bundles for version ${VERSION}..."
