@@ -1,8 +1,8 @@
 # Google ML Kit for Swift Package Manager
 
 Google ships ML Kit only through CocoaPods. This project rebuilds those pods as
-XCFrameworks, publishes them as GitHub Release assets, and exposes them as 17
-SwiftPM library products.
+XCFrameworks, publishes them as GitHub Release assets, and exposes every
+user-facing ML Kit iOS API as a SwiftPM library product.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ Apple Silicon simulators are supported — see [Simulator support](#simulator-su
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "9.0.1")
+    .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "9.0.2")
 ]
 ```
 
@@ -39,11 +39,11 @@ runtime rather than at build time:
 3. Nothing else — but read [Simulator support](#simulator-support) if you are
    coming from an older release with `EXCLUDED_ARCHS` set.
 
-> **Upgrading from 9.0.0 or 9.0.0-1?** `9.0.1` is the same upstream ML Kit
-> 9.0.0 build, repackaged. It is the first release where text recognition, pose
-> detection and selfie segmentation ship their models at all, where a single
-> product can be adopted without undefined symbols, where the simulator slice
-> covers arm64, and where App Store Connect accepts the upload. If you set
+> **Upgrading from 9.0.0 or 9.0.0-1?** `9.0.2` is the same upstream ML Kit
+> 9.0.0 build, repackaged. Since 9.0.1, text recognition, pose detection and
+> selfie segmentation ship their models at all, a single product can be adopted
+> without undefined symbols, the simulator slice covers arm64, and App Store
+> Connect accepts the upload. If you set
 > `EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64` for an earlier release, remove it.
 
 ### 1. Add the linker flags
@@ -67,7 +67,7 @@ Xcode project, and make sure they land in **Copy Bundle Resources** of your app
 target.
 
 ```bash
-./scripts/download_bundles.sh 9.0.1
+./scripts/download_bundles.sh 9.0.2
 ```
 
 | Bundle | Needed by |
@@ -88,6 +88,7 @@ target.
 | `MLKitSegmentationCommonResources.bundle` | `MLKitSegmentationSelfie` |
 | `MLKitXenoResources.bundle` | `MLKitPoseDetection`, `MLKitPoseDetectionAccurate`, `MLKitSegmentationSelfie` |
 | `MLKitTranslate_resource.bundle` | `MLKitTranslate` |
+| `MLKitDigitalInkRecognition_resource.bundle` | `MLKitDigitalInkRecognition` |
 | `PredictOnDeviceResource.bundle` | `MLKitSmartReply` |
 
 `PredictOnDevice_resource.bundle` is also published: it is the same content
@@ -129,6 +130,8 @@ Add only the products you use; each one links just the frameworks it needs.
 | `MLKitLanguageID` | Identify the language of a string |
 | `MLKitTranslate` | Translate between languages on device |
 | `MLKitSmartReply` | Suggest contextual replies |
+| `MLKitEntityExtraction` | Find addresses, dates, phone numbers and the like in text |
+| `MLKitDigitalInkRecognition` | Recognise handwriting and drawn strokes |
 
 ## Simulator support
 
@@ -150,14 +153,17 @@ iphonesimulator, so no `EXCLUDED_ARCHS` workaround is needed.
   inside ML Kit anyway — it is closed source.
 - **Resource bundles are manual.** Swift Package Manager has no way to ship
   them inside a binary target. See [above](#2-add-the-resource-bundles).
-- **The wrapper version is not the pod version.** `9.0.1` repackages upstream
+- **Digital ink recognition and entity extraction download their models at
+  runtime** from Google, so they ship no bundled model and need network access
+  the first time you use them.
+- **The wrapper version is not the pod version.** `9.0.2` repackages upstream
   ML Kit `9.0.0`; the pod versions each framework reports are Google's own.
 
 ## Example app
 
 ```bash
 git submodule update --init
-./scripts/download_bundles.sh 9.0.1
+./scripts/download_bundles.sh 9.0.2
 cd Example && open Example.xcworkspace
 ```
 

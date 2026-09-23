@@ -32,6 +32,8 @@ target 'MLKit' do
   # Vision modules - Selfie Segmentation
   pod 'GoogleMLKit/SegmentationSelfie', '~> 9.0.0'
   # Language modules
+  pod 'GoogleMLKit/DigitalInkRecognition', '~> 9.0.0'
+  pod 'GoogleMLKit/EntityExtraction', '~> 9.0.0'
   pod 'GoogleMLKit/LanguageID', '~> 9.0.0'
   pod 'GoogleMLKit/Translate', '~> 9.0.0'
   pod 'GoogleMLKit/SmartReply', '~> 9.0.0'

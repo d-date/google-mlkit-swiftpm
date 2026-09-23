@@ -1,4 +1,6 @@
 import CoreImage
+import MLKitDigitalInkRecognition
+import MLKitEntityExtraction
 import Testing
 import UIKit
 
@@ -49,6 +51,29 @@ struct CameraTests {
       "Wie geht es dir heute?")
 
     #expect(language == "de")
+  }
+
+  /// Digital ink recognition and entity extraction fetch their models from
+  /// Google on first use, so there is nothing to run offline. Creating the
+  /// recogniser still proves the frameworks link and initialise, which is the
+  /// failure mode this suite exists to catch.
+  @Test
+  func createsAnEntityExtractor() throws {
+    let options = EntityExtractorOptions(modelIdentifier: .english)
+    _ = EntityExtractor.entityExtractor(options: options)
+
+    #expect(options.modelIdentifier == .english)
+  }
+
+  @Test
+  func createsADigitalInkRecognizer() throws {
+    let identifier = try #require(
+      try DigitalInkRecognitionModelIdentifier(forLanguageTag: "en-US"))
+    let model = DigitalInkRecognitionModel(modelIdentifier: identifier)
+    _ = DigitalInkRecognizer.digitalInkRecognizer(
+      options: DigitalInkRecognizerOptions(model: model))
+
+    #expect(identifier.languageTag == "en-US")
   }
 
   // MARK: - Fixtures

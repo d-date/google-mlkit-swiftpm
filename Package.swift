@@ -49,6 +49,12 @@ let package = Package(
       name: "MLKitSegmentationSelfie",
       targets: ["MLKitSegmentationSelfie", "MLKitSegmentationCommon", "MLKitXenoCommon", "MLImage", "MLKitVision", "Common"]),
     .library(
+      name: "MLKitDigitalInkRecognition",
+      targets: ["MLKitDigitalInkRecognition", "MLKitMDD", "SSZipArchive", "Common"]),
+    .library(
+      name: "MLKitEntityExtraction",
+      targets: ["MLKitEntityExtraction", "MLKitNaturalLanguage", "Common"]),
+    .library(
       name: "MLKitLanguageID",
       targets: ["MLKitLanguageID", "MLKitNaturalLanguage", "MLKitXenoCommon", "MLKitCommon", "GoogleToolboxForMac", "Common"]),
     .library(
@@ -69,124 +75,136 @@ let package = Package(
 
     .binaryTarget(
       name: "MLImage",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLImage.xcframework.zip",
-      checksum: "c82efa4a126339b660370468581795c89f1f6c54234d8c7118d3b6f1bca21d13"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLImage.xcframework.zip",
+      checksum: "9e206e2b1a7bd5e5c788fa3221616e61f8e9c1c1d0c12b9e81f20a24f3732103"),
     .binaryTarget(
       name: "MLKitBarcodeScanning",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitBarcodeScanning.xcframework.zip",
-      checksum: "ee1283f7670bf7f489c2f775f2f104778b44d7bdb36a7afbf80f39ec74643e59"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitBarcodeScanning.xcframework.zip",
+      checksum: "908da2e7448889be44d19b3476d02accca525d51a5d54d332c474cb23bce1cb4"),
     .binaryTarget(
       name: "MLKitCommon",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitCommon.xcframework.zip",
-      checksum: "b54fc36e00c1bf50ee5f19308d75423240ced914a4e7b0477dcd12fcb893f442"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitCommon.xcframework.zip",
+      checksum: "87456955b5a61d2f8a68a12290d77a00ab1b679dfb0192785b94e53a0f8d0a3d"),
     .binaryTarget(
       name: "MLKitFaceDetection",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitFaceDetection.xcframework.zip",
-      checksum: "2d14db31edf94275fae2268d257e0ad3620f23db272da011a0f0d46a8252c843"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitFaceDetection.xcframework.zip",
+      checksum: "4420f6712283c52941e7a0145356fe9a36bf9a572e30b5d615e2dc59ffcf94f8"),
     .binaryTarget(
       name: "MLKitVision",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitVision.xcframework.zip",
-      checksum: "99747eb79a2a0362846d03d2026d297bbb12b5d274cbf820b974b1f66b2a0600"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitVision.xcframework.zip",
+      checksum: "408a454ced451696ca2c98479c2db12d284b404a5d7daeeeffc6ac1dfb28942e"),
     .binaryTarget(
       name: "GoogleToolboxForMac",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/GoogleToolboxForMac.xcframework.zip",
-      checksum: "4a43341460995a185544a3fc25ce5df1f8a2ee1fd01cceaa9025eb39d538c44e"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/GoogleToolboxForMac.xcframework.zip",
+      checksum: "4e541c66b63f85ee3d7556cd505db041fe62784e680296de50cbaf92725965cd"),
     .binaryTarget(
       name: "MLKitTextRecognition",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitTextRecognition.xcframework.zip",
-      checksum: "9515b284b80f5bbcb762caf64cc4b02679355d44eeb9ae5f845d7eaf5bbeec31"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitTextRecognition.xcframework.zip",
+      checksum: "6703514a50c2e67c70c3420c6d820bc3d826936f227bb3f9079d5070819bd6dc"),
     .binaryTarget(
       name: "MLKitTextRecognitionChinese",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitTextRecognitionChinese.xcframework.zip",
-      checksum: "131855da30a06a1913e50d282fb6dbc07e72c5df03958d735fc0b5d2942cec69"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitTextRecognitionChinese.xcframework.zip",
+      checksum: "9d273b9d26b79d0a53ccd69c4b19bbdcbeec71172b45ffe7aa6c14a02f375658"),
     .binaryTarget(
       name: "MLKitTextRecognitionDevanagari",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitTextRecognitionDevanagari.xcframework.zip",
-      checksum: "37dc1439193a1a822c1bcbbf311f9bce26ea119a754da80ef04e8dc77bdbf42d"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitTextRecognitionDevanagari.xcframework.zip",
+      checksum: "b59c31e430ec3551a4ee5cd9f1e64f11193680d4cbb9ea2995240fea9410ae62"),
     .binaryTarget(
       name: "MLKitTextRecognitionJapanese",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitTextRecognitionJapanese.xcframework.zip",
-      checksum: "2f6b060c9217344663f42e65987177177cf02de486ea769158030af0aec85a9e"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitTextRecognitionJapanese.xcframework.zip",
+      checksum: "59e45c2dcc1c6d122f887d1d712ea805f7a9e3b9c1e958d68344cdc330f10458"),
     .binaryTarget(
       name: "MLKitTextRecognitionKorean",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitTextRecognitionKorean.xcframework.zip",
-      checksum: "44602d069ddad09309aa8a72b978c891cec601075a212405366f789bbfcee289"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitTextRecognitionKorean.xcframework.zip",
+      checksum: "e285a1ae238fbad2654323837d0a74c2774c8f930e424609b03b8769f69fcdf4"),
     .binaryTarget(
       name: "MLKitImageLabeling",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitImageLabeling.xcframework.zip",
-      checksum: "22d4972fb08edc92338cff6c3694bf31167d501ff7812f1bf6b5da617c24221d"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitImageLabeling.xcframework.zip",
+      checksum: "2d420c9ef5391a76eaa55252244f86ac28853ed9584788594a9fcfe377cb4b81"),
     .binaryTarget(
       name: "MLKitImageLabelingCustom",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitImageLabelingCustom.xcframework.zip",
-      checksum: "3612a50658195933fa4a55c81d06cfd85959d00cdcba549170b379f175872d81"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitImageLabelingCustom.xcframework.zip",
+      checksum: "1a9c1892486cb472711e26a2c4e1c8f0d879eb9cdf52ac99066cab6809ca475b"),
     .binaryTarget(
       name: "MLKitObjectDetection",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitObjectDetection.xcframework.zip",
-      checksum: "64b5564c0978dd50b29ce3c86ec5b0770197f1251879f9ec8cd7c76821f566ea"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitObjectDetection.xcframework.zip",
+      checksum: "7bcddb81537e528f1c2c27d26653e5e3567c8579293810ad4f204f417533367c"),
     .binaryTarget(
       name: "MLKitObjectDetectionCustom",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitObjectDetectionCustom.xcframework.zip",
-      checksum: "e09faf7a46750bf5eee41dc695a1dbcba103ba0f149f9705fe4ad179f3d1a468"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitObjectDetectionCustom.xcframework.zip",
+      checksum: "68c118222e5d6adf3b20669c1af2d111a95b1652c438b112849ae2341fb5c0c9"),
     .binaryTarget(
       name: "MLKitPoseDetection",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitPoseDetection.xcframework.zip",
-      checksum: "ad400c4e32ac1c95b87a2d4db4552a4218d0db7ff9926232fa555e1ba92ee975"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitPoseDetection.xcframework.zip",
+      checksum: "04751fa0d9919ddaed86876baf6c89618f50e448ddfcecaf6e5bd3b0dd645461"),
     .binaryTarget(
       name: "MLKitPoseDetectionAccurate",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitPoseDetectionAccurate.xcframework.zip",
-      checksum: "0d9e7baab1456c4bd024b569afe5a4a1a21f0abb957977f916805fc6960abfa5"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitPoseDetectionAccurate.xcframework.zip",
+      checksum: "b5ff4bf3947733f28538ac23d7e8e23fdfdc5c2c585379ce7a58a62f44cfa8b6"),
     .binaryTarget(
       name: "MLKitSegmentationSelfie",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitSegmentationSelfie.xcframework.zip",
-      checksum: "d98868c1e9c77f005d14e3da35aca026fd17dab7d10240fd1c473eb9d71df115"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitSegmentationSelfie.xcframework.zip",
+      checksum: "29c3a323cc1e53db56c2bbfb8c84dc53dce499cc248c9a38d60497fc87be7c52"),
     .binaryTarget(
       name: "MLKitLanguageID",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitLanguageID.xcframework.zip",
-      checksum: "c4baf33a08eacf8040e2eb5afd82425d47188aa470335b4339d264129e3c748a"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitLanguageID.xcframework.zip",
+      checksum: "1bf2fed0e3513eedacd0edae8560c6abebfce8baa4d95c349170d213d2f4c25d"),
     .binaryTarget(
       name: "MLKitTranslate",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitTranslate.xcframework.zip",
-      checksum: "53c535b7a71327218083ab740e8fd9e961db255f4ed6ca2d99233ceb1280c8cc"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitTranslate.xcframework.zip",
+      checksum: "8cb621486b01b5a55295b0236e3aece107e7624a7d15c1dd67e62e99d35eecdb"),
     .binaryTarget(
       name: "MLKitSmartReply",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitSmartReply.xcframework.zip",
-      checksum: "0e3f65dbbf4dd9cdbe6a41aed658db8261dae9970e1a55c68169da22df686f69"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitSmartReply.xcframework.zip",
+      checksum: "56936cf6316b6331e4f65f12dc51a6141a95240235e70008d653479549c88fd6"),
     .binaryTarget(
       name: "MLKitVisionKit",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitVisionKit.xcframework.zip",
-      checksum: "933ee28008ebeb6551e10e65397f1298ffe32fd50cfb1e7ec8d568557511e3fa"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitVisionKit.xcframework.zip",
+      checksum: "0947e5126d779a503430929b7a51a0e172af4910d5cd3040673104284cd0cd0c"),
     .binaryTarget(
       name: "MLKitImageLabelingCommon",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitImageLabelingCommon.xcframework.zip",
-      checksum: "c390c4f4538cc3562c3d37058681dd6d4760f1cabfa80edb0e7a1fedcac799cf"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitImageLabelingCommon.xcframework.zip",
+      checksum: "6bcbde271617deb2f2cc38de5505266cf128ce07e909b1f8dc7e4effd85891f5"),
     .binaryTarget(
       name: "MLKitObjectDetectionCommon",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitObjectDetectionCommon.xcframework.zip",
-      checksum: "10c14a4141b167352f0b23bbfbca8080ebedae05b178f0163ba7ed343c2ebe26"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitObjectDetectionCommon.xcframework.zip",
+      checksum: "3a7172b620bb51d3d210707618b517d883c65e1b7e42f495eccae46398e8be95"),
     .binaryTarget(
       name: "MLKitPoseDetectionCommon",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitPoseDetectionCommon.xcframework.zip",
-      checksum: "08f264598ec23a886718957ff25fb3a78bb21cb30a0f17e75fc7acdecce95938"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitPoseDetectionCommon.xcframework.zip",
+      checksum: "733f72d697cb5c584484d6efff083690373986810ba0bc83ddb97110386857ab"),
     .binaryTarget(
       name: "MLKitSegmentationCommon",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitSegmentationCommon.xcframework.zip",
-      checksum: "195ef0070c4e5b363e5d7bd4a10528af62de41638be0fe68f894ad3913f8e9fb"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitSegmentationCommon.xcframework.zip",
+      checksum: "61689e13986032d6120d7c296f6fdc58983db83f98867356f59f52c0b17c884c"),
     .binaryTarget(
       name: "MLKitTextRecognitionCommon",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitTextRecognitionCommon.xcframework.zip",
-      checksum: "5296031ab6de07de8056863b27d5f0205df9929ca98765e03a120e05c4e735b8"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitTextRecognitionCommon.xcframework.zip",
+      checksum: "66e1d343be1d253faf282d9293c29d25c68ac70278b9d9670719c9a29602ecb3"),
     .binaryTarget(
       name: "MLKitXenoCommon",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitXenoCommon.xcframework.zip",
-      checksum: "521e6d9b77709cb6f392867c80e3f14fc51c46aa45dd7663d523d45e2bb4dc28"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitXenoCommon.xcframework.zip",
+      checksum: "46852be00814d9b6d66cccefaa7957e41c2bb29c3471adbf21e56ef44fe52e25"),
+    .binaryTarget(
+      name: "MLKitDigitalInkRecognition",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitDigitalInkRecognition.xcframework.zip",
+      checksum: "03558dade9ced0ca85e65d5134ebd2b37df4bbc22ba45e2703672b854c9d8e39"),
+    .binaryTarget(
+      name: "MLKitEntityExtraction",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitEntityExtraction.xcframework.zip",
+      checksum: "0baffe8bb32d306b3177a3f39cfa14e62c8c6ad9bff00803536cc4fbfa75eb42"),
+    .binaryTarget(
+      name: "MLKitMDD",
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitMDD.xcframework.zip",
+      checksum: "89842f863a85470ae77d8bcfc944d1635ecf1e45e49d34a4901a62a57811d703"),
     .binaryTarget(
       name: "MLKitNaturalLanguage",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/MLKitNaturalLanguage.xcframework.zip",
-      checksum: "8063ef3eaab9fdd2efdc42bfa35f4a544c344f67bddf57cfadee701f73bd841b"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/MLKitNaturalLanguage.xcframework.zip",
+      checksum: "7c1e1b378281f814a053283b8d470b40eb0c95405fc1227dac3f279424fc3c0a"),
     .binaryTarget(
       name: "SSZipArchive",
-      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.1/SSZipArchive.xcframework.zip",
-      checksum: "da0ea73662416c4b574fd242993deb1349e3d8581d1e029e9dd921699cf8939c"),
+      url: "https://github.com/d-date/google-mlkit-swiftpm/releases/download/9.0.2/SSZipArchive.xcframework.zip",
+      checksum: "1529d7e0dbd1e9ace91618f79698b58ba7a54ea98c49b1936c11fa946e8669a2"),
     .target(
       name: "Common",
       dependencies: [

@@ -15,7 +15,7 @@ You are a **Senior iOS Engineer** maintaining a SwiftPM binary distribution pack
 
 ## Project structure
 
-- `Package.swift` - Swift package definition with 17 library products and 30+ binary targets
+- `Package.swift` - Swift package definition with 19 library products and 33 binary targets
 - `Podfile` - CocoaPods dependencies for downloading ML Kit frameworks
 - `Makefile` - Build orchestration (bootstrap, build, create-xcframework, postprocess, archive), driven by the `MLKIT_MODULES` / `SOURCE_MODULES` lists at the top
 - `scripts/` - Ruby and shell automation scripts

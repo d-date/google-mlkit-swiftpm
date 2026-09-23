@@ -84,7 +84,6 @@ end
 
 if $PROGRAM_NAME == __FILE__
   package = uncommented(File.read("Package.swift"))
-  abort unless check_no_local_binaries(package)
   graph = pod_dependencies("Podfile.lock")
   available = binary_targets(package)
   failures = []
@@ -116,6 +115,9 @@ if $PROGRAM_NAME == __FILE__
     end
   end
 
+  released = check_no_local_binaries(package)
+
   abort "\n#{failures.length} product(s) do not link their full dependency closure" unless failures.empty?
+  abort "\nPackage.swift is not in a releasable state" unless released
   puts "\nAll products link their full dependency closure."
 end

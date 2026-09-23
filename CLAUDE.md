@@ -70,7 +70,7 @@ Makefile — when something breaks, locate the right file by stage:
 
 ### Module surface in `Package.swift`
 
-- 17 `.library` products and ~30 `.binaryTarget` entries. Each binary target points at `https://github.com/d-date/google-mlkit-swiftpm/releases/download/<version>/<Name>.xcframework.zip` with a SHA256 checksum.
+- 19 `.library` products -- every user-facing ML Kit iOS API -- and 33 `.binaryTarget` entries. Each binary target points at `https://github.com/d-date/google-mlkit-swiftpm/releases/download/<version>/<Name>.xcframework.zip` with a SHA256 checksum.
 - One real `.target` named `Common` re-exports `MLKitCommon` and pulls in non-binary Google SwiftPM dependencies (GoogleUtilities, gtm-session-fetcher, GoogleDataTransport, nanopb, promises). Every public library composes its binary target with `Common`, so consumers don't have to wire these themselves.
 - To point SwiftPM at `GoogleMLKit/*.xcframework` for local debugging, run `ruby scripts/use_local_binaries.rb`.
 

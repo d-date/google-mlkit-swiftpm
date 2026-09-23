@@ -30,6 +30,7 @@ MLKIT_MODULES = \
 	MLKitTextRecognitionCommon \
 	MLKitXenoCommon \
 	MLKitNaturalLanguage \
+	MLKitMDD \
 	MLKitBarcodeScanning \
 	MLKitFaceDetection \
 	MLKitTextRecognition \
@@ -44,6 +45,8 @@ MLKIT_MODULES = \
 	MLKitPoseDetection \
 	MLKitPoseDetectionAccurate \
 	MLKitSegmentationSelfie \
+	MLKitDigitalInkRecognition \
+	MLKitEntityExtraction \
 	MLKitLanguageID \
 	MLKitTranslate \
 	MLKitSmartReply

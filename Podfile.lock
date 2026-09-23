@@ -5,6 +5,12 @@ PODS:
   - GoogleMLKit/BarcodeScanning (9.0.0):
     - GoogleMLKit/MLKitCore
     - MLKitBarcodeScanning (~> 8.0.0)
+  - GoogleMLKit/DigitalInkRecognition (9.0.0):
+    - GoogleMLKit/MLKitCore
+    - MLKitDigitalInkRecognition (~> 8.0.0)
+  - GoogleMLKit/EntityExtraction (9.0.0):
+    - GoogleMLKit/MLKitCore
+    - MLKitEntityExtraction (~> 1.0.0-beta15)
   - GoogleMLKit/FaceDetection (9.0.0):
     - GoogleMLKit/MLKitCore
     - MLKitFaceDetection (~> 8.0.0)
@@ -83,6 +89,12 @@ PODS:
     - GoogleUtilities/Logger (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - GTMSessionFetcher/Core (< 4.0, >= 3.3.2)
+  - MLKitDigitalInkRecognition (8.0.0):
+    - MLKitCommon (~> 14.0)
+    - MLKitMDD (~> 10.0)
+    - SSZipArchive (< 3.0, >= 2.5.5)
+  - MLKitEntityExtraction (1.0.0-beta15):
+    - MLKitNaturalLanguage (~> 10.0)
   - MLKitFaceDetection (8.0.0):
     - MLKitCommon (~> 14.0)
     - MLKitVision (~> 10.0)
@@ -101,6 +113,8 @@ PODS:
     - MLKitVisionKit (~> 11.0)
   - MLKitLanguageID (9.0.0):
     - MLKitNaturalLanguage (~> 10.0)
+  - MLKitMDD (10.0.0):
+    - MLKitCommon (~> 14.0)
   - MLKitNaturalLanguage (10.0.0):
     - GoogleToolboxForMac/Logger (< 5.0, >= 4.2.1)
     - "GoogleToolboxForMac/NSData+zlib (< 5.0, >= 4.2.1)"
@@ -189,6 +203,8 @@ PODS:
 
 DEPENDENCIES:
   - GoogleMLKit/BarcodeScanning (~> 9.0.0)
+  - GoogleMLKit/DigitalInkRecognition (~> 9.0.0)
+  - GoogleMLKit/EntityExtraction (~> 9.0.0)
   - GoogleMLKit/FaceDetection (~> 9.0.0)
   - GoogleMLKit/ImageLabeling (~> 9.0.0)
   - GoogleMLKit/ImageLabelingCustom (~> 9.0.0)
@@ -216,11 +232,14 @@ SPEC REPOS:
     - MLImage
     - MLKitBarcodeScanning
     - MLKitCommon
+    - MLKitDigitalInkRecognition
+    - MLKitEntityExtraction
     - MLKitFaceDetection
     - MLKitImageLabeling
     - MLKitImageLabelingCommon
     - MLKitImageLabelingCustom
     - MLKitLanguageID
+    - MLKitMDD
     - MLKitNaturalLanguage
     - MLKitObjectDetection
     - MLKitObjectDetectionCommon
@@ -254,11 +273,14 @@ SPEC CHECKSUMS:
   MLImage: 0de5c6c2bf9e93b80ef752e2797f0836f03b58c0
   MLKitBarcodeScanning: 39de223e7b1b8a8fbf10816a536dd292d8a39343
   MLKitCommon: 47d47b50a031d00db62f1b0efe5a1d8b09a3b2e6
+  MLKitDigitalInkRecognition: d352ba532b816e7a930b8fa2e180288352c4736c
+  MLKitEntityExtraction: 9f529552862823d493d999fe7920fb195cfba8e3
   MLKitFaceDetection: 32549f1e70e6e7731261bf9cea2b74095e2531cb
   MLKitImageLabeling: 739591b1b69ebab735e97fa1b4ce37cea8361bb7
   MLKitImageLabelingCommon: 616b0c69b3e302720cfb65903da50dc2e697b915
   MLKitImageLabelingCustom: 43cf5d49fb762adb93e3108cb55c81a8ec005d57
   MLKitLanguageID: 7b7d115881e0e036627052e32d7771b9d7f67ee6
+  MLKitMDD: 264ea38cb1eafc18ee1f37eb69e7f2596962df6c
   MLKitNaturalLanguage: 498154f2461f97abb00eb161eb773670ffc46250
   MLKitObjectDetection: c6346f1e6fd945d9a1a993104184e886bda6e0f6
   MLKitObjectDetectionCommon: 0639341c7cbb44327dac9a23c473d2484d3169dd
@@ -283,6 +305,6 @@ SPEC CHECKSUMS:
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   SSZipArchive: 8a6ee5677c8e304bebc109e39cf0da91ccef22ea
 
-PODFILE CHECKSUM: 4f43f46380b4a6a4376bdffdddbf9edacb0b88d8
+PODFILE CHECKSUM: 454b6f435eb27f5a04ff8ba16faf15b6968a1d0d
 
 COCOAPODS: 1.17.0
