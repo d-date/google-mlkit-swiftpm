@@ -8,9 +8,22 @@ require 'open3'
 def package_url_regex(org, package_name)
   %r{
     \.package\(url:\s*"https://github\.com/#{Regexp.escape(org)}/#{Regexp.escape(package_name)}(?:\.git)?",\s*
-    (?:exact|from|\.upToNextMinor\(from|\.upToNextMajor\(from):\s*"([^"]+)"\)?\)
+    (?:(?:exact|from|\.upToNextMinor\(from|\.upToNextMajor\(from):\s*"([^"]+)"\)?|"([^"]+)"\.\.<"[^"]+")\)
   }x
 end
+
+# Upper bounds that are deliberately wider than the pod constraint.
+#
+# The ML Kit 9.0.0 pods declare GTMSessionFetcher `>= 3.3.2, < 4.0`, but
+# Firebase 13 requires 4.0.0..<6.0.0, so honouring the pod bound makes this
+# package unresolvable next to current Firebase (issue #124). gtm-session-fetcher
+# 4.0.0 and 5.0.0 are major releases only because they raised the minimum OS
+# (5.x requires iOS 15, as does this package); no public Objective-C API was
+# removed between 3.5.0 and 5.3.1, so the ML Kit binaries link against them
+# unchanged.
+UPPER_BOUND_OVERRIDES = {
+  'gtm-session-fetcher' => '6.0.0'
+}.freeze
 
 # The version requirement to write for a package.
 #
@@ -26,6 +39,8 @@ end
 def version_requirement(package_name, version)
   if package_name == 'nanopb'
     %(.upToNextMinor(from: "#{version}"))
+  elsif (upper = UPPER_BOUND_OVERRIDES[package_name])
+    %("#{version}"..<"#{upper}")
   else
     %(from: "#{version}")
   end
@@ -44,7 +59,7 @@ end
 def get_package_version(package_swift, org, package_name)
   pattern = package_url_regex(org, package_name)
   if package_swift =~ pattern
-    $1
+    $1 || $2
   end
 end
 

@@ -32,8 +32,9 @@ dSYM. Close with that explanation.
 - `Package.swift` dependency pins are **generated** from `Podfile.lock` by
   `scripts/update_package_dependencies.rb`. `renovate.json` disables the `swift`
   manager for the root `Package.swift`; close any PR that still slips through,
-  and never merge one that breaks a pod constraint (e.g. `GTMSessionFetcher`
-  is pinned `< 4.0`).
+  and never merge one that breaks a pod constraint. The one deliberate
+  exception is `GTMSessionFetcher`, widened to `..<6.0.0` for Firebase 13
+  (issue #124) -- see `UPPER_BOUND_OVERRIDES` in that script.
 - Ruby major upgrades are blocked on purpose: Ruby 4.0 broke CocoaPods on the
   macOS runners.
 - Anything touching `Example/` only is safe to merge on a green CI run.
