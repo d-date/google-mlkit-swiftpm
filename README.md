@@ -15,7 +15,7 @@ Apple Silicon simulators are supported — see [Simulator support](#simulator-su
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "9.0.2")
+    .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "9.0.3")
 ]
 ```
 
@@ -39,7 +39,7 @@ runtime rather than at build time:
 3. Nothing else — but read [Simulator support](#simulator-support) if you are
    coming from an older release with `EXCLUDED_ARCHS` set.
 
-> **Upgrading from 9.0.0 or 9.0.0-1?** `9.0.2` is the same upstream ML Kit
+> **Upgrading from 9.0.0 or 9.0.0-1?** `9.0.3` is the same upstream ML Kit
 > 9.0.0 build, repackaged. Since 9.0.1, text recognition, pose detection and
 > selfie segmentation ship their models at all, a single product can be adopted
 > without undefined symbols, the simulator slice covers arm64, and App Store
@@ -67,7 +67,7 @@ Xcode project, and make sure they land in **Copy Bundle Resources** of your app
 target.
 
 ```bash
-./scripts/download_bundles.sh 9.0.2
+./scripts/download_bundles.sh 9.0.3
 ```
 
 | Bundle | Needed by |
@@ -156,14 +156,14 @@ iphonesimulator, so no `EXCLUDED_ARCHS` workaround is needed.
 - **Digital ink recognition and entity extraction download their models at
   runtime** from Google, so they ship no bundled model and need network access
   the first time you use them.
-- **The wrapper version is not the pod version.** `9.0.2` repackages upstream
+- **The wrapper version is not the pod version.** `9.0.3` repackages upstream
   ML Kit `9.0.0`; the pod versions each framework reports are Google's own.
 
 ## Example app
 
 ```bash
 git submodule update --init
-./scripts/download_bundles.sh 9.0.2
+./scripts/download_bundles.sh 9.0.3
 cd Example && open Example.xcworkspace
 ```
 

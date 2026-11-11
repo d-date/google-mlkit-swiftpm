@@ -5,7 +5,7 @@
   ],
   "packageRules": [
     {
-      "description": "The Google dependency pins in the root Package.swift are generated from Podfile.lock by scripts/update_package_dependencies.rb. Bumping them here either reverts on the next release build or breaks the version range the ML Kit pods were built against (e.g. GTMSessionFetcher is pinned < 4.0).",
+      "description": "The Google dependency pins in the root Package.swift are generated from Podfile.lock by scripts/update_package_dependencies.rb. Bumping them here either reverts on the next release build or breaks the version range the ML Kit pods were built against (e.g. nanopb is limited to one minor version).",
       "matchManagers": ["swift"],
       "matchFileNames": ["Package.swift"],
       "enabled": false
