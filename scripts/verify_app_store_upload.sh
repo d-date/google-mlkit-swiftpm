@@ -10,7 +10,7 @@
 # validation runs either way.
 #
 # Requires:
-#   * GoogleMLKit/ from `make run`
+#   * build/distribution/ from `swiftpods package --version <version>`
 #   * an App Store Connect app record for $BUNDLE_ID
 #   * an Apple Distribution certificate in the keychain
 #   * `asc auth login` credentials for the team that owns the app record
@@ -47,10 +47,20 @@ elif [ -n "${1:-}" ]; then
   exit 1
 fi
 
-if [ ! -d GoogleMLKit ]; then
-  echo "error: GoogleMLKit/ not found -- run 'make run' first" >&2
+DIST="build/distribution"
+BUNDLES="build/bundles"
+if ! ls -d "$DIST"/*.xcframework > /dev/null 2>&1; then
+  echo "error: no XCFrameworks in $DIST/ -- run 'swiftpods package --version <version>' first" >&2
   exit 1
 fi
+
+# swiftpods publishes the resource bundles only as zips; unpack them once so
+# they can be copied into the Example app and the test runner.
+rm -rf "$BUNDLES"
+mkdir -p "$BUNDLES"
+for zip in "$DIST"/*.bundle.zip; do
+  unzip -q -o "$zip" -d "$BUNDLES"
+done
 
 if ! asc profiles local list --output json | grep -q "$PROFILE"; then
   echo "error: provisioning profile \"$PROFILE\" is not installed -- see the header" >&2
@@ -111,7 +121,7 @@ ruby scripts/use_local_binaries.rb
 
 echo "==> Refreshing the resource bundles the Example app carries"
 mkdir -p Example/Example/Resources/Bundles
-cp -rf GoogleMLKit/*.bundle Example/Example/Resources/Bundles/
+cp -rf "$BUNDLES"/*.bundle Example/Example/Resources/Bundles/
 
 # Signing settings are deliberately not passed here: a command-line build
 # setting reaches every target in the graph, and SwiftPM's resource-bundle
@@ -162,13 +172,13 @@ if [ -d "$APP/Frameworks" ]; then
     exit 1
   fi
 fi
-for bundle in GoogleMLKit/*.bundle; do
+for bundle in "$BUNDLES"/*.bundle; do
   if [ ! -d "$APP/$(basename "$bundle")" ]; then
     echo "error: the IPA is missing $(basename "$bundle")" >&2
     exit 1
   fi
 done
-echo "ML Kit model bundles: $(ls -d GoogleMLKit/*.bundle | wc -l | tr -d ' ')"
+echo "ML Kit model bundles: $(ls -d "$BUNDLES"/*.bundle | wc -l | tr -d ' ')"
 
 echo
 echo "==> Validating with Apple"

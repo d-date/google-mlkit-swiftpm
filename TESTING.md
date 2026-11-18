@@ -15,31 +15,39 @@ MLKit frameworks can have runtime issues that don't appear at build time:
 
 ### Level 1: Build-Time Verification (Automatic)
 
-These checks run automatically during `build_all.sh`:
+`swiftpods package --version <version>` checks these itself:
+
+- every prebuilt framework gets an `Info.plist` and an arm64 simulator slice
+- every product is linked on its own into an iOS executable for the simulator
+  and the device, with `-ObjC -all_load` (catches a product that omits a
+  transitive framework)
+
+Then confirm the generated manifest parses:
 
 ```bash
-ruby scripts/verify_build.rb
+swift package dump-package > /dev/null
 ```
 
-**What it checks:**
-- All XCFramework zip files exist
-- Package.swift syntax is valid
-- Info.plist files are present
-- xcframework-maker is built
-
-### Level 2: Static Analysis (Manual)
-
-Run after building to check for obvious issues:
+### Level 2: Runtime Tests on the Simulator (Required)
 
 ```bash
-./scripts/verify_runtime.sh <version>
+./scripts/verify_local_archive.sh
 ```
 
-**What it checks:**
-- XCFramework architectures (arm64 for device, x86_64 for simulator)
-- Info.plist presence in each framework
-- Symbol table validity
-- Package.swift target definitions
+It points `Package.swift` at `build/distribution/`, runs the SwiftPM test
+target `CameraTests` (`Example/Package/Tests/CameraTests`) on the arm64
+Simulator, launches the Example app, archives for device and checks the
+archive (no embedded GoogleToolboxForMac/SSZipArchive, nothing linked
+dynamically, every model bundle present, model data not dead-stripped).
+
+**`CameraTests` needs the model bundles inside the test bundle.** ML Kit
+resolves its models against the main bundle, which for a SwiftPM test target
+is the test runner, so text recognition only works when
+`LatinOCRResources.bundle` is copied into the built `CameraTests.xctest`;
+`verify_local_archive.sh` copies every bundle there. Verified 2026-11-18:
+without the bundle, both the 9.0.3 artifacts and the swiftpods-built ones fail
+with "Invalid model path."; with it copied into `CameraTests.xctest`, the
+swiftpods-built artifacts pass all 5 `CameraTests`.
 
 ### Level 3: Example App Testing (Required)
 
@@ -71,7 +79,7 @@ open Example.xcworkspace
 16. [ ] Test Smart Reply (if UI available)
 
 #### Simulator Testing (Optional)
-1. [ ] Build for iOS Simulator (Intel Mac)
+1. [ ] Build for iOS Simulator
 2. [ ] App launches without crash
 3. [ ] Basic UI navigation works
 4. [ ] Note: Camera may not work in simulator
@@ -97,11 +105,11 @@ open Example.xcworkspace
 ### Recommended Testing Flow
 
 ```bash
-# 1. Build new version
-./scripts/build_all.sh <version>
+# 1. Build the XCFrameworks and regenerate Package.swift
+swiftpods package --version <version>
 
-# 2. Run static analysis
-./scripts/verify_runtime.sh <version>
+# 2. Run ML Kit on the Simulator and archive for device
+./scripts/verify_local_archive.sh
 
 # 3. Test Example app
 cd Example
@@ -110,11 +118,13 @@ open Example.xcworkspace
 # Test all features
 # Check console
 
-# 4. If all tests pass, commit
+# 4. If all tests pass, commit, tag, push and release
 cd ..
-git add Podfile Podfile.lock Package.swift Resources/
-git commit -m "Update to MLKit <version>"
-git tag -a <version> -m "Release <version>"
+git add Podfile.swift Podfile.lock Package.swift Sources/Common/export.swift
+git commit -m "Release <version>"
+git tag <version>
+git push origin HEAD <version>
+scripts/release.sh --skip-package <version>
 ```
 
 ## Known Issues and Workarounds
@@ -123,14 +133,10 @@ git tag -a <version> -m "Release <version>"
 
 **Cause:** Missing Info.plist in framework
 
-**Solution:**
-1. Check `Resources/*-Info.plist` files exist
-2. Verify `prepare-info-plist` Makefile target ran
-3. Manually copy Info.plist if needed:
-   ```bash
-   cp Resources/MLKitCommon-Info.plist \
-     GoogleMLKit/MLKitCommon.xcframework/ios-arm64/MLKitCommon.framework/Info.plist
-   ```
+**Solution:** `swiftpods package` adds an `Info.plist` to every prebuilt
+framework that lacks one. Check the framework in
+`build/distribution/<Name>.xcframework` and report it to swiftpods if the
+plist is missing.
 
 ### Issue: Duplicate symbol errors
 
@@ -151,12 +157,10 @@ git tag -a <version> -m "Release <version>"
 
 ### Issue: Simulator on Apple Silicon crashes
 
-**Cause:** MLKit doesn't include arm64 simulator slice
+**Cause:** ML Kit doesn't include an arm64 simulator slice
 
-**Solution:**
-- Test on Intel Mac simulator
-- Or test on physical device only
-- Known limitation documented in README
+**Solution:** `swiftpods package` synthesises it from the device slice; check
+with `lipo -archs` on the simulator slice in `build/distribution/`.
 
 ## Reporting Issues
 

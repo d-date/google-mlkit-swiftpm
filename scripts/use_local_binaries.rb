@@ -2,8 +2,9 @@
 # frozen_string_literal: true
 
 # Rewrites every `.binaryTarget` in Package.swift to point at the XCFrameworks
-# in GoogleMLKit/ instead of a GitHub Release asset, so the package can be
-# built and archived before anything is published.
+# that `swiftpods package` wrote to build/distribution/ instead of a GitHub
+# Release asset, so the package can be built and archived before anything is
+# published.
 #
 # Replaces the block of commented-out `path:` targets this file used to carry
 # for the same purpose. Restore with `git checkout Package.swift`.
@@ -11,7 +12,7 @@
 # Usage: use_local_binaries.rb [package-path] [xcframework-directory]
 
 package_path = ARGV[0] || "Package.swift"
-directory = ARGV[1] || "GoogleMLKit"
+directory = ARGV[1] || "build/distribution"
 
 source = File.read(package_path)
 rewritten = source.gsub(

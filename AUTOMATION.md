@@ -1,47 +1,30 @@
 # MLKit SwiftPM Automation Guide
 
-This repository includes automation tools to keep the SwiftPM wrapper up-to-date with the latest MLKit releases.
+This repository includes automation to keep the SwiftPM wrapper up to date with the latest ML Kit releases.
 
 ## Background
 
-MLKit is distributed exclusively via CocoaPods. This project converts MLKit frameworks to XCFramework format for SwiftPM compatibility. The process involves:
+ML Kit is distributed exclusively via CocoaPods. This project builds those pods into XCFrameworks with
+[swiftpods](https://github.com/d-date/swiftpods) and publishes them as binary targets of `Package.swift`.
 
-1. Using CocoaPods to download and build MLKit frameworks (without project integration)
-2. Building for both `iphoneos` and `iphonesimulator` SDKs
-3. Converting to XCFramework using `xcodebuild -create-xcframework`
-4. Handling FAT object files that require archive conversion (`ar`, `ranlib`)
-5. Publishing as binary targets in Package.swift
+`swiftpods package --version <version>` reads `Podfile.swift` and, in one run:
 
-For technical details, see the original article: <https://zenn.dev/d_date/articles/cd4ce3b2b5c29d>
+1. installs the pods (keeping the versions in `Podfile.lock`) and builds them for `iphoneos` and `iphonesimulator`
+2. turns them into XCFrameworks: adds an `Info.plist` where a prebuilt framework lacks one, synthesises the
+   arm64 simulator slice, converts object-file binaries into `ar` archives, and builds the two source pods
+   (GoogleToolboxForMac, SSZipArchive) as library XCFrameworks
+3. writes `<Module>.xcframework.zip` and `<Bundle>.bundle.zip` to `build/distribution/`
+4. regenerates `Package.swift` (products, binary target URLs and checksums, dependency ranges) and
+   `Sources/Common/export.swift`
+5. links every product on its own for the simulator and the device
 
-## Overview
+See the swiftpods README, section "Distributing pods as a Swift package", for the details.
 
-The automation system consists of:
+## Versioning
 
-1. **Version Check Script** - Detects new MLKit releases from CocoaPods
-2. **Build Scripts** - Automates the XCFramework build process
-3. **Verification Script** - Validates build outputs
-4. **GitHub Actions Workflows** - Orchestrates automated checks and builds
-
-## Key Components
-
-### xcframework-maker
-
-This project uses a custom `xcframework-maker` tool (located in `xcframework-maker/`) to handle the conversion of frameworks to XCFrameworks. This tool:
-
-- Properly handles static frameworks with FAT object files
-- Adds arm64 simulator support where possible
-- Manages Info.plist files for frameworks that lack them
-
-The tool must be built before creating XCFrameworks:
-
-```bash
-make bootstrap-builder
-```
-
-### Info.plist Files
-
-MLKit frameworks often lack proper Info.plist files. This project maintains template Info.plist files in the `Resources/` directory that are copied to frameworks during the build process (via the `prepare-info-plist` Makefile target).
+Release tags are `major.minor.patch`: major and minor follow ML Kit, the patch number counts wrapper
+releases (`9.0.4` repackages ML Kit `9.0.0`). The ML Kit version itself is the `GoogleMLKit/*` requirement in
+`Podfile.swift`.
 
 ## Automation Workflows
 
@@ -50,22 +33,27 @@ MLKit frameworks often lack proper Info.plist files. This project maintains temp
 **File:** `.github/workflows/check-mlkit-updates.yml`
 
 - **Trigger:** Daily at 9:00 UTC (or manually via workflow_dispatch)
-- **Purpose:** Checks if a new version of GoogleMLKit is available on CocoaPods
+- **Purpose:** Compares the latest GoogleMLKit version on CocoaPods with the requirement in `Podfile.swift`
+  (`scripts/check_mlkit_version.rb`)
 - **Action:** Creates a GitHub issue if a new version is found
 
 ### 2. Build MLKit XCFrameworks (Manual)
 
 **File:** `.github/workflows/build-mlkit.yml`
 
-- **Trigger:** Manual workflow dispatch
-- **Purpose:** Builds XCFrameworks for a specific MLKit version
+- **Trigger:** Manual workflow dispatch with `version` and `create_release` inputs
 - **Steps:**
-  1. Updates Podfile with the specified version
-  2. Builds XCFrameworks using the existing Makefile
-  3. Calculates checksums
-  4. Updates Package.swift
-  5. Creates a GitHub release with the built frameworks
-  6. Closes the related issue
+  1. Builds swiftpods from `d-date/swiftpods` at `SWIFTPODS_REF` (currently `main`; to be pinned to a tag)
+  2. Runs `swiftpods package --version <version>` and `swift package dump-package`
+  3. With `create_release`: commits `Podfile.swift`, `Podfile.lock`, `Package.swift` and
+     `Sources/Common/export.swift` if they changed, tags `<version>`, pushes both, runs
+     `scripts/release.sh --skip-package <version>` and closes the related issue
+  4. Without `create_release`: uploads the zips and the generated `Package.swift` as a workflow artifact
+
+### 3. CI
+
+**File:** `.github/workflows/ci.yml` — on every PR and push to `main`: Ruby and shell syntax of `scripts/`,
+and `swift package dump-package`.
 
 ## Manual Usage
 
@@ -75,113 +63,29 @@ MLKit frameworks often lack proper Info.plist files. This project maintains temp
 ruby scripts/check_mlkit_version.rb
 ```
 
-This script will:
+### Move to a New ML Kit Version
 
-- Fetch the latest MLKit version from CocoaPods
-- Compare it with the current version in Podfile
-- Output whether an update is available
+1. Raise the `GoogleMLKit/*` requirements in `Podfile.swift`
+2. Run `swiftpods update` to move `Podfile.lock`
+3. Commit both, then release as below
 
-### Build a New Version
-
-```bash
-./scripts/build_all.sh <version>
-```
-
-Example:
+### Build and Release Locally
 
 ```bash
-./scripts/build_all.sh 7.0.0
+swiftpods package --version <version>
+./scripts/verify_local_archive.sh
+scripts/release.sh <version>
 ```
 
-This script will:
+`scripts/release.sh` runs `swiftpods package` itself, then checks that every `*.xcframework.zip` that
+`Package.swift` references exists in `build/distribution/`, points at `<version>` and matches its checksum,
+and that the tag `<version>` on origin carries the same `Package.swift`. If the tag does not exist yet it stops;
+commit `Podfile.swift`, `Podfile.lock`, `Package.swift` and `Sources/Common/export.swift`, tag `<version>`, push
+the branch and the tag, then run `scripts/release.sh --skip-package <version>`. It creates the GitHub Release
+(a prerelease when the tag has a `-` suffix) if needed and uploads those xcframework zips plus every
+`*.bundle.zip` in `build/distribution/`, replacing assets of the same name.
 
-1. Update the Podfile and Info.plist files with the new version
-2. Run the full build process (via `make run`)
-3. Calculate checksums for all XCFrameworks
-4. Update Package.swift with new URLs and checksums
-5. Verify the build output
-
-After running the script:
-
-1. Review the changes in `Package.swift`, `Podfile`, and `Resources/`
-2. Test the package: `swift package resolve`
-3. Upload artifacts to an existing GitHub release (see below)
-4. Commit the changes
-5. Push to GitHub
-
-### Upload Artifacts to GitHub Release
-
-After building XCFrameworks, you can upload them to an existing GitHub release:
-
-```bash
-./scripts/upload_release.sh <version>
-```
-
-Example:
-
-```bash
-./scripts/upload_release.sh 7.0.0
-```
-
-This script will:
-
-1. Check if the specified release exists
-2. Delete old XCFramework assets from the release (if any)
-3. Upload all newly built XCFramework zip files from `GoogleMLKit/`
-
-**Note:** The release must already exist. Create it first using:
-
-```bash
-gh release create <version> --title "Release <version>" --notes "Updated to MLKit <version>"
-```
-
-Or let GitHub Actions create it automatically (see "Triggering a Build via GitHub Actions" below).
-
-### Update Individual Components
-
-#### Update Podfile Only
-
-```bash
-ruby scripts/update_version.rb <version>
-```
-
-This also updates the `CFBundleShortVersionString` in all Info.plist files in the `Resources/` directory.
-
-#### Verify Build
-
-Check if all required files and tools are present:
-
-```bash
-ruby scripts/verify_build.rb
-```
-
-This checks:
-
-- Info.plist files in Resources/
-- xcframework-maker is built
-- XCFramework zip files exist (post-build)
-- Package.swift syntax is valid
-
-#### Update Checksums Only
-
-After building XCFrameworks:
-
-```bash
-ruby scripts/update_checksums.rb <version>
-```
-
-### Understanding the Build Process
-
-The build process follows these steps (as defined in the Makefile):
-
-1. **bootstrap-cocoapods**: Install gems and run `pod install`
-2. **bootstrap-builder**: Build the xcframework-maker tool
-3. **build-cocoapods**: Build frameworks for both iphoneos and iphonesimulator
-4. **prepare-info-plist**: Copy Info.plist files from Resources/ to frameworks
-5. **create-xcframework**: Create XCFrameworks from built frameworks
-6. **archive**: Convert FAT objects to archives and zip XCFrameworks
-
-The automation scripts wrap these steps and add version management and verification.
+Set `SWIFTPODS` to the swiftpods binary if it is not on `PATH`.
 
 ## GitHub Actions Setup
 
@@ -204,19 +108,12 @@ You can configure this in: **Settings → Actions → General → Workflow permi
 
 ## Triggering a Build via GitHub Actions
 
-1. Go to **Actions** tab in GitHub
-2. Select **"Build MLKit XCFrameworks"** workflow
+1. Go to the **Actions** tab in GitHub
+2. Select the **"Build MLKit XCFrameworks"** workflow
 3. Click **"Run workflow"**
-4. Enter the MLKit version (e.g., `5.1.0`)
+4. Enter the release version (e.g., `9.0.4`)
 5. Choose whether to create a release automatically
 6. Click **"Run workflow"**
-
-The workflow will:
-
-- Build the XCFrameworks
-- Update Package.swift
-- Create a release (if selected)
-- Close the related issue (if it exists)
 
 ## Troubleshooting
 
@@ -226,47 +123,16 @@ If `check_mlkit_version.rb` fails to fetch version info:
 
 - The script uses the CocoaPods Trunk API (`https://trunk.cocoapods.org/api/v1/pods/GoogleMLKit`)
 - Check your internet connection
-- Verify the CocoaPods Trunk API is accessible
 - The API may be temporarily unavailable
 
 ### Build Fails
 
-- Check Xcode version compatibility
-- Verify CocoaPods dependencies are installed
-- Check that the MLKit version exists in CocoaPods
+- swiftpods needs Xcode with Swift 6.4
+- Check that the ML Kit version exists in CocoaPods
+- `swiftpods package` fails when a product does not link on its own (verification)
 
-### Checksum Mismatch
+### Release Refused
 
-- Ensure XCFramework zip files are in `GoogleMLKit/` directory
-- Verify the files are not corrupted
-- Re-run the build process
-
-### Release Creation Fails
-
-- Check repository permissions
-- Verify GITHUB_TOKEN has sufficient permissions
-- Ensure the tag doesn't already exist
-
-## Future Improvements
-
-Possible enhancements:
-
-1. **Fully Automated Releases**
-   - Automatically trigger builds when new versions are detected
-   - Require manual approval before creating releases
-
-2. **Version Testing**
-   - Add automated tests to verify the built frameworks work correctly
-   - Test integration with sample projects
-
-3. **Changelog Generation**
-   - Automatically generate changelogs based on MLKit release notes
-
-## Contributing
-
-When adding new automation features:
-
-1. Test scripts locally before committing
-2. Use descriptive commit messages
-3. Update this documentation
-4. Consider adding error handling and logging
+`scripts/release.sh` names each zip that is missing, points at another release or does not match its
+checksum. Re-run `swiftpods package --version <version>` and commit the regenerated `Package.swift` before
+tagging.
