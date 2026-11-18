@@ -27,7 +27,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.4.12'
-          bundler-cache: true
 
       - name: Check for MLKit updates
         id: check
@@ -55,8 +54,8 @@ jobs:
             const body = `A new version of GoogleMLKit is available: **${newVersion}**
 
             To update:
-            1. Run the automated build workflow, or
-            2. Manually run: \`./scripts/build_all.sh ${newVersion}\`
+            1. Raise the \`GoogleMLKit/*\` requirements in \`Podfile.swift\`, run \`swiftpods update\` and merge the change
+            2. Run the **Build MLKit XCFrameworks** workflow with the release version (major.minor follow ML Kit)
 
             This issue was automatically created by the check-mlkit-updates workflow.`;
 

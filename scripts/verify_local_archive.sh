@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Builds and archives the Example app against the XCFrameworks in GoogleMLKit/,
+# Builds and archives the Example app against the XCFrameworks in build/distribution/,
 # so a release can be validated before it is published. Checks the three things
 # that repeatedly broke consumers:
 #
@@ -30,10 +30,20 @@ DERIVED_DATA="${TMPDIR:-/tmp}/mlkit-verify-derived"
 SIMULATOR="${MLKIT_VERIFY_SIMULATOR:-platform=iOS Simulator,name=iPhone 17 Pro}"
 ARCHIVE_PATH="${TMPDIR:-/tmp}/mlkit-verify.xcarchive"
 
-if [ ! -d GoogleMLKit ]; then
-  echo "error: GoogleMLKit/ not found -- run 'make run' first" >&2
+DIST="build/distribution"
+BUNDLES="build/bundles"
+if ! ls -d "$DIST"/*.xcframework > /dev/null 2>&1; then
+  echo "error: no XCFrameworks in $DIST/ -- run 'swiftpods package --version <version>' first" >&2
   exit 1
 fi
+
+# swiftpods publishes the resource bundles only as zips; unpack them once so
+# they can be copied into the Example app and the test runner.
+rm -rf "$BUNDLES"
+mkdir -p "$BUNDLES"
+for zip in "$DIST"/*.bundle.zip; do
+  unzip -q -o "$zip" -d "$BUNDLES"
+done
 
 # Restore from a copy rather than with `git checkout`: Package.swift normally
 # has uncommitted changes while a fix is being verified.
@@ -55,7 +65,7 @@ echo "==> Refreshing the resource bundles the Example app carries"
 # keeps its own copies checked in. Sync them with what was just built -- a diff
 # here means the bundles on the release need updating too.
 mkdir -p Example/Example/Resources/Bundles
-cp -rf GoogleMLKit/*.bundle Example/Example/Resources/Bundles/
+cp -rf "$BUNDLES"/*.bundle Example/Example/Resources/Bundles/
 
 echo "==> Building the runtime tests for the arm64 Simulator"
 xcodebuild build-for-testing \
@@ -71,7 +81,7 @@ xcodebuild build-for-testing \
 # of Google's models to this repo).
 echo "==> Staging resource bundles into the test runner"
 for xctest in "$DERIVED_DATA"/Build/Products/*-iphonesimulator/*.xctest; do
-  cp -rf GoogleMLKit/*.bundle "$xctest/"
+  cp -rf "$BUNDLES"/*.bundle "$xctest/"
 done
 
 echo "==> Running ML Kit on the arm64 Simulator"
@@ -162,14 +172,14 @@ fi
 # needs it throws at runtime on device even though the Simulator tests passed
 # from the staged copies.
 MISSING_BUNDLES=""
-for bundle in GoogleMLKit/*.bundle; do
+for bundle in "$BUNDLES"/*.bundle; do
   [ -d "$APP/$(basename "$bundle")" ] || MISSING_BUNDLES="$MISSING_BUNDLES $(basename "$bundle")"
 done
 if [ -n "$MISSING_BUNDLES" ]; then
   echo "error: the archived app is missing model bundles:$MISSING_BUNDLES" >&2
   exit 1
 fi
-echo "ML Kit model bundles in the app: $(ls -d GoogleMLKit/*.bundle | wc -l | tr -d ' ')"
+echo "ML Kit model bundles in the app: $(ls -d "$BUNDLES"/*.bundle | wc -l | tr -d ' ')"
 
 # The OCR model alone is ~58MB of data inside MLKitTextRecognitionCommon; if it
 # were dead-stripped the app binary could not reach this size.

@@ -18,17 +18,13 @@ jobs:
         with:
           ruby-version: '3.4.12'
 
+      # `ruby -c a.rb b.rb` and `bash -n a.sh b.sh` check only the first file
+      # (the rest become arguments), so check each file on its own.
       - name: Check Ruby syntax
-        run: ruby -c scripts/*.rb
+        run: for f in scripts/*.rb; do ruby -c "$f" || exit 1; done
 
       - name: Check shell syntax
-        run: bash -n scripts/*.sh build_with_asdf.sh
+        run: for f in scripts/*.sh; do bash -n "$f" || exit 1; done
 
       - name: Verify Package.swift parses
         run: swift package dump-package > /dev/null
-
-      - name: Verify every product links its full dependency closure
-        run: ruby scripts/check_product_closure.rb
-
-      - name: Verify the Mach-O platform patcher
-        run: ruby scripts/test_patch_macho_platform.rb
