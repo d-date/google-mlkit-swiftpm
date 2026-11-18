@@ -6,8 +6,8 @@ user-facing ML Kit iOS API as a SwiftPM library product.
 
 ## Requirements
 
-- iOS 15 or later
-- Xcode 15 or later to consume the package; Xcode 26 or later to build it
+- iOS 15.5 or later (the minimum the ML Kit 9 pods declare)
+- Xcode 15 or later to consume the package; Xcode with Swift 6.4 to build it
 
 Apple Silicon simulators are supported — see [Simulator support](#simulator-support).
 
@@ -15,7 +15,7 @@ Apple Silicon simulators are supported — see [Simulator support](#simulator-su
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "9.0.3")
+    .package(url: "https://github.com/d-date/google-mlkit-swiftpm", from: "9.0.4")
 ]
 ```
 
@@ -39,6 +39,10 @@ runtime rather than at build time:
 3. Nothing else — but read [Simulator support](#simulator-support) if you are
    coming from an older release with `EXCLUDED_ARCHS` set.
 
+> **Upgrading to 9.0.4?** It is built with [swiftpods](https://github.com/d-date/swiftpods)
+> instead of the old Makefile pipeline and raises the minimum to iOS 15.5.
+> Resolving it prints two `#warning`s; see [Dependency overrides](#dependency-overrides).
+>
 > **Upgrading from 9.0.0 or 9.0.0-1?** `9.0.3` is the same upstream ML Kit
 > 9.0.0 build, repackaged. Since 9.0.1, text recognition, pose detection and
 > selfie segmentation ship their models at all, a single product can be adopted
@@ -67,7 +71,7 @@ Xcode project, and make sure they land in **Copy Bundle Resources** of your app
 target.
 
 ```bash
-./scripts/download_bundles.sh 9.0.3
+./scripts/download_bundles.sh 9.0.4
 ```
 
 | Bundle | Needed by |
@@ -95,6 +99,10 @@ target.
 under the name ML Kit nests inside its own framework, which is what releases
 before 9.0.1 shipped. Add whichever your build already refers to; adding both
 is harmless.
+
+Since 9.0.4 the bundles of the two pods built from source are published too:
+`GoogleToolboxForMac_Privacy.bundle`, `GoogleToolboxForMac_Logger_Privacy.bundle`
+and `SSZipArchive.bundle`.
 
 A missing bundle shows up as a runtime throw — text recognition, for example,
 raises `MLKTextRecognizerInternalErrorCreationFailure` with "Invalid model
@@ -140,9 +148,24 @@ dropped Rosetta simulators — so on Apple Silicon the published XCFrameworks
 used to be unusable in the Simulator entirely.
 
 Since 9.0.1 the arm64 simulator slice is synthesised from the device slice by
-rewriting the Mach-O platform (`scripts/postprocess_xcframeworks.rb`).
+rewriting the Mach-O platform (done by `swiftpods package` since 9.0.4).
 Published XCFrameworks carry `arm64` for iphoneos and `arm64` + `x86_64` for
 iphonesimulator, so no `EXCLUDED_ARCHS` workaround is needed.
+
+## Dependency overrides
+
+Two Google dependencies are declared wider than the ML Kit pods accept, in
+`Podfile.swift` with `overridingPodRequirements: .unsafe(reason:)`, because
+current Firebase needs them:
+
+- `gtm-session-fetcher` `3.5.0..<6.0.0` (the pods require `>= 3.3.2, < 4.0`);
+  the ABI was checked by hand for Firebase 13 (#124, #125).
+- `nanopb` `2.30910.0..<2.30911.0` (the pods require `~> 3.30910.0`);
+  Firebase 13.1.1 requires `2.30910.1`, a fork commit of the pods' `2.30910.0`.
+
+The generated `Package.swift` starts with one `#warning` per override, which
+`swift package resolve` prints when it evaluates the manifest. It is expected
+and does not need action.
 
 ## Known limitations
 
@@ -156,14 +179,14 @@ iphonesimulator, so no `EXCLUDED_ARCHS` workaround is needed.
 - **Digital ink recognition and entity extraction download their models at
   runtime** from Google, so they ship no bundled model and need network access
   the first time you use them.
-- **The wrapper version is not the pod version.** `9.0.3` repackages upstream
+- **The wrapper version is not the pod version.** Major and minor follow ML
+  Kit; the patch number counts wrapper releases. `9.0.4` repackages upstream
   ML Kit `9.0.0`; the pod versions each framework reports are Google's own.
 
 ## Example app
 
 ```bash
-git submodule update --init
-./scripts/download_bundles.sh 9.0.3
+./scripts/download_bundles.sh 9.0.4
 cd Example && open Example.xcworkspace
 ```
 
@@ -172,16 +195,17 @@ Silicon Simulator, and exercises every module.
 
 ## Maintaining this package
 
-The build is driven by the `Makefile`; `CLAUDE.md` explains the pipeline stage
-by stage and `AUTOMATION.md` covers the release automation.
+The package is built by [swiftpods](https://github.com/d-date/swiftpods) from
+`Podfile.swift`. `swiftpods package` builds the pods, writes every
+`*.xcframework.zip` and `*.bundle.zip` to `build/distribution/`, regenerates
+`Package.swift` (do not edit it by hand) and links every product on its own.
+`CLAUDE.md` and `AUTOMATION.md` have the details.
 
 ```bash
-git submodule update --init          # xcframework-maker
-make run                             # build everything into GoogleMLKit/
-make verify                          # module lists, Info.plists, product closure
-./scripts/verify_runtime.sh          # slices, Info.plists, symbol table
-./scripts/verify_local_archive.sh    # run ML Kit on the Simulator, archive for device
+swiftpods package --version <version>        # build into build/distribution/, regenerate Package.swift
+./scripts/verify_local_archive.sh            # run ML Kit on the Simulator, archive for device
 ./scripts/verify_app_store_upload.sh --upload   # Apple-side validation and delivery
+scripts/release.sh <version>                 # create the GitHub Release and upload the zips
 ```
 
 `verify_local_archive.sh` is the gate that matters: it runs inference on the
@@ -190,11 +214,8 @@ model bundle reached the app and that nothing was linked dynamically. A missing
 model bundle builds and archives perfectly and only fails when inference runs,
 so build-time checks alone are not enough.
 
-To pick up a new upstream ML Kit version:
-
-```bash
-ruby scripts/check_mlkit_version.rb
-./scripts/build_all.sh <version>
-```
-
-Or run the **Build MLKit XCFrameworks** workflow from the Actions tab.
+To pick up a new upstream ML Kit version, raise the `GoogleMLKit/*`
+requirements in `Podfile.swift`, run `swiftpods update`, and release with the
+ML Kit major.minor (`ruby scripts/check_mlkit_version.rb` reports whether one
+is out). Normally run the **Build MLKit XCFrameworks** workflow from the
+Actions tab; it packages, commits, tags and calls `scripts/release.sh`.

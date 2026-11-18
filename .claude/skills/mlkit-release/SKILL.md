@@ -16,12 +16,12 @@ app, because it links every product at once.
 
 | Symptom | Mechanism | Check with |
 | --- | --- | --- |
-| `Undefined symbols … _OBJC_CLASS_$_MLKXeno*` when adopting one product | The `.library` product omits a transitive framework. A product links only the targets it lists. | `ruby scripts/check_product_closure.rb` |
-| `MLKTextRecognizerInternalErrorCreationFailure "Invalid model path."` | The module's model bundle was never published. `Pods/<module>/Resources/<Name>/` is the full list; ten of them exist only there, not nested in any framework | `ls GoogleMLKit/*.bundle` against `ls -d Pods/*/Resources/*/`, and `./scripts/verify_local_archive.sh` |
-| A framework binary that is ~33KB in the app | The framework binary is a bare Mach-O object, so Xcode relinks it as a dylib and dead-strips the data | `file GoogleMLKit/<name>.xcframework/*/<name>.framework/<name>` — must say `ar archive` |
+| `Undefined symbols … _OBJC_CLASS_$_MLKXeno*` when adopting one product | The `.library` product omits a transitive framework. A product links only the targets it lists. | `swiftpods package` links every product on its own and fails on this |
+| `MLKTextRecognizerInternalErrorCreationFailure "Invalid model path."` | The module's model bundle is missing from the app (or, in `CameraTests`, from the test bundle) | `ls build/distribution/*.bundle.zip`, the release assets, and `./scripts/verify_local_archive.sh` |
+| A framework binary that is ~33KB in the app | The framework binary is a bare Mach-O object, so Xcode relinks it as a dylib and dead-strips the data | `file build/distribution/<name>.xcframework/*/<name>.framework/<name>` — must say `ar archive` |
 | `ITMS-91065: Missing signature` on upload | A framework bundle on Apple's commonly-used-SDK list is embedded in the app. Xcode embeds a stub bundle for every static framework bundle it links. | `./scripts/verify_local_archive.sh` |
 | Cannot build for the Simulator on Apple Silicon | The simulator slice has no arm64. Xcode 26 dropped Rosetta simulators, so an x86_64-only slice is unusable. | `lipo -archs` on the simulator slice |
-| `Invalid MinimumOSVersion … is ''` (90530) on upload | A `Resources/*-Info.plist` template is missing the key; the templates ship verbatim into consumers' apps | `ruby scripts/verify_build.rb` |
+| `Invalid MinimumOSVersion … is ''` (90530) on upload | A framework `Info.plist` is missing the key; it ships verbatim into consumers' apps. swiftpods generates the plists | `plutil -p` on the framework's `Info.plist` in `build/distribution/` |
 
 Reports about **missing dSYMs** are expected and harmless: Google ships no
 DWARF, the frameworks are static, and their symbols land in the consumer's own
@@ -29,23 +29,22 @@ dSYM. Close with that explanation.
 
 ## Triage: dependency PRs
 
-- `Package.swift` dependency pins are **generated** from `Podfile.lock` by
-  `scripts/update_package_dependencies.rb`. `renovate.json` disables the `swift`
-  manager for the root `Package.swift`; close any PR that still slips through,
-  and never merge one that breaks a pod constraint. The one deliberate
-  exception is `GTMSessionFetcher`, widened to `..<6.0.0` for Firebase 13
-  (issue #124) -- see `UPPER_BOUND_OVERRIDES` in that script.
-- Ruby major upgrades are blocked on purpose: Ruby 4.0 broke CocoaPods on the
-  macOS runners.
+- `Package.swift` is **generated** by `swiftpods package` from `Podfile.swift`
+  and `Podfile.lock`. `renovate.json` disables the `swift` manager for the root
+  `Package.swift`; close any PR that still slips through, and never merge one
+  that breaks a pod constraint. The two deliberate exceptions are declared in
+  `Podfile.swift` with `overridingPodRequirements: .unsafe(reason:)` and show
+  up as `#warning`s at the top of `Package.swift`: `gtm-session-fetcher`
+  `3.5.0..<6.0.0` for Firebase 13 (#124, #125) and `nanopb`
+  `2.30910.0..<2.30911.0` (Firebase 13.1.1 needs the `2.30910.1` fork commit).
 - Anything touching `Example/` only is safe to merge on a green CI run.
 
 ## Fix, then verify before publishing
 
 ```bash
-make run                            # full pipeline into GoogleMLKit/
-make verify                         # closure + artifacts + Package.swift parse
-./scripts/verify_runtime.sh         # slices, Info.plists, symbol table
-./scripts/verify_local_archive.sh   # runs ML Kit on the Simulator, archives for device
+swiftpods package --version <version>   # build into build/distribution/, regenerate Package.swift, link every product
+swift package dump-package > /dev/null
+./scripts/verify_local_archive.sh       # runs ML Kit on the Simulator, archives for device
 ./scripts/verify_app_store_upload.sh --upload   # Apple-side validation and delivery
 ```
 
@@ -87,21 +86,24 @@ Four things cost time the first time round; they are worth knowing:
   while `asc auth login` keeps it in the keychain. The script stages a copy and
   removes it afterwards.
 
-To reproduce a consumer's single-product setup, the static closure check is
-enough — do not rely on the Example app.
+To reproduce a consumer's single-product setup, rely on the per-product link
+check of `swiftpods package`, not on the Example app.
 
 ## Publish
 
+Versions: major.minor follow ML Kit, the patch number counts wrapper
+releases. To bump ML Kit, raise the `GoogleMLKit/*` requirements in
+`Podfile.swift` and run `swiftpods update` first.
+
 ```bash
-ruby scripts/update_version.rb <version>      # only when bumping the pod version
-gh release create <version> --prerelease      # prerelease when the tag has a suffix
-./scripts/upload_release.sh <version>         # uploads *.xcframework.zip and *.bundle.zip
-ruby scripts/update_checksums.rb <version>    # rewrites Package.swift URLs + SHA256s
-swift package dump-package > /dev/null
+scripts/release.sh <version>    # swiftpods package, then stops until the tag exists
+git add Podfile.swift Podfile.lock Package.swift Sources/Common/export.swift
+git commit -m "Release <version>" && git tag <version> && git push origin HEAD <version>
+scripts/release.sh --skip-package <version>   # creates the release, uploads the zips
 ```
 
-Prefer the **Build MLKit XCFrameworks** workflow for a normal version bump; do
-it locally only when the pipeline itself changed, since that is what needs
+Prefer the **Build MLKit XCFrameworks** workflow, which does the same; do it
+locally only when the build itself changed, since that is what needs
 verifying. Resource bundles must be uploaded too — consumers add them by hand,
 and `scripts/download_bundles.sh` fetches them from the release.
 
@@ -110,6 +112,6 @@ manual steps it still requires (bundles, `-ObjC -all_load`).
 
 ## When adding a module
 
-`Podfile` → `Resources/<Name>-Info.plist` → `MLKIT_MODULES` in the `Makefile` →
-`Package.swift` (`.binaryTarget` plus product wiring). Everything else derives
-from those. Finish with `ruby scripts/check_product_closure.rb`.
+Add the `GoogleMLKit/<Subspec>` pod to `Podfile.swift`, run `swiftpods update`
+and `swiftpods package`. Products, binary targets and bundles derive from the
+pod graph; never edit `Package.swift` by hand.
