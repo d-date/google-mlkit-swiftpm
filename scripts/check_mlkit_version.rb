@@ -49,13 +49,13 @@ def fetch_latest_mlkit_version
   end
 end
 
-# Get current version from Podfile
+# Get current version from Podfile.swift
 def get_current_version
-  podfile = File.read('Podfile')
-  if podfile =~ /pod\s+'GoogleMLKit\/BarcodeScanning',\s+'~>\s+([0-9.]+)'/
+  podfile = File.read('Podfile.swift')
+  if podfile =~ /\.pod\(name:\s*"GoogleMLKit\/BarcodeScanning",\s*"~>\s*([0-9.]+)"\)/
     return $1
   end
-  raise "Could not parse version from Podfile"
+  raise "Could not parse version from Podfile.swift"
 end
 
 # Main execution

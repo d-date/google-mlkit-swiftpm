@@ -1,7 +1,4 @@
 PODS:
-  - GoogleDataTransport (10.1.0):
-    - nanopb (~> 3.30910.0)
-    - PromisesObjC (~> 2.4)
   - GoogleMLKit/BarcodeScanning (9.0.0):
     - GoogleMLKit/MLKitCore
     - MLKitBarcodeScanning (~> 8.0.0)
@@ -68,16 +65,6 @@ PODS:
     - GoogleToolboxForMac/Defines (= 4.2.1)
   - GoogleToolboxForMac/StringEncoding (4.2.1):
     - GoogleToolboxForMac/Defines (= 4.2.1)
-  - GoogleUtilities/Environment (8.1.0):
-    - GoogleUtilities/Privacy
-  - GoogleUtilities/Logger (8.1.0):
-    - GoogleUtilities/Environment
-    - GoogleUtilities/Privacy
-  - GoogleUtilities/Privacy (8.1.0)
-  - GoogleUtilities/UserDefaults (8.1.0):
-    - GoogleUtilities/Logger
-    - GoogleUtilities/Privacy
-  - GTMSessionFetcher/Core (3.5.0)
   - MLImage (1.0.0-beta8)
   - MLKitBarcodeScanning (8.0.0):
     - MLKitCommon (~> 14.0)
@@ -193,12 +180,6 @@ PODS:
   - MLKitXenoCommon (1.0.0-beta16):
     - MLKitCommon (~> 14.0)
     - MLKitVision (~> 10.0)
-  - nanopb (3.30910.0):
-    - nanopb/decode (= 3.30910.0)
-    - nanopb/encode (= 3.30910.0)
-  - nanopb/decode (3.30910.0)
-  - nanopb/encode (3.30910.0)
-  - PromisesObjC (2.4.0)
   - SSZipArchive (2.6.0)
 
 DEPENDENCIES:
@@ -224,11 +205,8 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
-    - GoogleDataTransport
     - GoogleMLKit
     - GoogleToolboxForMac
-    - GoogleUtilities
-    - GTMSessionFetcher
     - MLImage
     - MLKitBarcodeScanning
     - MLKitCommon
@@ -260,16 +238,11 @@ SPEC REPOS:
     - MLKitVision
     - MLKitVisionKit
     - MLKitXenoCommon
-    - nanopb
-    - PromisesObjC
     - SSZipArchive
 
 SPEC CHECKSUMS:
-  GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleMLKit: b1eee21a41c57704fe72483b15c85cb2c0cd7444
   GoogleToolboxForMac: d1a2cbf009c453f4d6ded37c105e2f67a32206d8
-  GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
-  GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   MLImage: 0de5c6c2bf9e93b80ef752e2797f0836f03b58c0
   MLKitBarcodeScanning: 39de223e7b1b8a8fbf10816a536dd292d8a39343
   MLKitCommon: 47d47b50a031d00db62f1b0efe5a1d8b09a3b2e6
@@ -301,10 +274,40 @@ SPEC CHECKSUMS:
   MLKitVision: 39a5a812db83c4a0794445088e567f3631c11961
   MLKitVisionKit: 316cd349468797ef4e7fd785bf658ca838984de3
   MLKitXenoCommon: 1a4268c1222a6043047af5bb9435028206c63287
-  nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
-  PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   SSZipArchive: 8a6ee5677c8e304bebc109e39cf0da91ccef22ea
 
-PODFILE CHECKSUM: 454b6f435eb27f5a04ff8ba16faf15b6968a1d0d
+SWIFT PACKAGES:
+  https://github.com/firebase/nanopb.git:
+    pods:
+      - nanopb
+    requirement: "(< 2.30911.0, >= 2.30910.0)"
+    revision: 3851d94a41890dea16dc3db34caf60e585cb4163
+    version: 2.30910.1
+  https://github.com/google/GoogleDataTransport.git:
+    pods:
+      - GoogleDataTransport
+    requirement: "(< 10.1.2, >= 10.1.0)"
+    revision: ba3358d3c3dbae8ef230b58a46b97ad65e84e974
+    version: 10.1.1
+  https://github.com/google/GoogleUtilities.git:
+    pods:
+      - GoogleUtilities
+    requirement: "(< 8.1.6, >= 8.1.0)"
+    revision: 5459ee5603def3db0fe14ca522185f42c48d978e
+    version: 8.1.5
+  https://github.com/google/gtm-session-fetcher.git:
+    pods:
+      - GTMSessionFetcher
+    requirement: "(< 6.0.0, >= 3.5.0)"
+    revision: 724a52eea6329b7e12d3ad8300d76ca9f3895fcc
+    version: 5.3.1
+  https://github.com/google/promises.git:
+    pods:
+      - PromisesObjC
+    requirement: "(< 2.4.2, >= 2.4.0)"
+    revision: f4a19a3c313dc2616c70bb49d29a799fb16be837
+    version: 2.4.1
+
+PODFILE CHECKSUM: c394012b0a9f4a24b8e544e9cf7a0aa7d745131b
 
 COCOAPODS: 1.17.0
