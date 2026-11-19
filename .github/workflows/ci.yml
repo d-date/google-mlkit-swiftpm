@@ -16,7 +16,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.4.12'
+          ruby-version: '3.4.13'
 
       # `ruby -c a.rb b.rb` and `bash -n a.sh b.sh` check only the first file
       # (the rest become arguments), so check each file on its own.
