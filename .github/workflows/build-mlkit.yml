@@ -36,8 +36,6 @@ jobs:
           xcode-version: latest-stable
 
       # swiftpods needs Swift 6.4, newer than the Swift in macos-26's Xcode.
-      # The action also exports TOOLCHAINS, so swiftpods' `xcrun swiftc` for
-      # Podfile.swift resolves to this toolchain along with the macOS SDK.
       - name: Set up Swift
         uses: tryswift/setup-swift@v1
         with:
@@ -59,6 +57,18 @@ jobs:
           echo "swiftpods $(git -C "$src" rev-parse HEAD)"
           swift build -c release --product swiftpods --package-path "$src"
           echo "SWIFTPODS=$(swift build -c release --show-bin-path --package-path "$src")/swiftpods" >> "$GITHUB_ENV"
+
+      # setup-swift exports TOOLCHAINS, which xcodebuild would also pick up and
+      # then fail to link package manifests with. Keep the toolchain to
+      # Podfile.swift: compile it through a wrapper that selects the toolchain
+      # (xcrun adds the macOS SDK), and drop TOOLCHAINS for the steps after this one.
+      - name: Scope the Swift toolchain to Podfile.swift
+        run: |
+          wrapper="$RUNNER_TEMP/swiftpods-swiftc"
+          printf '#!/bin/bash\nexec env TOOLCHAINS=%q xcrun --sdk macosx swiftc "$@"\n' "$TOOLCHAINS" > "$wrapper"
+          chmod +x "$wrapper"
+          echo "SWIFTPODS_SWIFTC=$wrapper" >> "$GITHUB_ENV"
+          echo "TOOLCHAINS=" >> "$GITHUB_ENV"
 
       - name: Build the XCFrameworks and Package.swift
         run: '"$SWIFTPODS" package --version "$VERSION"'
