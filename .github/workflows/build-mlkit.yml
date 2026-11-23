@@ -21,9 +21,7 @@ env:
 
 jobs:
   build:
-    # Swift 6.4 ships with Xcode 27, which GitHub only provides on the
-    # xcode-27 image (public preview); macos-26 stops at Xcode 26.6 (Swift 6.3).
-    runs-on: xcode-27
+    runs-on: macos-26
 
     steps:
       - name: Checkout repository
@@ -31,11 +29,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      # swiftpods needs Xcode with Swift 6.4.
+      # Xcode supplies the iOS SDKs and build tools.
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '27.2'
+          xcode-version: latest-stable
+
+      # swiftpods needs Swift 6.4, newer than the Swift in macos-26's Xcode.
+      - name: Set up Swift
+        id: swift
+        uses: tryswift/setup-swift@v1
+        with:
+          swift-version: '6.4.2'
+
+      # Compile Podfile.swift with the same toolchain instead of Xcode's swiftc.
+      - name: Use the Swift toolchain for manifests
+        run: echo "SWIFTPODS_SWIFTC=${{ steps.swift.outputs.swift-path }}/swiftc" >> "$GITHUB_ENV"
 
       - name: Validate version
         run: |
