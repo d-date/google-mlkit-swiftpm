@@ -36,15 +36,12 @@ jobs:
           xcode-version: latest-stable
 
       # swiftpods needs Swift 6.4, newer than the Swift in macos-26's Xcode.
+      # The action also exports TOOLCHAINS, so swiftpods' `xcrun swiftc` for
+      # Podfile.swift resolves to this toolchain along with the macOS SDK.
       - name: Set up Swift
-        id: swift
         uses: tryswift/setup-swift@v1
         with:
           swift-version: '6.4.2'
-
-      # Compile Podfile.swift with the same toolchain instead of Xcode's swiftc.
-      - name: Use the Swift toolchain for manifests
-        run: echo "SWIFTPODS_SWIFTC=${{ steps.swift.outputs.swift-path }}/swiftc" >> "$GITHUB_ENV"
 
       - name: Validate version
         run: |
