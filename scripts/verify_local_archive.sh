@@ -58,7 +58,7 @@ restore() {
 trap restore EXIT
 
 echo "==> Pointing Package.swift at local XCFrameworks"
-ruby scripts/use_local_binaries.rb
+swift scripts/use_local_binaries.swift
 
 echo "==> Refreshing the resource bundles the Example app carries"
 # SwiftPM cannot carry a bundle inside a binary target, so the Example app

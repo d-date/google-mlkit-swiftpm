@@ -34,7 +34,7 @@ releases (`9.0.4` repackages ML Kit `9.0.0`). The ML Kit version itself is the `
 
 - **Trigger:** Daily at 9:00 UTC (or manually via workflow_dispatch)
 - **Purpose:** Compares the latest GoogleMLKit version on CocoaPods with the requirement in `Podfile.swift`
-  (`scripts/check_mlkit_version.rb`)
+  (`scripts/check_mlkit_version.swift`)
 - **Action:** Creates a GitHub issue if a new version is found
 
 ### 2. Build MLKit XCFrameworks (Manual)
@@ -52,7 +52,7 @@ releases (`9.0.4` repackages ML Kit `9.0.0`). The ML Kit version itself is the `
 
 ### 3. CI
 
-**File:** `.github/workflows/ci.yml` — on every PR and push to `main`: Ruby and shell syntax of `scripts/`,
+**File:** `.github/workflows/ci.yml` — on every PR and push to `main`: type-checks the Swift scripts and checks shell syntax in `scripts/`,
 and `swift package dump-package`.
 
 ## Manual Usage
@@ -60,7 +60,7 @@ and `swift package dump-package`.
 ### Check for Updates
 
 ```bash
-ruby scripts/check_mlkit_version.rb
+swift scripts/check_mlkit_version.swift
 ```
 
 ### Move to a New ML Kit Version
@@ -119,7 +119,7 @@ You can configure this in: **Settings → Actions → General → Workflow permi
 
 ### Version Check Fails
 
-If `check_mlkit_version.rb` fails to fetch version info:
+If `check_mlkit_version.swift` fails to fetch version info:
 
 - The script uses the CocoaPods Trunk API (`https://trunk.cocoapods.org/api/v1/pods/GoogleMLKit`)
 - Check your internet connection

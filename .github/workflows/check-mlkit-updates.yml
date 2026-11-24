@@ -23,16 +23,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4.12'
-
       - name: Check for MLKit updates
         id: check
         run: |
           cd ${{ github.workspace }}
-          output=$(ruby scripts/check_mlkit_version.rb)
+          output=$(swift scripts/check_mlkit_version.swift)
           echo "$output"
 
           # Extract values from output

@@ -216,6 +216,6 @@ so build-time checks alone are not enough.
 
 To pick up a new upstream ML Kit version, raise the `GoogleMLKit/*`
 requirements in `Podfile.swift`, run `swiftpods update`, and release with the
-ML Kit major.minor (`ruby scripts/check_mlkit_version.rb` reports whether one
+ML Kit major.minor (`swift scripts/check_mlkit_version.swift` reports whether one
 is out). Normally run the **Build MLKit XCFrameworks** workflow from the
 Actions tab; it packages, commits, tags and calls `scripts/release.sh`.

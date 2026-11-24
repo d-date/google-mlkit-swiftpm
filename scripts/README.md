@@ -33,14 +33,14 @@ committed, tagged and pushed. Locally, commit `Podfile.swift`, `Podfile.lock`,
 `Package.swift` and `Sources/Common/export.swift`, tag and push before the
 upload step.
 
-## check_mlkit_version.rb
+## check_mlkit_version.swift
 
 Checks for new ML Kit versions on CocoaPods. Used by
 `.github/workflows/check-mlkit-updates.yml`.
 
 **Usage:**
 ```bash
-ruby scripts/check_mlkit_version.rb
+swift scripts/check_mlkit_version.swift
 ```
 
 **Output:**
@@ -57,7 +57,7 @@ Downloads the resource bundles of a release into
 ./scripts/download_bundles.sh <version>
 ```
 
-## use_local_binaries.rb
+## use_local_binaries.swift
 
 Rewrites every `.binaryTarget` in `Package.swift` to point at
 `build/distribution/*.xcframework` instead of a release asset, so the package
@@ -86,5 +86,5 @@ script for the account setup it needs.
 
 - Xcode with Swift 6.4 and swiftpods (for `release.sh` without `--skip-package`)
 - GitHub CLI (`gh`), authenticated, for `release.sh`
-- Ruby (standard library only) for the `.rb` scripts
+- Swift (Xcode's toolchain) for the `.swift` scripts
 - `asc` for `verify_app_store_upload.sh`

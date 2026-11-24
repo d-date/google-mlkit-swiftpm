@@ -9,12 +9,6 @@
       "matchManagers": ["swift"],
       "matchFileNames": ["Package.swift"],
       "enabled": false
-    },
-    {
-      "description": "Ruby is pinned to 3.x on purpose: Ruby 4.0 broke CocoaPods on the macOS runners (regression in PR #86).",
-      "matchPackageNames": ["ruby"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
     }
   ]
 }
