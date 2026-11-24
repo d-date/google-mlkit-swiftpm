@@ -53,7 +53,8 @@ func latestVersion() async throws -> String {
             guard (200 ..< 300).contains(status) else {
                 throw CheckError(message: "Failed to fetch MLKit version info: HTTP \(status)")
             }
-            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+            // Malformed JSON is a bad response, not a crash: report it like any other check error.
+            guard let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
                   let versions = json["versions"] as? [[String: Any]]
             else { throw CheckError(message: "Unexpected response from the CocoaPods Trunk API") }
             let latest = versions.compactMap { $0["name"] as? String }
@@ -88,8 +89,9 @@ do {
     print("Error: \(error.message)")
     print("UPDATE_AVAILABLE=false")
     print("Warning: Treating network error as 'no update available' to avoid failing on transient issues")
-} catch let error as CheckError {
-    print("Error: \(error.message)")
+} catch {
+    // Anything else is a real failure; still print the line the workflow parses.
+    print("Error: \((error as? CheckError)?.message ?? String(describing: error))")
     print("UPDATE_AVAILABLE=false")
     exit(1)
 }
