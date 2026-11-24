@@ -7,11 +7,17 @@ on:
 
 jobs:
   validate:
-    runs-on: macos-26
+    # Type checks, shell syntax and manifest parsing need no Xcode.
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
+
+      - name: Set up Swift
+        uses: tryswift/setup-swift@v1
+        with:
+          swift-version: '6.4.2'
 
       # `bash -n a.sh b.sh` checks only the first file (the rest become
       # arguments), so check each file on its own.

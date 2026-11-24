@@ -9,6 +9,9 @@
 // Usage: swift scripts/check_mlkit_version.swift
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking  // URLSession on Linux
+#endif
 
 let environment = ProcessInfo.processInfo.environment
 let maxRetries = environment["MLKIT_MAX_RETRIES"].flatMap(Int.init) ?? 3
