@@ -14,7 +14,8 @@ concurrency:
 
 jobs:
   check-updates:
-    runs-on: macos-latest
+    # Only fetches JSON from the CocoaPods Trunk API; no macOS needed.
+    runs-on: ubuntu-latest
     outputs:
       update_available: ${{ steps.check.outputs.update_available }}
       new_version: ${{ steps.check.outputs.new_version }}
@@ -23,16 +24,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Set up Swift
+        uses: tryswift/setup-swift@v1
         with:
-          ruby-version: '3.4.12'
+          swift-version: '6.4.2'
 
       - name: Check for MLKit updates
         id: check
         run: |
           cd ${{ github.workspace }}
-          output=$(ruby scripts/check_mlkit_version.rb)
+          output=$(swift scripts/check_mlkit_version.swift)
           echo "$output"
 
           # Extract values from output

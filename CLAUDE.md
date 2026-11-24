@@ -24,11 +24,11 @@ Versions: major.minor follow ML Kit, the patch number counts wrapper releases (`
 
 ### Inspect / verify
 
-- `./scripts/verify_local_archive.sh` — the pre-release gate. Repoints `Package.swift` at `build/distribution/` (via `scripts/use_local_binaries.rb`), unpacks the bundle zips into `build/bundles/`, **runs ML Kit on the arm64 Simulator** (`CameraTests`), **launches the app** there, archives for device, and asserts every model bundle reached the app, nothing ITMS-scanned is embedded, nothing is linked dynamically and the model data survived. The runtime steps are the only ones that catch a missing model bundle or a bad simulator slice — a linking check cannot.
+- `./scripts/verify_local_archive.sh` — the pre-release gate. Repoints `Package.swift` at `build/distribution/` (via `scripts/use_local_binaries.swift`), unpacks the bundle zips into `build/bundles/`, **runs ML Kit on the arm64 Simulator** (`CameraTests`), **launches the app** there, archives for device, and asserts every model bundle reached the app, nothing ITMS-scanned is embedded, nothing is linked dynamically and the model data survived. The runtime steps are the only ones that catch a missing model bundle or a bad simulator slice — a linking check cannot.
 - `./scripts/verify_app_store_upload.sh [--upload]` — archives with distribution signing, exports an App Store IPA, validates it with Apple and optionally delivers it. ITMS-91065 is raised by App Store Connect's post-upload processing, not by a local export or by `altool --validate-app`, so confirming that class of problem needs the `--upload` run.
 - `swift package dump-package` — validate `Package.swift` (CI runs this too)
-- `ruby scripts/check_mlkit_version.rb` — compare the latest GoogleMLKit on the CocoaPods Trunk API with the requirement in `Podfile.swift`
-- `ruby scripts/use_local_binaries.rb` — repoint every `binaryTarget` at `build/distribution/*.xcframework`; undo with `git checkout Package.swift`
+- `swift scripts/check_mlkit_version.swift` — compare the latest GoogleMLKit on the CocoaPods Trunk API with the requirement in `Podfile.swift`
+- `swift scripts/use_local_binaries.swift` — repoint every `binaryTarget` at `build/distribution/*.xcframework`; undo with `git checkout Package.swift`
 
 ### Example app
 
@@ -40,7 +40,7 @@ Versions: major.minor follow ML Kit, the patch number counts wrapper releases (`
 
 - `Build MLKit XCFrameworks` (`.github/workflows/build-mlkit.yml`) — manual `workflow_dispatch` with `version` and `create_release` inputs. Builds swiftpods from d-date/swiftpods at `SWIFTPODS_REF` (`main` until a tag is pinned), runs `swiftpods package`, commits `Podfile.swift`/`Podfile.lock`/`Package.swift`/`Sources/Common/export.swift` if changed, tags, pushes, and runs `scripts/release.sh --skip-package`. Preferred over local builds for shipping a version.
 - `Check MLKit Updates` (`.github/workflows/check-mlkit-updates.yml`) — daily cron at 09:00 UTC. Opens an issue when CocoaPods has a newer version.
-- `CI` (`.github/workflows/ci.yml`) — runs on every PR: Ruby/shell syntax of each script and `swift package dump-package`.
+- `CI` (`.github/workflows/ci.yml`) — runs on every PR: type-checks the Swift scripts, checks shell syntax and `swift package dump-package`.
 
 ## What `Podfile.swift` sets
 
@@ -74,4 +74,4 @@ Versions: major.minor follow ML Kit, the patch number counts wrapper releases (`
 
 - iOS 15.5+ (from `Podfile.swift`); `Package.swift` is generated.
 - No new third-party dependencies without asking first.
-- Ruby scripts use the standard library only; there is no Gemfile.
+- Swift scripts run with `swift scripts/<name>.swift` and use Foundation only; the repository needs no Ruby.

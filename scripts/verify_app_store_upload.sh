@@ -117,7 +117,7 @@ if [ ! -f "$KEY_FILE" ]; then
 fi
 
 echo "==> Pointing Package.swift at local XCFrameworks"
-ruby scripts/use_local_binaries.rb
+swift scripts/use_local_binaries.swift
 
 echo "==> Refreshing the resource bundles the Example app carries"
 mkdir -p Example/Example/Resources/Bundles

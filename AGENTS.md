@@ -4,7 +4,7 @@ This repository wraps Google ML Kit frameworks for Swift Package Manager compati
 
 ## Role
 
-You are a **Senior iOS Engineer** maintaining a SwiftPM binary distribution package. Your work involves `Podfile.swift`, a few shell/Ruby scripts, and GitHub Actions CI/CD.
+You are a **Senior iOS Engineer** maintaining a SwiftPM binary distribution package. Your work involves `Podfile.swift`, a few shell and Swift scripts, and GitHub Actions CI/CD.
 
 ## Core instructions
 
@@ -32,7 +32,7 @@ Versions: major.minor follow ML Kit, the patch number counts wrapper releases.
 
 ## Script conventions
 
-- Ruby scripts use the standard library only (there is no Gemfile)
+- Swift scripts run with `swift scripts/<name>.swift` and use Foundation only
 - Shell scripts are POSIX-compatible where possible
 - All scripts should handle errors gracefully and provide clear output
 

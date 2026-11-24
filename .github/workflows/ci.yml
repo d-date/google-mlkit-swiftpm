@@ -7,21 +7,22 @@ on:
 
 jobs:
   validate:
-    runs-on: macos-26
+    # Type checks, shell syntax and manifest parsing need no Xcode.
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Set up Swift
+        uses: tryswift/setup-swift@v1
         with:
-          ruby-version: '3.4.12'
+          swift-version: '6.4.2'
 
-      # `ruby -c a.rb b.rb` and `bash -n a.sh b.sh` check only the first file
-      # (the rest become arguments), so check each file on its own.
-      - name: Check Ruby syntax
-        run: for f in scripts/*.rb; do ruby -c "$f" || exit 1; done
+      # `bash -n a.sh b.sh` checks only the first file (the rest become
+      # arguments), so check each file on its own.
+      - name: Type-check Swift scripts
+        run: for f in scripts/*.swift; do swiftc -typecheck "$f" || exit 1; done
 
       - name: Check shell syntax
         run: for f in scripts/*.sh; do bash -n "$f" || exit 1; done
